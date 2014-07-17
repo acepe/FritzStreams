@@ -18,7 +18,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Calendar;
 
-import de.acepe.fritzstreams.util.Config;
 import de.acepe.fritzstreams.util.FileFormat;
 import de.acepe.fritzstreams.util.UrlFormat;
 

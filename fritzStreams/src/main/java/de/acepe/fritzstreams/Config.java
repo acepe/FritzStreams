@@ -1,4 +1,4 @@
-package de.acepe.fritzstreams.util;
+package de.acepe.fritzstreams;
 
 import java.text.SimpleDateFormat;
 import java.util.Locale;

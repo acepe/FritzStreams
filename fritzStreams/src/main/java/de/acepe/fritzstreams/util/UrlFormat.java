@@ -3,6 +3,7 @@ package de.acepe.fritzstreams.util;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
+import de.acepe.fritzstreams.Config;
 import de.acepe.fritzstreams.Stream;
 
 public class UrlFormat {
