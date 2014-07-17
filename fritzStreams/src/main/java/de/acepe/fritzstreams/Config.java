@@ -6,7 +6,9 @@ import java.util.Locale;
 public class Config {
     public static final Locale GERMANY = Locale.GERMANY;
 
-    public static final SimpleDateFormat URL_DAY_OF_WEEK_FORMAT = new SimpleDateFormat("EEEE", GERMANY);
+    public static final String DAY_OF_WEEK_FORMAT = "EEEE";
+    public static final SimpleDateFormat URL_DAY_OF_WEEK_FORMAT = new SimpleDateFormat(DAY_OF_WEEK_FORMAT, GERMANY);
+
     public static final java.lang.String URL_DATE_FORMAT = "yyyyMMdd";
     public static final java.lang.String URLYEAR_FORMAT = "yyyy";
 

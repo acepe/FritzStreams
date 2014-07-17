@@ -112,7 +112,7 @@ public class DownloadTask extends AsyncTask<Void, Void, Void> {
     }
 
     private Notification createNotification(String title, String text) {
-        Intent intent = new Intent(context, DateChooser.class);
+        Intent intent = new Intent(context, MainActivity.class);
         PendingIntent pIntent = PendingIntent.getActivity(context, 0, intent, 0);
 
         Notification noti = new Notification.Builder(context).setContentTitle(title)
