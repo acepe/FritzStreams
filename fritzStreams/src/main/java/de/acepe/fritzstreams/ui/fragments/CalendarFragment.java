@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.CalendarView;
 import android.widget.TextView;
 
@@ -12,25 +13,37 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
 import de.acepe.fritzstreams.Config;
+import de.acepe.fritzstreams.DownloadTask;
 import de.acepe.fritzstreams.R;
+import de.acepe.fritzstreams.backend.Streams;
 
 public class CalendarFragment extends Fragment {
 
     private CalendarView mCalendarView;
-    private TextView mDayOfWeekLabel;
-    private TextView mStream1;
-    private TextView mStream2;
+    private TextView mDayOfWeek;
+    private TextView mNightflight;
+    private TextView mSoundgarden;
+    private Button mBtnDownloadNightflight;
+    private Button mBtnDownloadSoundgarden;
+    private Streams mStreams;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_date_chooser, container, false);
 
         mCalendarView = (CalendarView) view.findViewById(R.id.calendarView);
-        mDayOfWeekLabel = (TextView) view.findViewById(R.id.dayOfWeekLabel);
-        mStream1 = (TextView) view.findViewById(R.id.streamFirst);
-        mStream2 = (TextView) view.findViewById(R.id.streamSecond);
+        mDayOfWeek = (TextView) view.findViewById(R.id.dayOfWeekLabel);
+        mNightflight = (TextView) view.findViewById(R.id.streamFirst);
+        mSoundgarden = (TextView) view.findViewById(R.id.streamSecond);
+        mBtnDownloadNightflight = (Button) view.findViewById(R.id.buttonDownloadNightflight);
+        mBtnDownloadSoundgarden = (Button) view.findViewById(R.id.buttonDownloadSoundgarden);
 
+        mBtnDownloadNightflight.setOnClickListener(oclDownload);
+        mBtnDownloadSoundgarden.setOnClickListener(oclDownload);
         mCalendarView.setOnDateChangeListener(odclCalendar);
+
+        mStreams = new Streams();
+
         updateLabels(Calendar.getInstance());
 
         return view;
@@ -40,9 +53,9 @@ public class CalendarFragment extends Fragment {
         SimpleDateFormat sdf = new SimpleDateFormat(Config.DAY_OF_WEEK_FORMAT);
         String dayOfWeek = sdf.format(cal.getTime());
 
-        mDayOfWeekLabel.setText(dayOfWeek);
-        mStream1.setText(getFirstStream(cal));
-        mStream2.setText(getSecondStream(cal));
+        mDayOfWeek.setText(dayOfWeek);
+        mNightflight.setText(mStreams.getStream(Streams.Stream.nightflight, cal));
+        mSoundgarden.setText(mStreams.getStream(Streams.Stream.soundgarden, cal));
     }
 
     private CalendarView.OnDateChangeListener odclCalendar = new CalendarView.OnDateChangeListener() {
@@ -55,47 +68,28 @@ public class CalendarFragment extends Fragment {
         }
     };
 
-    private static CharSequence getFirstStream(Calendar cal) {
-        int dayOfWeek = cal.get(Calendar.DAY_OF_WEEK);
-        switch (dayOfWeek) {
-            case Calendar.MONDAY:
-                return "Rock";
-            case Calendar.TUESDAY:
-                return "House";
-            case Calendar.WEDNESDAY:
-                return "Club/Rap";
-            case Calendar.THURSDAY:
-                return "Club";
-            case Calendar.FRIDAY:
-                return "Rock";
-            case Calendar.SATURDAY:
-                return "Club";
-            case Calendar.SUNDAY:
-                return "Remix/Club";
-            default:
-                throw new RuntimeException("Unknown day of week");
+    private View.OnClickListener oclDownload = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            switch (v.getId()){
+                case R.id.buttonDownloadNightflight:
+                    download(Streams.Stream.nightflight);
+                    break;
+                case R.id.buttonDownloadSoundgarden:
+                    download(Streams.Stream.soundgarden);
+                    break;
+            }
         }
+    };
+
+    private void download(Streams.Stream stream) {
+        long selected = mCalendarView.getDate();
+        Calendar cal = Calendar.getInstance();
+        cal.setTimeInMillis(selected);
+
+        new DownloadTask(getActivity(), cal, stream).execute();
     }
 
-    private static CharSequence getSecondStream(Calendar cal) {
-        int dayOfWeek = cal.get(Calendar.DAY_OF_WEEK);
-        switch (dayOfWeek) {
-            case Calendar.MONDAY:
-                return "International";
-            case Calendar.TUESDAY:
-                return "Club";
-            case Calendar.WEDNESDAY:
-                return "Rap";
-            case Calendar.THURSDAY:
-                return "Stahlwerk";
-            case Calendar.FRIDAY:
-                return "Urban";
-            case Calendar.SATURDAY:
-                return "Club";
-            case Calendar.SUNDAY:
-                return "Rock";
-            default:
-                throw new RuntimeException("Unknown day of week");
-        }
-    }
+
+
 }

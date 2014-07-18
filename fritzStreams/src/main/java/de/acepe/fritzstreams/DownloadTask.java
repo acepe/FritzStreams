@@ -18,25 +18,21 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Calendar;
 
+import de.acepe.fritzstreams.backend.Streams;
 import de.acepe.fritzstreams.util.FileFormat;
 import de.acepe.fritzstreams.util.UrlFormat;
 
 public class DownloadTask extends AsyncTask<Void, Void, Void> {
 
     private final Context context;
-    private final Calendar cal;
-
-    private final Stream stream;
 
     private final String fileName;
     private final String outFileFLV;
     private final String outFileMP3;
     private final String url;
 
-    public DownloadTask(Context context, Calendar cal, Stream stream) {
+    public DownloadTask(Context context, Calendar cal, Streams.Stream stream) {
         this.context = context;
-        this.cal = cal;
-        this.stream = stream;
 
         fileName = FileFormat.getFileName(cal, stream);
         outFileFLV = FileFormat.getPathForFLVFile(fileName);
@@ -86,6 +82,7 @@ public class DownloadTask extends AsyncTask<Void, Void, Void> {
                             Log.d("ffmpeg", "Success file:" + outFile.getPath());
                         }
                     }
+                    //noinspection ResultOfMethodCallIgnored
                     new File(outFileFLV).delete();
                 }
             });
@@ -115,12 +112,11 @@ public class DownloadTask extends AsyncTask<Void, Void, Void> {
         Intent intent = new Intent(context, MainActivity.class);
         PendingIntent pIntent = PendingIntent.getActivity(context, 0, intent, 0);
 
-        Notification noti = new Notification.Builder(context).setContentTitle(title)
+        return new Notification.Builder(context).setContentTitle(title)
                                                              .setContentText(text)
                                                              .setSmallIcon(R.drawable.ic_launcher)
                                                              .setContentIntent(pIntent)
                                                              .build();
-        return noti;
     }
 
 

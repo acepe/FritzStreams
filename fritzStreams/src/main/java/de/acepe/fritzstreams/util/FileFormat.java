@@ -7,11 +7,11 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
 import de.acepe.fritzstreams.Config;
-import de.acepe.fritzstreams.Stream;
+import de.acepe.fritzstreams.backend.Streams;
 
 public class FileFormat {
 
-    public static String getFileName(Calendar cal, Stream stream) {
+    public static String getFileName(Calendar cal, Streams.Stream stream) {
         SimpleDateFormat dateFormat = new SimpleDateFormat(Config.FILE_DATE_FORMAT, Config.GERMANY);
         String fileTemplate = getFileTemplate(stream);
         String dayOfWeek = Config.URL_DAY_OF_WEEK_FORMAT.format(cal.getTime()).toLowerCase(Config.GERMANY);
@@ -19,8 +19,8 @@ public class FileFormat {
         return String.format(fileTemplate, dayOfWeek, date);
     }
 
-    public static String getFileTemplate(Stream stream) {
-        return stream == Stream.nightflight ? Config.FILE_NIGHTFLIGHT_FORMAT : Config.FILE_SOUNDGARDEN_FORMAT;
+    public static String getFileTemplate(Streams.Stream stream) {
+        return stream == Streams.Stream.nightflight ? Config.FILE_NIGHTFLIGHT_FORMAT : Config.FILE_SOUNDGARDEN_FORMAT;
     }
 
     public static String getPathForFLVFile(String fileName) {

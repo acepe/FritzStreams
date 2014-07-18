@@ -8,6 +8,7 @@ import android.widget.CalendarView;
 import java.util.Calendar;
 import java.util.Locale;
 
+import de.acepe.fritzstreams.backend.Streams;
 import de.acepe.fritzstreams.ui.fragments.CalendarFragment;
 
 public class MainActivity extends Activity {
@@ -31,7 +32,7 @@ public class MainActivity extends Activity {
         Calendar cal = Calendar.getInstance(GERMANY);
         cal.setTimeInMillis(selected);
 
-        new DownloadTask(this, cal, Stream.nightflight).execute();
+        new DownloadTask(this, cal, Streams.Stream.nightflight).execute();
     }
 
     public void downloadSecond(@SuppressWarnings("unused") View view) {
@@ -40,7 +41,7 @@ public class MainActivity extends Activity {
         Calendar cal = Calendar.getInstance(GERMANY);
         cal.setTimeInMillis(selected);
 
-        new DownloadTask(this, cal, Stream.soundgarden).execute();
+        new DownloadTask(this, cal, Streams.Stream.soundgarden).execute();
     }
 
 

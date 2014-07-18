@@ -55,7 +55,7 @@
                 android:layout_weight="1" />
 
             <Button
-                android:id="@+id/buttonDownloadFirst"
+                android:id="@+id/buttonDownloadNightflight"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:onClick="downloadFirst"
@@ -87,7 +87,7 @@
                 android:layout_weight="1" />
 
             <Button
-                android:id="@+id/buttonDownloadSecond"
+                android:id="@+id/buttonDownloadSoundgarden"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:onClick="downloadSecond"

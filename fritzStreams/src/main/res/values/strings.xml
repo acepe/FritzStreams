@@ -8,5 +8,21 @@
     <string name="downloading_notification_title">Downloading stream</string>
     <string name="converting_notification_title">Converting stream</string>
     <string name="finished_notification_title">Download complete</string>
+    
+    <string name="nightflight_monday">Rock</string>
+    <string name="nightflight_tuesday">House</string>
+    <string name="nightflight_wednesday">Club/Rap</string>
+    <string name="nightflight_thursday">Club</string>
+    <string name="nightflight_friday">Rock</string>
+    <string name="nightflight_saturday">Club</string>
+    <string name="nightflight_sunday">Remix/Club</string>
+    
+    <string name="soundgarden_monday">International</string>
+    <string name="soundgarden_tuesday">Club</string>
+    <string name="soundgarden_wednesday">Rap</string>
+    <string name="soundgarden_thursday">Stahlwerk</string>
+    <string name="soundgarden_friday">Urban</string>
+    <string name="soundgarden_saturday">Club</string>
+    <string name="soundgarden_sunday">Rock</string>
 
 </resources>
