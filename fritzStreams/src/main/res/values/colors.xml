@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="yellow_fritz">#ffd500</color>
+    <color name="yellow">#bffff30c</color>
+
+    <color name="red_fritz">#e80007</color>
+    <color name="red_brighter">#6eff1800</color>
+    <color name="selected_week">#6eff9214</color>
+
+    <color name="black">#000000</color>
+    <color name="white">#ffffff</color>
+
+</resources>

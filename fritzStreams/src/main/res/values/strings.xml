@@ -25,4 +25,9 @@
     <string name="soundgarden_saturday">Club</string>
     <string name="soundgarden_sunday">Rock</string>
 
+    <string-array name="navigation_array">
+        <item>Calendar</item>
+        <item>Downloads</item>
+        <item>Settings</item>
+    </string-array>
 </resources>

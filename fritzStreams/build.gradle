@@ -4,6 +4,11 @@ android {
     compileSdkVersion 17
     buildToolsVersion "20"
 
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_7
+        targetCompatibility JavaVersion.VERSION_1_7
+    }
+
     defaultConfig {
         applicationId "de.acepe.fritzstreams"
         minSdkVersion 16

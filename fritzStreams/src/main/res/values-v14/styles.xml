@@ -1,12 +1,21 @@
 <resources>
 
-    <!--
-        Base application theme for API 14+. This theme completely replaces
-        AppBaseTheme from BOTH res/values/styles.xml and
-        res/values-v11/styles.xml on API 14+ devices.
-    -->
-    <style name="AppBaseTheme" parent="android:Theme.Holo.Light.DarkActionBar">
-        <!-- API 14 theme customizations can go here. -->
+    <style name="FritzAppTheme" parent="@android:style/Theme.Holo.Light">
+        <item name="android:actionBarStyle">@style/MyActionBarTheme</item>
+        <item name="android:calendarViewStyle">@style/Widget.CalendarView.Custom</item>
+    </style>
+
+    <style name="Widget.CalendarView.Custom" parent="android:Widget.CalendarView">
+        <item name="android:focusedMonthDateColor">@color/red_fritz</item>
+        <item name="android:unfocusedMonthDateColor">@color/red_brighter</item>
+        <item name="android:weekNumberColor">@color/red_brighter</item>
+        <item name="android:selectedWeekBackgroundColor">@color/yellow_fritz</item>
+
+    </style>
+
+    <style name="MyActionBarTheme" parent="@android:style/Widget.Holo.Light.ActionBar">
+        <item name="android:background">@color/yellow_fritz</item>
+        <item name="android:textColor">@color/red_fritz</item>
     </style>
 
 </resources>
