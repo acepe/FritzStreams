@@ -8,7 +8,6 @@
     <string name="downloading_notification_title">Downloading stream</string>
     <string name="converting_notification_title">Converting stream</string>
     <string name="finished_notification_title">Download complete</string>
-    
     <string name="nightflight_monday">Rock</string>
     <string name="nightflight_tuesday">House</string>
     <string name="nightflight_wednesday">Club/Rap</string>
@@ -16,7 +15,6 @@
     <string name="nightflight_friday">Rock</string>
     <string name="nightflight_saturday">Club</string>
     <string name="nightflight_sunday">Remix/Club</string>
-    
     <string name="soundgarden_monday">International</string>
     <string name="soundgarden_tuesday">Club</string>
     <string name="soundgarden_wednesday">Rap</string>
@@ -30,4 +28,13 @@
         <item>Downloads</item>
         <item>Settings</item>
     </string-array>
+
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="pref_dl_wifi_only">Wifi only</string>
+    <string name="pref_dl_wifi_only_summary">Download stream only if connected to wifi network</string>
+    <string name="pref_dl_dir">Set download folder</string>
+    <string name="file_dialog_set_dir">Select directory</string>
+    <string name="dialog_close">Close</string>
+    <string name="download_noti_not_mounted">No storage device found!</string>
+
 </resources>

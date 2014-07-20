@@ -2,7 +2,7 @@ apply plugin: 'android'
 
 android {
     compileSdkVersion 17
-    buildToolsVersion "20"
+    buildToolsVersion '20'
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_7
@@ -37,4 +37,5 @@ dependencies {
     compile project(':androidffmpeglibrary')
     compile 'com.android.support:appcompat-v7:20.+'
     compile files('src/main/libs/libdump.jar')
+
 }

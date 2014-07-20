@@ -42,7 +42,6 @@ public class CalendarFragment extends Fragment {
         mBtnDownloadSoundgarden.setOnClickListener(oclDownload);
 
         mCalendarView.setOnDateChangeListener(odclCalendar);
-        mCalendarView.setMaxDate(Calendar.getInstance().getTime().getTime());
 
         mStreams = new Streams();
 

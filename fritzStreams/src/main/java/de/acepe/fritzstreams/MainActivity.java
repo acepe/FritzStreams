@@ -16,6 +16,7 @@ import android.widget.ListView;
 import java.util.LinkedList;
 
 import de.acepe.fritzstreams.ui.fragments.CalendarFragment;
+import de.acepe.fritzstreams.ui.fragments.SettingsFragment;
 
 public class MainActivity extends Activity {
 
@@ -41,6 +42,7 @@ public class MainActivity extends Activity {
         setContentView(R.layout.main_activity);
 
         mFragments.add(new CalendarFragment());
+        mFragments.add(new SettingsFragment());
 
         mDrawerList = (ListView) findViewById(R.id.left_drawer);
         mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
@@ -114,13 +116,13 @@ public class MainActivity extends Activity {
                         mLastPosition = position;
                         break;
                     case DOWNLOADS:
-                        ft.replace(R.id.content_frame, mFragments.get(0)).commit();
+                        ft.replace(R.id.content_frame, mFragments.get(0)).addToBackStack(null).commit();
                         mCurrentFragment = 0;
                         mLastPosition = position;
                         break;
                     case SETTINGS:
-                        ft.replace(R.id.content_frame, mFragments.get(0)).commit();
-                        mCurrentFragment = 0;
+                        ft.replace(R.id.content_frame, mFragments.get(1)).addToBackStack(null).commit();
+                        mCurrentFragment = 1;
                         mLastPosition = position;
                         break;
                     default:
