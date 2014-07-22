@@ -1,5 +1,8 @@
 package de.acepe.fritzstreams.ui.fragments;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+
 import android.app.Fragment;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -8,13 +11,9 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CalendarView;
 import android.widget.TextView;
-
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-
 import de.acepe.fritzstreams.Config;
-import de.acepe.fritzstreams.DownloadTask;
 import de.acepe.fritzstreams.R;
+import de.acepe.fritzstreams.backend.DownloadTask;
 import de.acepe.fritzstreams.backend.Streams;
 
 public class CalendarFragment extends Fragment {
@@ -72,7 +71,7 @@ public class CalendarFragment extends Fragment {
     private View.OnClickListener oclDownload = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            switch (v.getId()){
+            switch (v.getId()) {
                 case R.id.buttonDownloadNightflight:
                     download(Streams.Stream.nightflight);
                     break;
@@ -90,7 +89,5 @@ public class CalendarFragment extends Fragment {
 
         new DownloadTask(getActivity(), cal, stream).execute();
     }
-
-
 
 }

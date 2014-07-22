@@ -36,5 +36,6 @@
     <string name="file_dialog_set_dir">Select directory</string>
     <string name="dialog_close">Close</string>
     <string name="download_noti_not_mounted">No storage device found!</string>
+    <string name="failed_notification_title">Download cancelled!</string>
 
 </resources>
