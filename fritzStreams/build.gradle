@@ -11,11 +11,13 @@ android {
 
     defaultConfig {
         applicationId "de.acepe.fritzstreams"
-        minSdkVersion 16
-        targetSdkVersion 17
+        minSdkVersion 15
+        targetSdkVersion 20
 
         ndk {
-            moduleName "librtmp"
+            moduleName "dump"
+            cFlags "-D__STDC_CONSTANT_MACROS -DNO_CRYPTO -DRTMPDUMP_VERSION=\\\"v2.4\\\""
+            ldLibs "log"
         }
     }
 
@@ -28,14 +30,14 @@ android {
     sourceSets {
         main {
             jniLibs.srcDirs = ['jniLibs']
-            jni.srcDirs = [] //disable automatic ndk-build
+            // jni.srcDirs = [] //disable automatic ndk-build
         }
     }
 
 }
 dependencies {
     compile project(':androidffmpeglibrary')
+    compile project(':RtmpDump')
     compile 'com.android.support:appcompat-v7:20.+'
-    compile files('src/main/libs/libdump.jar')
 
 }

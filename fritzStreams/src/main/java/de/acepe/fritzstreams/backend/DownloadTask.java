@@ -139,7 +139,7 @@ public class DownloadTask extends AsyncTask<Void, Void, Void> {
                                                 .setContentText(text)
                                                 .setSmallIcon(R.drawable.ic_launcher)
                                                 .setContentIntent(pIntent)
-                                                .build();
+                                                .getNotification();
     }
 
 }
