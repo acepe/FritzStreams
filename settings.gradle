@@ -1,0 +1,3 @@
+include ':fritzStreams'
+include ':androidffmpeglibrary'
+include ':RtmpDump'

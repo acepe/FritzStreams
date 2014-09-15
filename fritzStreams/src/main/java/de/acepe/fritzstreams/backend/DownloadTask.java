@@ -59,13 +59,23 @@ public class DownloadTask extends AsyncTask<Void, Void, Void> {
     protected Void doInBackground(Void... commands) {
         String command = String.format(Config.RTMP_DUMP_FORMAT, url, outFileFLV);
 
+        downloadFLV(command);
+
+        convertToMp3();
+
+        return null;
+    }
+
+    private void downloadFLV(String command) {
         showNotification(R.string.downloading_notification_title, fileName);
         mWifiLock.acquire();
 
         Log.i(TAG_RTMPDUMP, "downloading: " + command);
         Rtmpdump dump = new Rtmpdump();
         dump.parseString(command);
+    }
 
+    private void convertToMp3() {
         showNotification(R.string.converting_notification_title, fileName);
         FfmpegController fc;
         try {
@@ -106,8 +116,10 @@ public class DownloadTask extends AsyncTask<Void, Void, Void> {
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
         }
+    }
 
-        return null;
+    public static void append(String message) {
+        Log.i(TAG_RTMPDUMP, "message");
     }
 
     @Override
