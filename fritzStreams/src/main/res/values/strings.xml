@@ -7,7 +7,9 @@
     <string name="download">Download</string>
     <string name="downloading_notification_title">Downloading stream</string>
     <string name="converting_notification_title">Converting stream</string>
-    <string name="finished_notification_title">Download complete</string>
+    <string name="finished_notification_title">Converting finished</string>
+    <string name="download_failed_notification_title">Download failed</string>
+    <string name="download_succeeded_notification_title">Download completed</string>
     <string name="nightflight_monday">Rock</string>
     <string name="nightflight_tuesday">House</string>
     <string name="nightflight_wednesday">Club/Rap</string>

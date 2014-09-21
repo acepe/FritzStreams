@@ -227,6 +227,7 @@ void RTMP_LogStatus(const char *format, ...)
 
 	fprintf(fmsg, "%s", str);
 	//printf(str);
+	callback_handler(str);
 	fflush(fmsg);
 	neednl = 1;
 }

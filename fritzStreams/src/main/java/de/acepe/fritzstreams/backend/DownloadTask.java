@@ -2,13 +2,7 @@ package de.acepe.fritzstreams.backend;
 
 import static android.net.wifi.WifiManager.WIFI_MODE_FULL_HIGH_PERF;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.Calendar;
-
-import org.ffmpeg.android.Clip;
-import org.ffmpeg.android.FfmpegController;
-import org.ffmpeg.android.ShellUtils.ShellCallback;
 
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -17,6 +11,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
+import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
 import com.schriek.rtmpdump.Rtmpdump;
@@ -24,29 +19,34 @@ import com.schriek.rtmpdump.Rtmpdump;
 import de.acepe.fritzstreams.Config;
 import de.acepe.fritzstreams.MainActivity;
 import de.acepe.fritzstreams.R;
-import de.acepe.fritzstreams.util.FileFormat;
+import de.acepe.fritzstreams.util.DownloadFileUtil;
 import de.acepe.fritzstreams.util.UrlFormat;
 
-public class DownloadTask extends AsyncTask<Void, Void, Void> {
+public class DownloadTask extends AsyncTask<Void, Void, Boolean> {
+
+    public interface Callback {
+        void onDownloadFinished(boolean succeeded);
+    }
 
     private final static String TAG = "DownloadTask";
-    private static final String TAG_FFMPEG = "ffmpeg";
     private static final String TAG_RTMPDUMP = "RtmpDump";
 
     private final Context context;
+    private Callback callback;
     private final String fileName;
     private final String outFileFLV;
-    private final String outFileMP3;
     private final String url;
 
     private WifiManager.WifiLock mWifiLock;
 
-    public DownloadTask(Context context, Calendar cal, Streams.Stream stream) {
+    public DownloadTask(Context context, Calendar cal, Streams.Stream stream, Callback callback) {
         this.context = context;
+        this.callback = callback;
 
-        fileName = FileFormat.getFileName(cal, stream);
-        outFileFLV = FileFormat.getPathForFLVFile(fileName);
-        outFileMP3 = FileFormat.getPathForMP3File(fileName);
+        DownloadFileUtil downloadFileUtil = new DownloadFileUtil(context);
+        fileName = downloadFileUtil.fileBaseName(cal, stream);
+        outFileFLV = downloadFileUtil.pathForFLVFile(fileName);
+
         url = UrlFormat.getUrl(cal, stream);
 
         WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
@@ -56,66 +56,17 @@ public class DownloadTask extends AsyncTask<Void, Void, Void> {
     }
 
     @Override
-    protected Void doInBackground(Void... commands) {
+    protected Boolean doInBackground(Void... commands) {
         String command = String.format(Config.RTMP_DUMP_FORMAT, url, outFileFLV);
 
-        downloadFLV(command);
-
-        convertToMp3();
-
-        return null;
-    }
-
-    private void downloadFLV(String command) {
         showNotification(R.string.downloading_notification_title, fileName);
         mWifiLock.acquire();
 
         Log.i(TAG_RTMPDUMP, "downloading: " + command);
         Rtmpdump dump = new Rtmpdump();
         dump.parseString(command);
-    }
 
-    private void convertToMp3() {
-        showNotification(R.string.converting_notification_title, fileName);
-        FfmpegController fc;
-        try {
-            final Clip inClip = new Clip(outFileFLV);
-            final File outFile = new File(outFileMP3);
-            final File inFile = new File(outFileFLV);
-            final long inSize = inFile.length();
-
-            File fileTmp = context.getApplicationContext().getCacheDir();
-            File fileAppRoot = new File(context.getApplicationContext().getApplicationInfo().dataDir);
-
-            fc = new FfmpegController(fileTmp, fileAppRoot);
-            fc.extractAudio(inClip, outFile, new ShellCallback() {
-                @Override
-                public void shellOut(String shellLine) {
-                    Log.i(TAG_FFMPEG, shellLine);
-                    long outSize = outFile.length();
-                    if (outSize > 0) {
-                        long frac = (long) (((float) outSize / (float) inSize) * 100);
-                        showNotification(R.string.converting_notification_title, frac + "%");
-                    }
-                }
-
-                @Override
-                public void processComplete(int exitValue) {
-                    if (exitValue != 0) {
-                        Log.e(TAG_FFMPEG, "Extraction error. FFmpeg failed");
-                        cancel(true);
-                    } else {
-                        if (outFile.exists()) {
-                            Log.d(TAG_FFMPEG, "Success file:" + outFile.getPath());
-                        }
-                    }
-                    // noinspection ResultOfMethodCallIgnored
-                    new File(outFileFLV).delete();
-                }
-            });
-        } catch (IOException | InterruptedException e) {
-            e.printStackTrace();
-        }
+        return true;
     }
 
     public static void append(String message) {
@@ -123,9 +74,12 @@ public class DownloadTask extends AsyncTask<Void, Void, Void> {
     }
 
     @Override
-    protected void onPostExecute(Void result) {
+    protected void onPostExecute(Boolean succeeded) {
         mWifiLock.release();
-        showNotification(R.string.finished_notification_title, fileName);
+        showNotification(succeeded
+                ? R.string.download_succeeded_notification_title
+                : R.string.download_failed_notification_title, fileName);
+        callback.onDownloadFinished(succeeded);
     }
 
     @Override
@@ -147,11 +101,11 @@ public class DownloadTask extends AsyncTask<Void, Void, Void> {
         Intent intent = new Intent(context, MainActivity.class);
         PendingIntent pIntent = PendingIntent.getActivity(context, 0, intent, 0);
 
-        return new Notification.Builder(context).setContentTitle(title)
-                                                .setContentText(text)
-                                                .setSmallIcon(R.drawable.ic_launcher)
-                                                .setContentIntent(pIntent)
-                                                .getNotification();
+        return new NotificationCompat.Builder(context).setContentTitle(title)
+                                                      .setContentText(text)
+                                                      .setSmallIcon(R.drawable.ic_launcher)
+                                                      .setContentIntent(pIntent)
+                                                      .build();
     }
 
 }

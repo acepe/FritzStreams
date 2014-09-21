@@ -134,6 +134,7 @@ void callback_handler(char *s) {
 		}
 		isAttached = true;
 	}
+    (*env)->PushLocalFrame(env, 5);
 
 	/* Construct a Java string */
 	jstring js = (*env)->NewStringUTF(env, s);
@@ -162,6 +163,9 @@ void callback_handler(char *s) {
 
 	if (isAttached)
 		(*sVm)->DetachCurrentThread(sVm);
+
+    (*env)->DeleteLocalRef(env, js);
+    (*env)->PopLocalFrame(env, NULL);
 }
 
 JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *jvm, void *reserved) {

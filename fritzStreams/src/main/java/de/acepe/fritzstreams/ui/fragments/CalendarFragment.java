@@ -13,7 +13,7 @@ import android.widget.CalendarView;
 import android.widget.TextView;
 import de.acepe.fritzstreams.Config;
 import de.acepe.fritzstreams.R;
-import de.acepe.fritzstreams.backend.DownloadTask;
+import de.acepe.fritzstreams.backend.StreamDownload;
 import de.acepe.fritzstreams.backend.Streams;
 
 public class CalendarFragment extends Fragment {
@@ -87,7 +87,7 @@ public class CalendarFragment extends Fragment {
         Calendar cal = Calendar.getInstance();
         cal.setTimeInMillis(selected);
 
-        new DownloadTask(getActivity(), cal, stream).execute();
+        new StreamDownload(getActivity()).downloadAndConvert(cal, stream);
     }
 
 }

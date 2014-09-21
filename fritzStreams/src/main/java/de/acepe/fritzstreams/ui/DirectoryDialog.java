@@ -1,5 +1,11 @@
 package de.acepe.fritzstreams.ui;
 
+import java.io.File;
+import java.io.FilenameFilter;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -7,26 +13,9 @@ import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.os.Environment;
 import android.util.Log;
-
-import java.io.File;
-import java.io.FilenameFilter;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Locale;
-
 import de.acepe.fritzstreams.R;
 
-
-public class FileDialog {
-
-    private static final String PARENT_DIR = "..";
-
-    private final String TAG = getClass().getName();
-
-    private String[] fileList;
-
-    private File currentPath;
+public class DirectoryDialog {
 
     public interface FileSelectedListener {
 
@@ -38,20 +27,20 @@ public class FileDialog {
         void directorySelected(File directory);
     }
 
-    private ListenerList<FileSelectedListener> fileListenerList
-            = new ListenerList<>();
-
-    private ListenerList<DirectorySelectedListener> dirListenerList
-            = new ListenerList<>();
+    private static final String TAG = DirectoryDialog.class.getName();
+    private static final String PARENT_DIR = "..";
 
     private final Activity activity;
 
-    private boolean selectDirectoryOption;
+    private ListenerList<FileSelectedListener> fileListenerList = new ListenerList<>();
+    private ListenerList<DirectorySelectedListener> dirListenerList = new ListenerList<>();
 
-    private String fileEndsWith;
+    private String[] fileList;
+    private File currentPath;
 
-    public FileDialog(Activity activity, File path) {
+    public DirectoryDialog(Activity activity, File path) {
         this.activity = activity;
+
         if (!path.exists()) {
             path = Environment.getExternalStorageDirectory();
         }
@@ -64,24 +53,21 @@ public class FileDialog {
      * @return file dialog
      */
     public Dialog createFileDialog() {
+
         AlertDialog.Builder builder = new AlertDialog.Builder(activity);
 
         builder.setTitle(currentPath.getPath());
-        if (selectDirectoryOption) {
-            builder.setPositiveButton(activity.getString(R.string.file_dialog_set_dir),
-                    new OnClickListener() {
-                        public void onClick(DialogInterface dialog, int which) {
-                            Log.d(TAG, currentPath.getPath());
-                            fireDirectorySelectedEvent(currentPath);
-                        }
-                    });
-            builder.setNegativeButton(activity.getString(R.string.dialog_close),
-                    new OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                        }
-                    });
-        }
+        builder.setPositiveButton(activity.getString(R.string.file_dialog_set_dir), new OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                Log.d(TAG, currentPath.getPath());
+                fireDirectorySelectedEvent(currentPath);
+            }
+        });
+        builder.setNegativeButton(activity.getString(R.string.dialog_close), new OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+            }
+        });
 
         builder.setItems(fileList, new OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
@@ -107,11 +93,6 @@ public class FileDialog {
         }
 
         return dialog;
-    }
-
-
-    public void setSelectDirectoryOption(boolean selectDirectoryOption) {
-        this.selectDirectoryOption = selectDirectoryOption;
     }
 
     public void addDirectoryListener(DirectorySelectedListener listener) {
@@ -148,25 +129,16 @@ public class FileDialog {
             FilenameFilter filter = new FilenameFilter() {
                 public boolean accept(File dir, String filename) {
                     File sel = new File(dir, filename);
-                    if (!sel.canRead()) {
-                        return false;
-                    }
-                    if (selectDirectoryOption) {
-                        return sel.isDirectory();
-                    } else {
-                        boolean endsWith = fileEndsWith == null | filename
-                                .toLowerCase(Locale.getDefault()).endsWith(fileEndsWith);
-                        return endsWith || sel.isDirectory();
-                    }
+                    return sel.canRead() && sel.isDirectory();
                 }
             };
             String[] fileList1 = path.list(filter);
             if (fileList1 != null) {
-                Collections.addAll(r,fileList1);
+                Collections.addAll(r, fileList1);
             }
         }
         Collections.sort(r);
-        fileList = r.toArray(new String[]{});
+        fileList = r.toArray(new String[r.size()]);
     }
 
     private File getChosenFile(String fileChosen) {
@@ -199,10 +171,12 @@ class ListenerList<L> {
         }
     }
 
+    @SuppressWarnings("UnusedDeclaration")
     public void remove(L listener) {
         listenerList.remove(listener);
     }
 
+    @SuppressWarnings("UnusedDeclaration")
     public List<L> getListenerList() {
         return listenerList;
     }

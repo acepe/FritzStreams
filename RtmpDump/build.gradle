@@ -1,0 +1,30 @@
+apply plugin: 'android-library'
+
+android {
+    compileSdkVersion 16
+    buildToolsVersion '20.0.0'
+
+    defaultConfig {
+        applicationId "com.schriek.rtmpdump"
+        minSdkVersion 14
+        targetSdkVersion 15
+
+        ndk {
+            moduleName "dump"
+            cFlags "-D__STDC_CONSTANT_MACROS -DNO_CRYPTO -DRTMPDUMP_VERSION=\\\"v2.4\\\""
+            ldLibs "log"
+        }
+
+    }
+
+    buildTypes {
+        release {
+            runProguard false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
+        }
+    }
+}
+
+dependencies {
+    compile 'com.android.support:support-v4:18.+'
+}
