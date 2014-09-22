@@ -38,6 +38,6 @@ android {
 dependencies {
     compile project(':androidffmpeglibrary')
     compile project(':RtmpDump')
+    compile project(':android-support-v4-preferencefragment')
     compile 'com.android.support:appcompat-v7:20.+'
-
 }
