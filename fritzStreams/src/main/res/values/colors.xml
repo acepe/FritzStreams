@@ -10,4 +10,10 @@
     <color name="black">#000000</color>
     <color name="white">#ffffff</color>
 
+    <color name="progress_start">#80ffd300</color>
+    <color name="progress_center">#80ffb600</color>
+    <color name="progress_end">#a0ffcb00</color>
+    <color name="progress_bg_start">#5A5A5A</color>
+    <color name="progress_bg_end">#6A6A6A</color>
+
 </resources>

@@ -22,15 +22,21 @@ import de.acepe.fritzstreams.util.DownloadFileUtil;
 
 public class ConvertTask extends AsyncTask<Void, Void, Void> {
 
+    public interface Callback {
+        void onConvertFinished(boolean succeeded);
+    }
+
     private static final String TAG_FFMPEG = "ffmpeg";
 
     private final Context context;
     private final String fileName;
     private final String outFileFLV;
     private final String outFileMP3;
+    private final Callback callback;
 
-    public ConvertTask(Context context, Calendar cal, Streams.Stream stream) {
+    public ConvertTask(Context context, Calendar cal, Streams.Stream stream, Callback callback) {
         this.context = context;
+        this.callback = callback;
 
         DownloadFileUtil downloadFileUtil = new DownloadFileUtil(context);
         fileName = downloadFileUtil.fileBaseName(cal, stream);
@@ -40,7 +46,10 @@ public class ConvertTask extends AsyncTask<Void, Void, Void> {
 
     @Override
     protected Void doInBackground(Void... commands) {
-        showNotification(R.string.converting_notification_title, fileName);
+        Notification notification = createNotification(context.getString(R.string.converting_notification_title),
+                                                       fileName,
+                                                       true);
+        showNotification(notification);
 
         final Clip inClip = new Clip(outFileFLV);
         final File outFile = new File(outFileMP3);
@@ -61,18 +70,14 @@ public class ConvertTask extends AsyncTask<Void, Void, Void> {
 
     @Override
     protected void onPostExecute(Void result) {
-        showNotification(R.string.finished_notification_title, fileName);
+        Notification notification = createNotification(context.getString(R.string.finished_notification_title),
+                                                       fileName,
+                                                       false);
+        showNotification(notification);
+        callback.onConvertFinished(true);
     }
 
-    private void showNotification(int downloadingNotificationTitle, String text) {
-        Notification notification = createNotification(context.getString(downloadingNotificationTitle), text);
-        notification.flags |= Notification.FLAG_AUTO_CANCEL;
-
-        NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-        notificationManager.notify(0, notification);
-    }
-
-    private Notification createNotification(String title, String text) {
+    private Notification createNotification(String title, String text, boolean ongoing) {
         Intent intent = new Intent(context, MainActivity.class);
         PendingIntent pIntent = PendingIntent.getActivity(context, 0, intent, 0);
 
@@ -80,7 +85,14 @@ public class ConvertTask extends AsyncTask<Void, Void, Void> {
                                                       .setContentText(text)
                                                       .setSmallIcon(R.drawable.ic_launcher)
                                                       .setContentIntent(pIntent)
+                                                      .setOngoing(ongoing)
                                                       .build();
+    }
+
+    private void showNotification(Notification notification) {
+        notification.flags |= Notification.FLAG_AUTO_CANCEL;
+        NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManager.notify(0, notification);
     }
 
     private class FFMpegCallback implements ShellCallback {
@@ -98,7 +110,10 @@ public class ConvertTask extends AsyncTask<Void, Void, Void> {
             long outSize = outFile.length();
             if (outSize > 0) {
                 long frac = (long) (((float) outSize / (float) inSize) * 100);
-                showNotification(R.string.converting_notification_title, frac + "%");
+                Notification notification = createNotification(context.getString(R.string.converting_notification_title),
+                                                               frac + "%",
+                                                               true);
+                showNotification(notification);
             }
         }
 

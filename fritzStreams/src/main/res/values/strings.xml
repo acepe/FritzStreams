@@ -40,4 +40,7 @@
     <string name="download_noti_not_mounted">No storage device found!</string>
     <string name="failed_notification_title">Download cancelled!</string>
 
+    <string name="downloads_empty">No downloads</string>
+    <string name="download_freespace">Free space</string>
+
 </resources>

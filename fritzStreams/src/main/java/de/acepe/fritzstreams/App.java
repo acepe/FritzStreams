@@ -1,9 +1,13 @@
 package de.acepe.fritzstreams;
 
 import java.text.SimpleDateFormat;
+import java.util.LinkedList;
 import java.util.Locale;
 
-public class Config {
+import android.app.Application;
+import de.acepe.fritzstreams.backend.StreamDownloader;
+
+public class App {
     public static final Locale GERMANY = Locale.GERMANY;
 
     public static final String DAY_OF_WEEK_FORMAT = "EEEE";
@@ -25,6 +29,10 @@ public class Config {
 
     public static final String RTMP_DUMP_FORMAT = "rtmpdump -r %s -o %s";
 
-    public static final String DEFAULT_DOWNLOAD_DIR = "FritzStreams";
     public static final String SP_DOWNLOAD_DIR = "pref_dl_dir";
+
+    public static Application mApp;
+
+    public static LinkedList<StreamDownloader> downloaders = new LinkedList<>();
+
 }

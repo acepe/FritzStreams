@@ -8,7 +8,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Environment;
 import android.preference.PreferenceManager;
-import de.acepe.fritzstreams.Config;
+import de.acepe.fritzstreams.App;
 import de.acepe.fritzstreams.backend.Streams;
 
 public class DownloadFileUtil {
@@ -20,19 +20,19 @@ public class DownloadFileUtil {
     }
 
     public String fileBaseName(Calendar cal, Streams.Stream stream) {
-        SimpleDateFormat dateFormat = new SimpleDateFormat(Config.FILE_DATE_FORMAT, Config.GERMANY);
+        SimpleDateFormat dateFormat = new SimpleDateFormat(App.FILE_DATE_FORMAT, App.GERMANY);
         String fileTemplate = getFileTemplate(stream);
-        String dayOfWeek = Config.URL_DAY_OF_WEEK_FORMAT.format(cal.getTime()).toLowerCase(Config.GERMANY);
+        String dayOfWeek = App.URL_DAY_OF_WEEK_FORMAT.format(cal.getTime()).toLowerCase(App.GERMANY);
         String date = dateFormat.format(cal.getTime());
         return String.format(fileTemplate, dayOfWeek, date);
     }
 
     public String getFileTemplate(Streams.Stream stream) {
-        return stream == Streams.Stream.nightflight ? Config.FILE_NIGHTFLIGHT_FORMAT : Config.FILE_SOUNDGARDEN_FORMAT;
+        return stream == Streams.Stream.nightflight ? App.FILE_NIGHTFLIGHT_FORMAT : App.FILE_SOUNDGARDEN_FORMAT;
     }
 
     public String pathForFLVFile(String fileName) {
-        return getPathWithoutExtension(fileName) + Config.FILE_EXTENSION_FLV;
+        return getPathWithoutExtension(fileName) + App.FILE_EXTENSION_FLV;
     }
 
     public String pathForMP3File(String fileName) {
@@ -47,8 +47,8 @@ public class DownloadFileUtil {
 
     private String getDownloadDir() {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-        String defaultPath = Environment.getExternalStorageDirectory() + File.separator + Config.DEFAULT_DOWNLOAD_DIR;
-        return sharedPreferences.getString(Config.SP_DOWNLOAD_DIR, defaultPath);
+        String defaultPath = Environment.DIRECTORY_MUSIC;
+        return sharedPreferences.getString(App.SP_DOWNLOAD_DIR, defaultPath);
     }
 
     private String getOutFileName(String outFileWithoutExtension) {
@@ -56,9 +56,7 @@ public class DownloadFileUtil {
     }
 
     private String getOutFileName(String outFileWithoutExtension, int count) {
-        String outFileName = outFileWithoutExtension
-                             + (count == 0 ? "" : "(" + count + ")")
-                             + Config.FILE_EXTENSION_MP3;
+        String outFileName = outFileWithoutExtension + (count == 0 ? "" : "(" + count + ")") + App.FILE_EXTENSION_MP3;
         final File outFile = new File(outFileName);
         if (outFile.exists())
             return getOutFileName(outFileWithoutExtension, ++count);

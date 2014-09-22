@@ -16,7 +16,7 @@ import android.util.Log;
 
 import com.schriek.rtmpdump.Rtmpdump;
 
-import de.acepe.fritzstreams.Config;
+import de.acepe.fritzstreams.App;
 import de.acepe.fritzstreams.MainActivity;
 import de.acepe.fritzstreams.R;
 import de.acepe.fritzstreams.util.DownloadFileUtil;
@@ -57,7 +57,7 @@ public class DownloadTask extends AsyncTask<Void, Void, Boolean> {
 
     @Override
     protected Boolean doInBackground(Void... commands) {
-        String command = String.format(Config.RTMP_DUMP_FORMAT, url, outFileFLV);
+        String command = String.format(App.RTMP_DUMP_FORMAT, url, outFileFLV);
 
         showNotification(R.string.downloading_notification_title, fileName);
         mWifiLock.acquire();

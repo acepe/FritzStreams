@@ -11,9 +11,9 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CalendarView;
 import android.widget.TextView;
-import de.acepe.fritzstreams.Config;
+import de.acepe.fritzstreams.App;
 import de.acepe.fritzstreams.R;
-import de.acepe.fritzstreams.backend.StreamDownload;
+import de.acepe.fritzstreams.backend.StreamDownloader;
 import de.acepe.fritzstreams.backend.Streams;
 
 public class CalendarFragment extends Fragment {
@@ -50,7 +50,7 @@ public class CalendarFragment extends Fragment {
     }
 
     private void updateLabels(Calendar cal) {
-        SimpleDateFormat sdf = new SimpleDateFormat(Config.DAY_OF_WEEK_FORMAT);
+        SimpleDateFormat sdf = new SimpleDateFormat(App.DAY_OF_WEEK_FORMAT);
         String dayOfWeek = sdf.format(cal.getTime());
 
         mDayOfWeek.setText(dayOfWeek);
@@ -87,7 +87,8 @@ public class CalendarFragment extends Fragment {
         Calendar cal = Calendar.getInstance();
         cal.setTimeInMillis(selected);
 
-        new StreamDownload(getActivity()).downloadAndConvert(cal, stream);
+        StreamDownloader streamDownloader = new StreamDownloader(getActivity(), cal, stream);
+        streamDownloader.downloadAndConvert();
     }
 
 }

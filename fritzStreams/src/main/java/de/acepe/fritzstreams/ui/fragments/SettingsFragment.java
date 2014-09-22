@@ -9,7 +9,7 @@ import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.widget.Toast;
-import de.acepe.fritzstreams.Config;
+import de.acepe.fritzstreams.App;
 import de.acepe.fritzstreams.R;
 import de.acepe.fritzstreams.ui.DirectoryDialog;
 
@@ -28,21 +28,21 @@ public class SettingsFragment extends PreferenceFragment {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
 
         // Create dialog
-        String defaultPath = Environment.getExternalStorageDirectory() + File.separator + Config.DEFAULT_DOWNLOAD_DIR;
-        String path = sharedPreferences.getString(Config.SP_DOWNLOAD_DIR, defaultPath);
+        String defaultPath = Environment.DIRECTORY_MUSIC;
+        String path = sharedPreferences.getString(App.SP_DOWNLOAD_DIR, defaultPath);
 
         mDirectoryDialog = new DirectoryDialog(getActivity(), new File(path));
         mDirectoryDialog.addDirectoryListener(new DirectoryDialog.DirectorySelectedListener() {
             public void directorySelected(File directory) {
                 SharedPreferences.Editor editor = getPreferenceScreen().getSharedPreferences().edit();
-                editor.putString(Config.SP_DOWNLOAD_DIR, directory.getAbsolutePath());
+                editor.putString(App.SP_DOWNLOAD_DIR, directory.getAbsolutePath());
                 editor.commit();
 
                 mDownloadDir.setSummary(directory.getAbsolutePath());
             }
         });
 
-        mDownloadDir = getPreferenceScreen().findPreference(Config.SP_DOWNLOAD_DIR);
+        mDownloadDir = getPreferenceScreen().findPreference(App.SP_DOWNLOAD_DIR);
         mDownloadDir.setOnPreferenceClickListener(opclDownloadDir);
         mDownloadDir.setSummary(path);
     }
