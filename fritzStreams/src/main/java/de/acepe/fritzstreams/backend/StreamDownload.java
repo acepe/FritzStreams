@@ -10,7 +10,7 @@ public class StreamDownload implements DownloadTask.Callback, ConvertTask.Callba
 
     private String downloadedKB;
 
-    private enum State {
+    public enum State {
         waiting, downloading, converting, finished
     }
 
@@ -25,9 +25,6 @@ public class StreamDownload implements DownloadTask.Callback, ConvertTask.Callba
     }
 
     public void downloadAndConvert() {
-        App.downloaders.add(this);
-
-        // TODO: only one active download at the time, download next in list after task finished
         App.activeDownload = this;
         state = State.downloading;
         new DownloadTask(context, downloadInformation, this).execute();
@@ -55,6 +52,10 @@ public class StreamDownload implements DownloadTask.Callback, ConvertTask.Callba
         return localizedState;
     }
 
+    public State getState() {
+        return state;
+    }
+
     @Override
     public void onDownloadFinished(boolean succeeded) {
         if (succeeded) {
@@ -68,6 +69,9 @@ public class StreamDownload implements DownloadTask.Callback, ConvertTask.Callba
         state = State.finished;
         App.downloaders.remove(this);
         App.activeDownload = null;
-        // TODO: start next download, if any
+
+        if (!App.downloaders.isEmpty()) {
+            App.downloaders.get(0).downloadAndConvert();
+        }
     }
 }

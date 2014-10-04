@@ -48,10 +48,12 @@ public class DownloadAdapter extends ArrayAdapter<StreamDownload> {
         // downloadViewHolder.cancel.setOnClickListener(oclCancel);
         downloadViewHolder.cancel.setTag(downloader);
 
-        downloadViewHolder.progress.setIndeterminate(true);
-        // TODO: change when converting:
-        // downloadViewHolder.progress.setMax(100);
-        // downloadViewHolder.progress.setProgress(downloader.getCurrentProgress());
+        if (downloader.getState() == StreamDownload.State.downloading)
+            downloadViewHolder.progress.setIndeterminate(true);
+        else {
+            downloadViewHolder.progress.setMax(100);
+            downloadViewHolder.progress.setProgress(downloader.getCurrentProgress());
+        }
         downloadViewHolder.title.setText(downloader.getTitle());
         downloadViewHolder.subtitle.setText(downloader.getSubtitle());
 

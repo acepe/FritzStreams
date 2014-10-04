@@ -85,7 +85,13 @@ public class CalendarFragment extends Fragment {
         cal.setTimeInMillis(selected);
 
         StreamDownload streamDownload = new StreamDownload(getActivity(), cal, stream);
-        streamDownload.downloadAndConvert();
+        App.downloaders.add(streamDownload);
+        if (!isDownloadInProgress())
+            streamDownload.downloadAndConvert();
+    }
+
+    private boolean isDownloadInProgress() {
+        return App.activeDownload != null;
     }
 
 }
