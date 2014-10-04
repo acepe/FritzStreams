@@ -13,8 +13,8 @@ import android.widget.CalendarView;
 import android.widget.TextView;
 import de.acepe.fritzstreams.App;
 import de.acepe.fritzstreams.R;
-import de.acepe.fritzstreams.backend.StreamDownloader;
-import de.acepe.fritzstreams.backend.Streams;
+import de.acepe.fritzstreams.backend.Stream;
+import de.acepe.fritzstreams.backend.StreamDownload;
 
 public class CalendarFragment extends Fragment {
 
@@ -24,7 +24,6 @@ public class CalendarFragment extends Fragment {
     private TextView mSoundgarden;
     private Button mBtnDownloadNightflight;
     private Button mBtnDownloadSoundgarden;
-    private Streams mStreams;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -42,8 +41,6 @@ public class CalendarFragment extends Fragment {
 
         mCalendarView.setOnDateChangeListener(odclCalendar);
 
-        mStreams = new Streams();
-
         updateLabels(Calendar.getInstance());
 
         return view;
@@ -54,8 +51,8 @@ public class CalendarFragment extends Fragment {
         String dayOfWeek = sdf.format(cal.getTime());
 
         mDayOfWeek.setText(dayOfWeek);
-        mNightflight.setText(mStreams.getStream(Streams.Stream.nightflight, cal));
-        mSoundgarden.setText(mStreams.getStream(Streams.Stream.soundgarden, cal));
+        mNightflight.setText(Stream.nightflight.getStream(cal));
+        mSoundgarden.setText(Stream.soundgarden.getStream(cal));
     }
 
     private CalendarView.OnDateChangeListener odclCalendar = new CalendarView.OnDateChangeListener() {
@@ -73,22 +70,22 @@ public class CalendarFragment extends Fragment {
         public void onClick(View v) {
             switch (v.getId()) {
                 case R.id.buttonDownloadNightflight:
-                    download(Streams.Stream.nightflight);
+                    download(Stream.nightflight);
                     break;
                 case R.id.buttonDownloadSoundgarden:
-                    download(Streams.Stream.soundgarden);
+                    download(Stream.soundgarden);
                     break;
             }
         }
     };
 
-    private void download(Streams.Stream stream) {
+    private void download(Stream stream) {
         long selected = mCalendarView.getDate();
         Calendar cal = Calendar.getInstance();
         cal.setTimeInMillis(selected);
 
-        StreamDownloader streamDownloader = new StreamDownloader(getActivity(), cal, stream);
-        streamDownloader.downloadAndConvert();
+        StreamDownload streamDownload = new StreamDownload(getActivity(), cal, stream);
+        streamDownload.downloadAndConvert();
     }
 
 }

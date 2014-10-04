@@ -4,19 +4,16 @@ import java.util.Calendar;
 
 import de.acepe.fritzstreams.R;
 
-public class Streams {
+public enum Stream {
 
-    public static enum Stream {
-        soundgarden, nightflight
-    }
+    soundgarden, nightflight;
 
-    public int getStream(Stream stream, Calendar cal) {
-        if (stream == Stream.soundgarden)
+    public int getStream(Calendar cal) {
+        if (this == Stream.soundgarden)
             return getSoundgarden(cal);
 
         return getNightflight(cal);
     }
-
 
     private static int getSoundgarden(Calendar cal) {
         switch (cal.get(Calendar.DAY_OF_WEEK)) {
@@ -40,7 +37,7 @@ public class Streams {
     }
 
     private static int getNightflight(Calendar cal) {
-        switch ( cal.get(Calendar.DAY_OF_WEEK)) {
+        switch (cal.get(Calendar.DAY_OF_WEEK)) {
             case Calendar.MONDAY:
                 return R.string.nightflight_monday;
             case Calendar.TUESDAY:

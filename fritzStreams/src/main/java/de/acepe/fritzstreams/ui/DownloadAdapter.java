@@ -12,20 +12,20 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import de.acepe.fritzstreams.App;
 import de.acepe.fritzstreams.R;
-import de.acepe.fritzstreams.backend.StreamDownloader;
+import de.acepe.fritzstreams.backend.StreamDownload;
 
-public class DownloadAdapter extends ArrayAdapter<StreamDownloader> {
+public class DownloadAdapter extends ArrayAdapter<StreamDownload> {
 
     private final Context mContext;
 
-    public DownloadAdapter(Context context, int resource, List<StreamDownloader> data) {
+    public DownloadAdapter(Context context, int resource, List<StreamDownload> data) {
         super(context, resource, data);
         mContext = context;
     }
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        StreamDownloader downloader = App.downloaders.get(position);
+        StreamDownload downloader = App.downloaders.get(position);
         DownloadViewHolder downloadViewHolder;
 
         if (convertView == null) {
@@ -48,8 +48,10 @@ public class DownloadAdapter extends ArrayAdapter<StreamDownloader> {
         // downloadViewHolder.cancel.setOnClickListener(oclCancel);
         downloadViewHolder.cancel.setTag(downloader);
 
-        downloadViewHolder.progress.setMax(100);
-        downloadViewHolder.progress.setProgress(downloader.getCurrentProgress());
+        downloadViewHolder.progress.setIndeterminate(true);
+        // TODO: change when converting:
+        // downloadViewHolder.progress.setMax(100);
+        // downloadViewHolder.progress.setProgress(downloader.getCurrentProgress());
         downloadViewHolder.title.setText(downloader.getTitle());
         downloadViewHolder.subtitle.setText(downloader.getSubtitle());
 

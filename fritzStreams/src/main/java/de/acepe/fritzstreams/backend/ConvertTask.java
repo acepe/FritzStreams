@@ -2,7 +2,6 @@ package de.acepe.fritzstreams.backend;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Calendar;
 
 import org.ffmpeg.android.Clip;
 import org.ffmpeg.android.FfmpegController;
@@ -13,14 +12,14 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.media.MediaScannerConnection;
 import android.os.AsyncTask;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import de.acepe.fritzstreams.MainActivity;
 import de.acepe.fritzstreams.R;
-import de.acepe.fritzstreams.util.DownloadFileUtil;
 
-public class ConvertTask extends AsyncTask<Void, Void, Void> {
+public class ConvertTask extends AsyncTask<Void, Void, Boolean> {
 
     public interface Callback {
         void onConvertFinished(boolean succeeded);
@@ -29,52 +28,49 @@ public class ConvertTask extends AsyncTask<Void, Void, Void> {
     private static final String TAG_FFMPEG = "ffmpeg";
 
     private final Context context;
-    private final String fileName;
-    private final String outFileFLV;
-    private final String outFileMP3;
+    private final DownloadInformation downloadInformation;
     private final Callback callback;
 
-    public ConvertTask(Context context, Calendar cal, Streams.Stream stream, Callback callback) {
+    public ConvertTask(Context context, DownloadInformation downloadInformation, Callback callback) {
         this.context = context;
+        this.downloadInformation = downloadInformation;
         this.callback = callback;
-
-        DownloadFileUtil downloadFileUtil = new DownloadFileUtil(context);
-        fileName = downloadFileUtil.fileBaseName(cal, stream);
-        outFileFLV = downloadFileUtil.pathForFLVFile(fileName);
-        outFileMP3 = downloadFileUtil.pathForMP3File(fileName);
     }
 
     @Override
-    protected Void doInBackground(Void... commands) {
+    protected Boolean doInBackground(Void... commands) {
         Notification notification = createNotification(context.getString(R.string.converting_notification_title),
-                                                       fileName,
+                                                       downloadInformation.getFileBaseName(),
                                                        true);
         showNotification(notification);
 
-        final Clip inClip = new Clip(outFileFLV);
-        final File outFile = new File(outFileMP3);
-        final File inFile = new File(outFileFLV);
-        final long inSize = inFile.length();
+        final Clip inClip = new Clip(downloadInformation.getOutFileFLV());
+        final File outFile = new File(downloadInformation.getOutFileMp3());
+        final File inFile = new File(downloadInformation.getOutFileFLV());
 
         File fileTmp = context.getApplicationContext().getCacheDir();
         File fileAppRoot = new File(context.getApplicationContext().getApplicationInfo().dataDir);
 
         try {
             FfmpegController fc = new FfmpegController(fileTmp, fileAppRoot);
-            fc.extractAudio(inClip, outFile, new FFMpegCallback(outFile, inSize));
+            fc.extractAudio(inClip, outFile, new FFMpegCallback(inFile, outFile));
+            MediaScannerConnection.scanFile(context, new String[] { outFile.getAbsolutePath() }, null, null);
+            return true;
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
+            return false;
         }
-        return null;
     }
 
     @Override
-    protected void onPostExecute(Void result) {
-        Notification notification = createNotification(context.getString(R.string.finished_notification_title),
-                                                       fileName,
-                                                       false);
-        showNotification(notification);
-        callback.onConvertFinished(true);
+    protected void onPostExecute(Boolean result) {
+        if (result) {
+            Notification notification = createNotification(context.getString(R.string.finished_notification_title),
+                                                           downloadInformation.getFileBaseName(),
+                                                           false);
+            showNotification(notification);
+        }
+        callback.onConvertFinished(result);
     }
 
     private Notification createNotification(String title, String text, boolean ongoing) {
@@ -96,20 +92,22 @@ public class ConvertTask extends AsyncTask<Void, Void, Void> {
     }
 
     private class FFMpegCallback implements ShellCallback {
+        private File inFile;
         private final File outFile;
-        private final long inSize;
+        private final float inSize;
 
-        public FFMpegCallback(File outFile, long inSize) {
+        public FFMpegCallback(File inFile, File outFile) {
+            this.inFile = inFile;
             this.outFile = outFile;
-            this.inSize = inSize;
+            inSize = inFile.length();
         }
 
         @Override
         public void shellOut(String shellLine) {
             Log.i(TAG_FFMPEG, shellLine);
-            long outSize = outFile.length();
+            float outSize = outFile.length();
             if (outSize > 0) {
-                long frac = (long) (((float) outSize / (float) inSize) * 100);
+                long frac = (long) (outSize / inSize * 100);
                 Notification notification = createNotification(context.getString(R.string.converting_notification_title),
                                                                frac + "%",
                                                                true);
@@ -128,7 +126,7 @@ public class ConvertTask extends AsyncTask<Void, Void, Void> {
                 }
             }
             // noinspection ResultOfMethodCallIgnored
-            new File(outFileFLV).delete();
+            inFile.delete();
         }
     }
 }

@@ -1,11 +1,19 @@
 package de.acepe.fritzstreams.backend;
 
-import android.util.Log;
+import de.acepe.fritzstreams.App;
+import de.acepe.fritzstreams.util.Utilities;
 
 public class CallBack {
 
     public static void rtmpMessage(String message) {
-        Log.i("Test", message);
-        DownloadTask.append(message);
+        // RTMPDump output: 106775.074 kB / 4526.65 sec
+        int divider = message.indexOf("/");
+        if (divider == -1)
+            return;
+
+        String downloadedBytes = message.substring(0, divider - 3);
+        downloadedBytes = downloadedBytes.trim().replace(".", "");
+        long bytes = Long.parseLong(downloadedBytes);
+        App.activeDownload.setProgress(Utilities.humanReadableBytes(bytes, false));
     }
 }

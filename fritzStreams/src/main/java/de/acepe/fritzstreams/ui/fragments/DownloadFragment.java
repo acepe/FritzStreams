@@ -109,7 +109,6 @@ public class DownloadFragment extends Fragment {
                     return;
 
                 getActivity().runOnUiThread(new Runnable() {
-
                     @Override
                     public void run() {
                         if (getActivity() == null) {
@@ -127,7 +126,6 @@ public class DownloadFragment extends Fragment {
                         sb.append(Utilities.humanReadableBytes((long) Utilities.getFreeSpaceExternal(), true));
                         mFreeSpace.setText(sb.toString());
                     }
-
                 });
             }
         };

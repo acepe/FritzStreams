@@ -1,4 +1,4 @@
-package de.acepe.fritzstreams.util;
+package de.acepe.fritzstreams.backend;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
@@ -9,17 +9,31 @@ import android.content.SharedPreferences;
 import android.os.Environment;
 import android.preference.PreferenceManager;
 import de.acepe.fritzstreams.App;
-import de.acepe.fritzstreams.backend.Streams;
 
-public class DownloadFileUtil {
+public class DownloadInformation {
 
     private final Context context;
+    private final Calendar cal;
+    private final Stream stream;
+    private final String fileBaseName;
+    private final String outFileFLV;
 
-    public DownloadFileUtil(Context context) {
+    private final String outFileMp3;
+    private final String url;
+
+    public DownloadInformation(Context context, Calendar cal, Stream stream) {
         this.context = context;
+        this.cal = cal;
+        this.stream = stream;
+
+        fileBaseName = fileBaseName();
+        outFileFLV = pathForFLVFile();
+        outFileMp3 = pathForMP3File();
+
+        url = UrlFormat.getUrl(cal, stream);
     }
 
-    public String fileBaseName(Calendar cal, Streams.Stream stream) {
+    private String fileBaseName() {
         SimpleDateFormat dateFormat = new SimpleDateFormat(App.FILE_DATE_FORMAT, App.GERMANY);
         String fileTemplate = getFileTemplate(stream);
         String dayOfWeek = App.URL_DAY_OF_WEEK_FORMAT.format(cal.getTime()).toLowerCase(App.GERMANY);
@@ -27,16 +41,16 @@ public class DownloadFileUtil {
         return String.format(fileTemplate, dayOfWeek, date);
     }
 
-    public String getFileTemplate(Streams.Stream stream) {
-        return stream == Streams.Stream.nightflight ? App.FILE_NIGHTFLIGHT_FORMAT : App.FILE_SOUNDGARDEN_FORMAT;
+    private String getFileTemplate(Stream stream) {
+        return stream == Stream.nightflight ? App.FILE_NIGHTFLIGHT_FORMAT : App.FILE_SOUNDGARDEN_FORMAT;
     }
 
-    public String pathForFLVFile(String fileName) {
-        return getPathWithoutExtension(fileName) + App.FILE_EXTENSION_FLV;
+    private String pathForFLVFile() {
+        return getPathWithoutExtension(fileBaseName) + App.FILE_EXTENSION_FLV;
     }
 
-    public String pathForMP3File(String fileName) {
-        return getOutFileName(getPathWithoutExtension(fileName));
+    private String pathForMP3File() {
+        return getOutFileName(getPathWithoutExtension(fileBaseName));
     }
 
     private String getPathWithoutExtension(String fileName) {
@@ -64,4 +78,19 @@ public class DownloadFileUtil {
         return outFileName;
     }
 
+    public String getFileBaseName() {
+        return fileBaseName;
+    }
+
+    public String getOutFileMp3() {
+        return outFileMp3;
+    }
+
+    public String getOutFileFLV() {
+        return outFileFLV;
+    }
+
+    public String getUrl() {
+        return url;
+    }
 }

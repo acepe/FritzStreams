@@ -42,5 +42,9 @@
 
     <string name="downloads_empty">No downloads</string>
     <string name="download_freespace">Free space</string>
+    <string name="waiting">Waiting</string>
+    <string name="downloading">Downloading</string>
+    <string name="converting">Converting</string>
+    <string name="finished">Finished</string>
 
 </resources>

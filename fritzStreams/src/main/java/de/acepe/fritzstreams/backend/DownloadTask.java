@@ -2,8 +2,6 @@ package de.acepe.fritzstreams.backend;
 
 import static android.net.wifi.WifiManager.WIFI_MODE_FULL_HIGH_PERF;
 
-import java.util.Calendar;
-
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -19,8 +17,6 @@ import com.schriek.rtmpdump.Rtmpdump;
 import de.acepe.fritzstreams.App;
 import de.acepe.fritzstreams.MainActivity;
 import de.acepe.fritzstreams.R;
-import de.acepe.fritzstreams.util.DownloadFileUtil;
-import de.acepe.fritzstreams.util.UrlFormat;
 
 public class DownloadTask extends AsyncTask<Void, Void, Boolean> {
 
@@ -28,26 +24,19 @@ public class DownloadTask extends AsyncTask<Void, Void, Boolean> {
         void onDownloadFinished(boolean succeeded);
     }
 
-    private final static String TAG = "DownloadTask";
+    private static final String TAG = "DownloadTask";
     private static final String TAG_RTMPDUMP = "RtmpDump";
 
     private final Context context;
-    private Callback callback;
-    private final String fileName;
-    private final String outFileFLV;
-    private final String url;
+    private final DownloadInformation downloadInformation;
 
+    private Callback callback;
     private WifiManager.WifiLock mWifiLock;
 
-    public DownloadTask(Context context, Calendar cal, Streams.Stream stream, Callback callback) {
+    public DownloadTask(Context context, DownloadInformation downloadInformation, Callback callback) {
         this.context = context;
+        this.downloadInformation = downloadInformation;
         this.callback = callback;
-
-        DownloadFileUtil downloadFileUtil = new DownloadFileUtil(context);
-        fileName = downloadFileUtil.fileBaseName(cal, stream);
-        outFileFLV = downloadFileUtil.pathForFLVFile(fileName);
-
-        url = UrlFormat.getUrl(cal, stream);
 
         WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
         if (wifiManager != null) {
@@ -57,9 +46,11 @@ public class DownloadTask extends AsyncTask<Void, Void, Boolean> {
 
     @Override
     protected Boolean doInBackground(Void... commands) {
-        String command = String.format(App.RTMP_DUMP_FORMAT, url, outFileFLV);
+        String command = String.format(App.RTMP_DUMP_FORMAT,
+                                       downloadInformation.getUrl(),
+                                       downloadInformation.getOutFileFLV());
 
-        showNotification(R.string.downloading_notification_title, fileName);
+        showNotification(R.string.downloading_notification_title, downloadInformation.getFileBaseName());
         mWifiLock.acquire();
 
         Log.i(TAG_RTMPDUMP, "downloading: " + command);
@@ -69,23 +60,19 @@ public class DownloadTask extends AsyncTask<Void, Void, Boolean> {
         return true;
     }
 
-    public static void append(String message) {
-        Log.i(TAG_RTMPDUMP, "message");
-    }
-
     @Override
     protected void onPostExecute(Boolean succeeded) {
         mWifiLock.release();
         showNotification(succeeded
                 ? R.string.download_succeeded_notification_title
-                : R.string.download_failed_notification_title, fileName);
+                : R.string.download_failed_notification_title, downloadInformation.getFileBaseName());
         callback.onDownloadFinished(succeeded);
     }
 
     @Override
     protected void onCancelled() {
         mWifiLock.release();
-        showNotification(R.string.failed_notification_title, fileName);
+        showNotification(R.string.failed_notification_title, downloadInformation.getFileBaseName());
         super.onCancelled();
     }
 
