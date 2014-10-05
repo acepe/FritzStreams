@@ -23,6 +23,8 @@ public class ConvertTask extends AsyncTask<Void, Void, Boolean> {
 
     public interface Callback {
         void onConvertFinished(boolean succeeded);
+
+        void setCurrentProgress(int currentProgress);
     }
 
     private static final String TAG_FFMPEG = "ffmpeg";
@@ -107,11 +109,8 @@ public class ConvertTask extends AsyncTask<Void, Void, Boolean> {
             Log.i(TAG_FFMPEG, shellLine);
             float outSize = outFile.length();
             if (outSize > 0) {
-                long frac = (long) (outSize / inSize * 100);
-                Notification notification = createNotification(context.getString(R.string.converting_notification_title),
-                                                               frac + "%",
-                                                               true);
-                showNotification(notification);
+                int frac = (int) (outSize / inSize * 100);
+                callback.setCurrentProgress(frac);
             }
         }
 

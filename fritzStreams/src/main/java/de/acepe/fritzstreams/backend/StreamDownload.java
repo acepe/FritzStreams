@@ -8,7 +8,8 @@ import de.acepe.fritzstreams.App;
 
 public class StreamDownload implements DownloadTask.Callback, ConvertTask.Callback {
 
-    private String downloadedKB = "0";
+    private String mDownloadedKB = "0";
+    private int mCurrentProgress;
 
     public enum State {
         waiting, downloading, converting, failed, finished
@@ -31,12 +32,11 @@ public class StreamDownload implements DownloadTask.Callback, ConvertTask.Callba
     }
 
     public int getCurrentProgress() {
-        // TODO: set and return progress when converting
-        return 0;
+        return mCurrentProgress;
     }
 
-    public void setDownloadedKB(String downloadedKB) {
-        this.downloadedKB = downloadedKB;
+    public void setmDownloadedKB(String mDownloadedKB) {
+        this.mDownloadedKB = mDownloadedKB;
     }
 
     public String getTitle() {
@@ -50,7 +50,7 @@ public class StreamDownload implements DownloadTask.Callback, ConvertTask.Callba
         Resources res = context.getResources();
         String localizedState = res.getString(res.getIdentifier(state.name(), "string", context.getPackageName()));
         if (state == State.downloading)
-            return localizedState + ": " + downloadedKB;
+            return localizedState + ": " + mDownloadedKB;
 
         return localizedState;
     }
@@ -78,6 +78,11 @@ public class StreamDownload implements DownloadTask.Callback, ConvertTask.Callba
         App.activeDownload = null;
 
         startNext();
+    }
+
+    @Override
+    public void setCurrentProgress(int currentProgress) {
+        this.mCurrentProgress = currentProgress;
     }
 
     private void startNext() {

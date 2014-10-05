@@ -58,6 +58,7 @@ public class DownloadAdapter extends ArrayAdapter<StreamDownload> {
                 downloadViewHolder.progress.setProgress(downloader.getCurrentProgress());
                 break;
             case failed:
+            case finished:
                 downloadViewHolder.progress.setVisibility(View.INVISIBLE);
         }
 
