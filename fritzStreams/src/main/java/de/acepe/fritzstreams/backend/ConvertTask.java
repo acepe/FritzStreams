@@ -22,41 +22,40 @@ import de.acepe.fritzstreams.R;
 public class ConvertTask extends AsyncTask<Void, Void, Boolean> {
 
     public interface Callback {
-        void onConvertFinished(boolean succeeded);
+        void onConvertFinished(TaskResult succeeded);
 
         void setCurrentProgress(int currentProgress);
     }
 
     private static final String TAG_FFMPEG = "ffmpeg";
 
-    private final Context context;
-    private final DownloadInformation downloadInformation;
-    private final Callback callback;
+    private final Context mContext;
+    private final DownloadInformation mDownloadInformation;
+    private final Callback mCallback;
+    private FfmpegController mFfmpegController;
+    private boolean mCancelled;
 
     public ConvertTask(Context context, DownloadInformation downloadInformation, Callback callback) {
-        this.context = context;
-        this.downloadInformation = downloadInformation;
-        this.callback = callback;
+        this.mContext = context;
+        this.mDownloadInformation = downloadInformation;
+        this.mCallback = callback;
     }
 
     @Override
     protected Boolean doInBackground(Void... commands) {
-        Notification notification = createNotification(context.getString(R.string.converting_notification_title),
-                                                       downloadInformation.getFileBaseName(),
-                                                       true);
-        showNotification(notification);
+        showNotification(R.string.converting_notification_title, mDownloadInformation.getFileBaseName());
 
-        final Clip inClip = new Clip(downloadInformation.getOutFileFLV());
-        final File outFile = new File(downloadInformation.getOutFileMp3());
-        final File inFile = new File(downloadInformation.getOutFileFLV());
+        final Clip inClip = new Clip(mDownloadInformation.getOutFileFLV());
+        final File outFile = new File(mDownloadInformation.getOutFileMp3());
+        final File inFile = new File(mDownloadInformation.getOutFileFLV());
 
-        File fileTmp = context.getApplicationContext().getCacheDir();
-        File fileAppRoot = new File(context.getApplicationContext().getApplicationInfo().dataDir);
+        File fileTmp = mContext.getApplicationContext().getCacheDir();
+        File fileAppRoot = new File(mContext.getApplicationContext().getApplicationInfo().dataDir);
 
         try {
-            FfmpegController fc = new FfmpegController(fileTmp, fileAppRoot);
-            fc.extractAudio(inClip, outFile, new FFMpegCallback(inFile, outFile));
-            MediaScannerConnection.scanFile(context, new String[] { outFile.getAbsolutePath() }, null, null);
+            mFfmpegController = new FfmpegController(fileTmp, fileAppRoot);
+            mFfmpegController.extractAudio(inClip, outFile, new FFMpegCallback(inFile, outFile));
+            MediaScannerConnection.scanFile(mContext, new String[] { outFile.getAbsolutePath() }, null, null);
             return true;
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
@@ -64,33 +63,69 @@ public class ConvertTask extends AsyncTask<Void, Void, Boolean> {
         }
     }
 
+    public void stop() {
+        mCancelled = true;
+
+        if (mFfmpegController != null)
+            mFfmpegController.stop();
+    }
+
     @Override
-    protected void onPostExecute(Boolean result) {
-        if (result) {
-            Notification notification = createNotification(context.getString(R.string.finished_notification_title),
-                                                           downloadInformation.getFileBaseName(),
-                                                           false);
-            showNotification(notification);
+    protected void onPostExecute(Boolean succeeded) {
+        onFinished(succeeded);
+    }
+
+    @Override
+    protected void onCancelled(Boolean result) {
+        onFinished(result);
+    }
+
+    private void onFinished(Boolean succeeded) {
+        if (succeeded) {
+            showNotification(R.string.finished_notification_title, mDownloadInformation.getFileBaseName());
+            mCallback.onConvertFinished(TaskResult.successful);
+            return;
         }
-        callback.onConvertFinished(result);
+
+        if (mCancelled) {
+            showNotification(R.string.download_cancelled_notification_title, mDownloadInformation.getFileBaseName());
+            deleteDownloadFiles();
+            mCallback.onConvertFinished(TaskResult.cancelled);
+            return;
+        }
+
+        deleteDownloadFiles();
+        showNotification(R.string.download_failed_notification_title, mDownloadInformation.getFileBaseName());
+        mCallback.onConvertFinished(TaskResult.failed);
     }
 
-    private Notification createNotification(String title, String text, boolean ongoing) {
-        Intent intent = new Intent(context, MainActivity.class);
-        PendingIntent pIntent = PendingIntent.getActivity(context, 0, intent, 0);
+    private void deleteDownloadFiles() {
+        File downloadFile = new File(mDownloadInformation.getOutFileFLV());
+        if (downloadFile.exists())
+            downloadFile.delete();
 
-        return new NotificationCompat.Builder(context).setContentTitle(title)
-                                                      .setContentText(text)
-                                                      .setSmallIcon(R.drawable.ic_launcher)
-                                                      .setContentIntent(pIntent)
-                                                      .setOngoing(ongoing)
-                                                      .build();
+        File convertFile = new File(mDownloadInformation.getOutFileMp3());
+        if (convertFile.exists())
+            convertFile.delete();
     }
 
-    private void showNotification(Notification notification) {
+    private void showNotification(int downloadingNotificationTitle, String text) {
+        Notification notification = createNotification(mContext.getString(downloadingNotificationTitle), text);
         notification.flags |= Notification.FLAG_AUTO_CANCEL;
-        NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+
+        NotificationManager notificationManager = (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
         notificationManager.notify(0, notification);
+    }
+
+    private Notification createNotification(String title, String text) {
+        Intent intent = new Intent(mContext, MainActivity.class);
+        PendingIntent pIntent = PendingIntent.getActivity(mContext, 0, intent, 0);
+
+        return new NotificationCompat.Builder(mContext).setContentTitle(title)
+                                                       .setContentText(text)
+                                                       .setSmallIcon(R.drawable.ic_launcher)
+                                                       .setContentIntent(pIntent)
+                                                       .build();
     }
 
     private class FFMpegCallback implements ShellCallback {
@@ -110,7 +145,7 @@ public class ConvertTask extends AsyncTask<Void, Void, Boolean> {
             float outSize = outFile.length();
             if (outSize > 0) {
                 int frac = (int) (outSize / inSize * 100);
-                callback.setCurrentProgress(frac);
+                mCallback.setCurrentProgress(frac);
             }
         }
 

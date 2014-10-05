@@ -9,6 +9,7 @@
     <string name="converting_notification_title">Converting stream</string>
     <string name="finished_notification_title">Converting finished</string>
     <string name="download_failed_notification_title">Download failed</string>
+    <string name="download_cancelled_notification_title">Download cancelled</string>
     <string name="download_succeeded_notification_title">Download completed</string>
     <string name="nightflight_monday">Rock</string>
     <string name="nightflight_tuesday">House</string>
@@ -47,5 +48,11 @@
     <string name="converting">Converting</string>
     <string name="finished">Finished</string>
     <string name="failed">Failed</string>
+    <string name="cancelled">Cancelled</string>
+    <string name="onlyWifi">Not connected to WiFi</string>
+    <string name="download_noti_canceled">Download cancelled</string>
+    <string name="download_noti_started">Download started</string>
+    <string name="download_only_wifi_notification_title">Download cancelled: not connected to WiFi.</string>
+    <string name="app_not_available">No audio player found...</string>
 
 </resources>

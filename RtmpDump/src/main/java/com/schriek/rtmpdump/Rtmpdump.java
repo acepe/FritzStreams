@@ -21,7 +21,6 @@ public class Rtmpdump {
     }
 
     protected void LoadLib() {
-
         try {
             System.loadLibrary("dump");
             testNative();

@@ -7,7 +7,7 @@
     <RelativeLayout
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:background="@color/yellow">
+        android:background="@color/yellow_fritz_bright">
 
         <TextView
             android:id="@+id/downloads_freespace"

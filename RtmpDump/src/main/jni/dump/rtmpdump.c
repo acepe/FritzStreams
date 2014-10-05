@@ -187,6 +187,8 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *jvm, void *reserved) {
 JNIEXPORT jint JNICALL Java_com_schriek_rtmpdump_Rtmpdump_run(JNIEnv *env, jobject obj, jobjectArray args)
 {
 	LOGV("run() called");
+	RTMP_ctrlC = false;
+	file = 0;
     int i = 0;
 	int argc = 0;
 	char **argv = NULL;
@@ -214,8 +216,13 @@ callback_handler("Loading native library compiled at " __TIME__ " " __DATE__);
 }
 
 void Java_com_schriek_rtmpdump_Rtmpdump_stop(JNIEnv* env, jobject javaThis) {
-LOGV("stop() called!");
-RTMP_ctrlC = TRUE;
+    LOGV("stop() called!");
+    RTMP_ctrlC = TRUE;
+
+    if (file != 0){
+    	fclose(file);
+    	file = 0;
+    }
 }
 
 void sigIntHandler(int sig) {
@@ -974,7 +981,6 @@ while ((opt = getopt_long(argc, argv,
 		RTMP_SetOpt(&rtmp, &av_playlist, (AVal *) &av_true);
 		break;
 	case 'r': {
-	    LOGV("handling -r");
 		AVal parsedHost, parsedApp, parsedPlaypath;
 		unsigned int parsedPort = 0;
 		int parsedProtocol = RTMP_PROTOCOL_UNDEFINED;

@@ -14,6 +14,6 @@ public class CallBack {
         String downloadedBytes = message.substring(0, divider - 3);
         downloadedBytes = downloadedBytes.trim().replace(".", "");
         long bytes = Long.parseLong(downloadedBytes);
-        App.activeDownload.setmDownloadedKB(Utilities.humanReadableBytes(bytes, false));
+        App.activeDownload.setDownloadedKB(Utilities.humanReadableBytes(bytes, false));
     }
 }

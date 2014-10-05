@@ -10,6 +10,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 import de.acepe.fritzstreams.App;
 import de.acepe.fritzstreams.R;
 import de.acepe.fritzstreams.backend.StreamDownload;
@@ -45,7 +46,7 @@ public class DownloadAdapter extends ArrayAdapter<StreamDownload> {
 
         convertView.setBackgroundResource(R.drawable.selector_selected);
 
-        // downloadViewHolder.cancel.setOnClickListener(oclCancel);
+        downloadViewHolder.cancel.setOnClickListener(oclCancel);
         downloadViewHolder.cancel.setTag(downloader);
 
         switch (downloader.getState()) {
@@ -57,8 +58,7 @@ public class DownloadAdapter extends ArrayAdapter<StreamDownload> {
                 downloadViewHolder.progress.setMax(100);
                 downloadViewHolder.progress.setProgress(downloader.getCurrentProgress());
                 break;
-            case failed:
-            case finished:
+            default:
                 downloadViewHolder.progress.setVisibility(View.INVISIBLE);
         }
 
@@ -75,4 +75,14 @@ public class DownloadAdapter extends ArrayAdapter<StreamDownload> {
         ImageButton cancel;
     }
 
+    private View.OnClickListener oclCancel = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            Toast.makeText(mContext, R.string.download_noti_canceled, Toast.LENGTH_SHORT).show();
+
+            StreamDownload downloader = (StreamDownload) v.getTag();
+            downloader.cancel();
+            notifyDataSetChanged();
+        }
+    };
 }

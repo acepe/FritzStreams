@@ -14,7 +14,7 @@
     </item>
     <item>
         <shape>
-            <gradient android:startColor="@color/yellow" android:endColor="@color/yellow_fritz" android:angle="270" />
+            <gradient android:startColor="@color/yellow_fritz_bright" android:endColor="@color/yellow_fritz" android:angle="270" />
             <padding android:left="10dp" android:top="10dp" android:right="10dp" android:bottom="10dp" />
         </shape>
     </item>

@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CalendarView;
 import android.widget.TextView;
+import android.widget.Toast;
 import de.acepe.fritzstreams.App;
 import de.acepe.fritzstreams.R;
 import de.acepe.fritzstreams.backend.Stream;
@@ -86,8 +87,10 @@ public class CalendarFragment extends Fragment {
 
         StreamDownload streamDownload = new StreamDownload(getActivity(), cal, stream);
         App.downloaders.add(streamDownload);
-        if (!isDownloadInProgress())
+        if (!isDownloadInProgress()) {
+            Toast.makeText(getActivity(), R.string.download_noti_started, Toast.LENGTH_SHORT).show();
             streamDownload.downloadAndConvert();
+        }
     }
 
     private boolean isDownloadInProgress() {

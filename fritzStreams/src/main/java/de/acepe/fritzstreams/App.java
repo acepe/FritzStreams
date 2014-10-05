@@ -29,6 +29,7 @@ public class App {
 
     public static final String RTMP_DUMP_FORMAT = "rtmpdump -r %s -o %s";
 
+    public static final String SP_WIFI_ONLY = "pref_dl_wifi_only";
     public static final String SP_DOWNLOAD_DIR = "pref_dl_dir";
 
     public static Application mApp;

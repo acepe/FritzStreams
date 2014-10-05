@@ -3,6 +3,8 @@ package de.acepe.fritzstreams.ui.fragments;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -11,8 +13,10 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 import de.acepe.fritzstreams.App;
 import de.acepe.fritzstreams.R;
+import de.acepe.fritzstreams.backend.StreamDownload;
 import de.acepe.fritzstreams.ui.DownloadAdapter;
 import de.acepe.fritzstreams.util.Utilities;
 
@@ -73,26 +77,20 @@ public class DownloadFragment extends Fragment {
 
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-            // if (Config.downloaders.get(position).getStatus() == AsyncTask.Status.FINISHED) {
-            // Uri lastFile = Config.downloaders.get(position).getLastFileUri();
-            // if (lastFile == null) {
-            // Toast.makeText(getActivity(), R.string.download_error, Toast.LENGTH_LONG)
-            // .show();
-            // } else {
-            // Intent mediaIntent = new Intent();
-            // mediaIntent.setAction(Intent.ACTION_VIEW);
-            // mediaIntent.setDataAndType(lastFile, "audio/*");
-            // mediaIntent.addFlags(
-            // Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-            //
-            // if (mediaIntent.resolveActivity(getActivity().getPackageManager()) != null) {
-            // startActivity(mediaIntent);
-            // } else {
-            // Toast.makeText(getActivity(), R.string.app_not_available, Toast.LENGTH_LONG)
-            // .show();
-            // }
-            // }
-            // }
+            if (App.downloaders.get(position).getState() == StreamDownload.State.finished) {
+                Uri outFile = App.downloaders.get(position).getOutFileUri();
+
+                Intent mediaIntent = new Intent();
+                mediaIntent.setAction(Intent.ACTION_VIEW);
+                mediaIntent.setDataAndType(outFile, "audio/*");
+                mediaIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+
+                if (mediaIntent.resolveActivity(getActivity().getPackageManager()) != null) {
+                    startActivity(mediaIntent);
+                } else {
+                    Toast.makeText(getActivity(), R.string.app_not_available, Toast.LENGTH_LONG).show();
+                }
+            }
         }
     };
 
