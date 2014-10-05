@@ -51,7 +51,7 @@
         android:paddingLeft="15dp"
         android:paddingRight="15dp"
         android:paddingTop="6dp"
-        android:progress="30"
+        android:progress="0"
         android:progressDrawable="@drawable/progress"
         android:indeterminateDrawable="@drawable/progress_indeterminate_horizontal" />
 

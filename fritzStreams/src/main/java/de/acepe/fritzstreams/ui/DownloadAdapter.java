@@ -48,12 +48,19 @@ public class DownloadAdapter extends ArrayAdapter<StreamDownload> {
         // downloadViewHolder.cancel.setOnClickListener(oclCancel);
         downloadViewHolder.cancel.setTag(downloader);
 
-        if (downloader.getState() == StreamDownload.State.downloading)
-            downloadViewHolder.progress.setIndeterminate(true);
-        else {
-            downloadViewHolder.progress.setMax(100);
-            downloadViewHolder.progress.setProgress(downloader.getCurrentProgress());
+        switch (downloader.getState()) {
+            case downloading:
+                downloadViewHolder.progress.setIndeterminate(true);
+                break;
+            case converting:
+                downloadViewHolder.progress.setIndeterminate(false);
+                downloadViewHolder.progress.setMax(100);
+                downloadViewHolder.progress.setProgress(downloader.getCurrentProgress());
+                break;
+            case failed:
+                downloadViewHolder.progress.setVisibility(View.INVISIBLE);
         }
+
         downloadViewHolder.title.setText(downloader.getTitle());
         downloadViewHolder.subtitle.setText(downloader.getSubtitle());
 

@@ -51,8 +51,8 @@ public class CalendarFragment extends Fragment {
         String dayOfWeek = sdf.format(cal.getTime());
 
         mDayOfWeek.setText(dayOfWeek);
-        mNightflight.setText(Stream.nightflight.getStream(cal));
-        mSoundgarden.setText(Stream.soundgarden.getStream(cal));
+        mNightflight.setText(Stream.nightflight.getStreamType(cal));
+        mSoundgarden.setText(Stream.soundgarden.getStreamType(cal));
     }
 
     private CalendarView.OnDateChangeListener odclCalendar = new CalendarView.OnDateChangeListener() {

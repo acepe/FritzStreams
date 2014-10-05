@@ -55,9 +55,9 @@ public class DownloadTask extends AsyncTask<Void, Void, Boolean> {
 
         Log.i(TAG_RTMPDUMP, "downloading: " + command);
         Rtmpdump dump = new Rtmpdump();
-        dump.parseString(command);
+        int returnValue = dump.parseString(command);
 
-        return true;
+        return returnValue == 0;
     }
 
     @Override

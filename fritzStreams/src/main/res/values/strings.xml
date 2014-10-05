@@ -46,5 +46,6 @@
     <string name="downloading">Downloading</string>
     <string name="converting">Converting</string>
     <string name="finished">Finished</string>
+    <string name="failed">Failed</string>
 
 </resources>

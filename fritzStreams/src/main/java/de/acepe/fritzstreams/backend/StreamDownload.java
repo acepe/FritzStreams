@@ -8,10 +8,10 @@ import de.acepe.fritzstreams.App;
 
 public class StreamDownload implements DownloadTask.Callback, ConvertTask.Callback {
 
-    private String downloadedKB;
+    private String downloadedKB = "0";
 
     public enum State {
-        waiting, downloading, converting, finished
+        waiting, downloading, converting, failed, finished
     }
 
     private final DownloadInformation downloadInformation;
@@ -35,12 +35,15 @@ public class StreamDownload implements DownloadTask.Callback, ConvertTask.Callba
         return 0;
     }
 
-    public void setProgress(String downloadedKB) {
+    public void setDownloadedKB(String downloadedKB) {
         this.downloadedKB = downloadedKB;
     }
 
     public String getTitle() {
-        return downloadInformation.getFileBaseName();
+        return downloadInformation.getDisplayStreamCategory()
+               + downloadInformation.getDisplayStreamType()
+               + " "
+               + downloadInformation.getDisplayDate();
     }
 
     public String getSubtitle() {
@@ -58,20 +61,31 @@ public class StreamDownload implements DownloadTask.Callback, ConvertTask.Callba
 
     @Override
     public void onDownloadFinished(boolean succeeded) {
-        if (succeeded) {
-            state = State.converting;
-            new ConvertTask(context, downloadInformation, StreamDownload.this).execute();
+        if (!succeeded) {
+            state = State.failed;
+            App.activeDownload = null;
+            startNext();
+            return;
         }
+
+        state = State.converting;
+        new ConvertTask(context, downloadInformation, StreamDownload.this).execute();
     }
 
     @Override
     public void onConvertFinished(boolean succeeded) {
         state = State.finished;
-        App.downloaders.remove(this);
         App.activeDownload = null;
 
-        if (!App.downloaders.isEmpty()) {
-            App.downloaders.get(0).downloadAndConvert();
+        startNext();
+    }
+
+    private void startNext() {
+        for (StreamDownload streamDownload : App.downloaders) {
+            if (streamDownload.getState() == State.waiting) {
+                streamDownload.downloadAndConvert();
+                return;
+            }
         }
     }
 }

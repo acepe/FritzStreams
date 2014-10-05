@@ -184,7 +184,7 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *jvm, void *reserved) {
 	return JNI_VERSION_1_4;
 }
 
-JNIEXPORT void JNICALL Java_com_schriek_rtmpdump_Rtmpdump_run(JNIEnv *env, jobject obj, jobjectArray args)
+JNIEXPORT jint JNICALL Java_com_schriek_rtmpdump_Rtmpdump_run(JNIEnv *env, jobject obj, jobjectArray args)
 {
 	LOGV("run() called");
     int i = 0;
@@ -203,7 +203,7 @@ JNIEXPORT void JNICALL Java_com_schriek_rtmpdump_Rtmpdump_run(JNIEnv *env, jobje
 	}
 
 	LOGV("run passing off to main()");
-    main(argc, argv);
+    return main(argc, argv);
 }
 
 void Java_com_schriek_rtmpdump_Rtmpdump_testNative(JNIEnv* env,

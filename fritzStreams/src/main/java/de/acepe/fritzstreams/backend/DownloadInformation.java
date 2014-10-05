@@ -1,6 +1,7 @@
 package de.acepe.fritzstreams.backend;
 
 import java.io.File;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
@@ -34,9 +35,9 @@ public class DownloadInformation {
     }
 
     private String fileBaseName() {
-        SimpleDateFormat dateFormat = new SimpleDateFormat(App.FILE_DATE_FORMAT, App.GERMANY);
         String fileTemplate = getFileTemplate(stream);
         String dayOfWeek = App.URL_DAY_OF_WEEK_FORMAT.format(cal.getTime()).toLowerCase(App.GERMANY);
+        SimpleDateFormat dateFormat = new SimpleDateFormat(App.FILE_DATE_FORMAT, App.GERMANY);
         String date = dateFormat.format(cal.getTime());
         return String.format(fileTemplate, dayOfWeek, date);
     }
@@ -92,5 +93,21 @@ public class DownloadInformation {
 
     public String getUrl() {
         return url;
+    }
+
+    public Stream getStream() {
+        return stream;
+    }
+
+    public String getDisplayStreamType() {
+        return context.getString(stream.getStreamType(cal));
+    }
+
+    public String getDisplayDate() {
+        return DateFormat.getDateInstance().format(cal.getTime());
+    }
+
+    public String getDisplayStreamCategory() {
+        return context.getString(stream.getStreamCategorie());
     }
 }

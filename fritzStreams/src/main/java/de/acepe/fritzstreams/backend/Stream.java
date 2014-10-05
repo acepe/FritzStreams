@@ -8,7 +8,13 @@ public enum Stream {
 
     soundgarden, nightflight;
 
-    public int getStream(Calendar cal) {
+    public int getStreamCategorie() {
+        if (this == Stream.soundgarden)
+            return R.string.stream_soundgarden;
+        return R.string.stream_nightflight;
+    }
+
+    public int getStreamType(Calendar cal) {
         if (this == Stream.soundgarden)
             return getSoundgarden(cal);
 

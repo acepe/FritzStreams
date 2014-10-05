@@ -10,10 +10,10 @@ public class Rtmpdump {
         LoadLib();
     }
 
-    public void parseString(String str) {
+    public int parseString(String str) {
         String[] split = str.split(" ");
 
-        run(split);
+        return run(split);
     }
 
     public void testHelpOutput() {
@@ -34,5 +34,5 @@ public class Rtmpdump {
 
     public native void stop();
 
-    public native void run(String[] args);
+    public native int run(String[] args);
 }
