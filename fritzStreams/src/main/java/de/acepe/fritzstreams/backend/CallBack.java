@@ -3,6 +3,7 @@ package de.acepe.fritzstreams.backend;
 import de.acepe.fritzstreams.App;
 import de.acepe.fritzstreams.util.Utilities;
 
+@SuppressWarnings("UnusedDeclaration")
 public class CallBack {
 
     public static void rtmpMessage(String message) {
@@ -13,7 +14,11 @@ public class CallBack {
 
         String downloadedBytes = message.substring(0, divider - 3);
         downloadedBytes = downloadedBytes.trim().replace(".", "");
-        long bytes = Long.parseLong(downloadedBytes);
-        App.activeDownload.setDownloadedKB(Utilities.humanReadableBytes(bytes, false));
+        try {
+            long bytes = Long.parseLong(downloadedBytes);
+            App.activeDownload.setDownloadedKB(Utilities.humanReadableBytes(bytes, false));
+        } catch (NumberFormatException e) {
+            App.activeDownload.setDownloadedKB(null);
+        }
     }
 }

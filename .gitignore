@@ -11,3 +11,5 @@ gradlew
 .navigation/raw/main.nvg.xml
 gradlew.bat
 import-summary.txt
+local.properties
+*.directory

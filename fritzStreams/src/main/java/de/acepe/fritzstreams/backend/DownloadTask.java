@@ -12,6 +12,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
+import android.os.PowerManager;
 import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
@@ -39,6 +40,7 @@ public class DownloadTask extends AsyncTask<Void, Void, TaskResult> {
     private boolean mCancelled;
     private Callback mCallback;
     private WifiManager.WifiLock mWifiLock;
+    private PowerManager.WakeLock mWakeLock;
     private Rtmpdump dump;
 
     public DownloadTask(Context context, DownloadInformation downloadInformation, Callback callback) {
@@ -48,14 +50,22 @@ public class DownloadTask extends AsyncTask<Void, Void, TaskResult> {
 
         mSharedPref = PreferenceManager.getDefaultSharedPreferences(mContext);
 
-        WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
-        if (wifiManager != null) {
-            mWifiLock = wifiManager.createWifiLock(WIFI_MODE_FULL_HIGH_PERF, TAG);
-        }
     }
 
     @Override
     protected TaskResult doInBackground(Void... commands) {
+        PowerManager powerManager = (PowerManager) mContext.getSystemService(Context.POWER_SERVICE);
+        if (powerManager != null) {
+            mWakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, TAG);
+            mWakeLock.acquire();
+        }
+
+        WifiManager wifiManager = (WifiManager) mContext.getSystemService(Context.WIFI_SERVICE);
+        if (wifiManager != null) {
+            mWifiLock = wifiManager.createWifiLock(WIFI_MODE_FULL_HIGH_PERF, TAG);
+            mWifiLock.acquire();
+        }
+
         if (mSharedPref.getBoolean(App.SP_WIFI_ONLY, false) && !Utilities.onWifi(mContext)) {
             return TaskResult.onlyWifi;
         }
@@ -65,7 +75,6 @@ public class DownloadTask extends AsyncTask<Void, Void, TaskResult> {
                                        mDownloadInformation.getOutFileFLV());
 
         showNotification(R.string.downloading_notification_title, mDownloadInformation.getFileBaseName());
-        mWifiLock.acquire();
 
         Log.i(TAG_RTMPDUMP, "downloading: " + command);
         dump = new Rtmpdump();
@@ -76,7 +85,7 @@ public class DownloadTask extends AsyncTask<Void, Void, TaskResult> {
 
     @Override
     protected void onPostExecute(TaskResult result) {
-        if (mWifiLock.isHeld())
+        if (mWifiLock != null && mWifiLock.isHeld())
             mWifiLock.release();
 
         if (mCancelled) {
@@ -97,22 +106,30 @@ public class DownloadTask extends AsyncTask<Void, Void, TaskResult> {
                 showNotification(R.string.download_only_wifi_notification_title, mDownloadInformation.getFileBaseName());
                 break;
         }
+
+        if (mWakeLock != null && mWakeLock.isHeld())
+            mWakeLock.release();
+
         mCallback.onDownloadFinished(result);
     }
 
     private void deleteDownloadFile() {
         File downloadFile = new File(mDownloadInformation.getOutFileFLV());
         if (downloadFile.exists())
+            // noinspection ResultOfMethodCallIgnored
             downloadFile.delete();
     }
 
     @Override
     protected void onCancelled() {
-        if (mWifiLock.isHeld())
-            mWifiLock.release();
-
         deleteDownloadFile();
         showNotification(R.string.failed_notification_title, mDownloadInformation.getFileBaseName());
+
+        if (mWifiLock != null && mWifiLock.isHeld())
+            mWifiLock.release();
+
+        if (mWakeLock != null && mWakeLock.isHeld())
+            mWakeLock.release();
         super.onCancelled();
     }
 

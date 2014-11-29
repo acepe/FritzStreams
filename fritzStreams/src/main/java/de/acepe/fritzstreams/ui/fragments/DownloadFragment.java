@@ -14,6 +14,7 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import de.acepe.fritzstreams.App;
 import de.acepe.fritzstreams.R;
 import de.acepe.fritzstreams.backend.StreamDownload;
@@ -55,8 +56,6 @@ public class DownloadFragment extends Fragment {
 
         // Create the adapter
         mAdapter = new DownloadAdapter(getActivity(), R.layout.download_row, App.downloaders);
-
-        mList.setOnItemClickListener(oiclDownload);
         mList.setAdapter(mAdapter);
 
         setHasOptionsMenu(true);
@@ -101,31 +100,33 @@ public class DownloadFragment extends Fragment {
      */
     private TimerTask createTimerTask() {
         return new TimerTask() {
+
             @Override
             public void run() {
                 if (mAdapter == null || getActivity() == null)
                     return;
 
-                getActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (getActivity() == null) {
-                            return;
-                        }
-
-                        mAdapter.notifyDataSetChanged();
-                        if (App.downloaders.isEmpty()) {
-                            mList.setEmptyView(mEmptyDownloads);
-                        }
-
-                        StringBuilder sb = new StringBuilder();
-                        sb.append(getActivity().getString(R.string.download_freespace));
-                        sb.append(": ");
-                        sb.append(Utilities.humanReadableBytes((long) Utilities.getFreeSpaceExternal(), false));
-                        mFreeSpace.setText(sb.toString());
-                    }
-                });
+                getActivity().runOnUiThread(updateFreespace);
             }
+
+            private Runnable updateFreespace = new Runnable() {
+                @Override
+                public void run() {
+                    if (getActivity() == null) {
+                        return;
+                    }
+
+                    mAdapter.notifyDataSetChanged();
+                    if (App.downloaders.isEmpty()) {
+                        mList.setEmptyView(mEmptyDownloads);
+                    }
+
+                    long freeSpaceExternal = (long) Utilities.getFreeSpaceExternal();
+                    mFreeSpace.setText(getActivity().getString(R.string.download_freespace)
+                                       + ": "
+                                       + Utilities.humanReadableBytes(freeSpaceExternal, false));
+                }
+            };
         };
     }
 }

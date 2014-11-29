@@ -11,6 +11,7 @@ import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import de.acepe.fritzstreams.App;
 import de.acepe.fritzstreams.R;
 import de.acepe.fritzstreams.backend.StreamDownload;
@@ -78,9 +79,10 @@ public class DownloadAdapter extends ArrayAdapter<StreamDownload> {
     private View.OnClickListener oclCancel = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            Toast.makeText(mContext, R.string.download_noti_canceled, Toast.LENGTH_SHORT).show();
-
             StreamDownload downloader = (StreamDownload) v.getTag();
+            if (downloader.getState() != StreamDownload.State.finished) {
+                Toast.makeText(mContext, R.string.download_noti_canceled, Toast.LENGTH_SHORT).show();
+            }
             downloader.cancel();
             notifyDataSetChanged();
         }
