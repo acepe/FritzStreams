@@ -8,23 +8,23 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.CalendarView;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import de.acepe.fritzstreams.App;
 import de.acepe.fritzstreams.R;
 import de.acepe.fritzstreams.backend.Stream;
 import de.acepe.fritzstreams.backend.StreamDownload;
+import de.acepe.fritzstreams.ui.components.IconLinkButton;
 
 public class CalendarFragment extends Fragment {
 
     private CalendarView mCalendarView;
     private TextView mDayOfWeek;
-    private TextView mNightflight;
-    private TextView mSoundgarden;
-    private Button mBtnDownloadNightflight;
-    private Button mBtnDownloadSoundgarden;
+
+    private IconLinkButton mBtnDownloadSoundgarden;
+    private IconLinkButton mBtnDownloadNightflight;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -32,13 +32,12 @@ public class CalendarFragment extends Fragment {
 
         mCalendarView = (CalendarView) view.findViewById(R.id.calendarView);
         mDayOfWeek = (TextView) view.findViewById(R.id.dayOfWeekLabel);
-        mNightflight = (TextView) view.findViewById(R.id.streamFirst);
-        mSoundgarden = (TextView) view.findViewById(R.id.streamSecond);
-        mBtnDownloadNightflight = (Button) view.findViewById(R.id.buttonDownloadNightflight);
-        mBtnDownloadSoundgarden = (Button) view.findViewById(R.id.buttonDownloadSoundgarden);
 
-        mBtnDownloadNightflight.setOnClickListener(oclDownload);
-        mBtnDownloadSoundgarden.setOnClickListener(oclDownload);
+        mBtnDownloadNightflight = (IconLinkButton) view.findViewById(R.id.ilbDownloadNightflight);
+        mBtnDownloadNightflight.setOnClickListener(oclDownloadNightflight);
+
+        mBtnDownloadSoundgarden = (IconLinkButton) view.findViewById(R.id.ilbDownloadSoundgarden);
+        mBtnDownloadSoundgarden.setOnClickListener(oclDownloadSoundgarden);
 
         mCalendarView.setOnDateChangeListener(odclCalendar);
 
@@ -52,8 +51,8 @@ public class CalendarFragment extends Fragment {
         String dayOfWeek = sdf.format(cal.getTime());
 
         mDayOfWeek.setText(dayOfWeek);
-        mNightflight.setText(Stream.nightflight.getStreamType(cal));
-        mSoundgarden.setText(Stream.soundgarden.getStreamType(cal));
+        mBtnDownloadNightflight.setGenreText(Stream.nightflight.getStreamType(cal));
+        mBtnDownloadSoundgarden.setGenreText(Stream.soundgarden.getStreamType(cal));
     }
 
     private CalendarView.OnDateChangeListener odclCalendar = new CalendarView.OnDateChangeListener() {
@@ -66,17 +65,17 @@ public class CalendarFragment extends Fragment {
         }
     };
 
-    private View.OnClickListener oclDownload = new View.OnClickListener() {
+    private View.OnClickListener oclDownloadNightflight = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            switch (v.getId()) {
-                case R.id.buttonDownloadNightflight:
-                    download(Stream.nightflight);
-                    break;
-                case R.id.buttonDownloadSoundgarden:
-                    download(Stream.soundgarden);
-                    break;
-            }
+            download(Stream.nightflight);
+        }
+    };
+
+    private View.OnClickListener oclDownloadSoundgarden = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            download(Stream.soundgarden);
         }
     };
 
