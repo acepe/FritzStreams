@@ -1,18 +1,17 @@
 apply plugin: 'android-library'
 
 android {
-    compileSdkVersion 19
-    buildToolsVersion "20"
+    compileSdkVersion 21
+    buildToolsVersion '21.1.2'
 
     defaultConfig {
-        applicationId "org.ffmpeg.android"
         minSdkVersion 10
-        targetSdkVersion 15
+        targetSdkVersion 21
     }
 
     buildTypes {
         release {
-            runProguard false
+            minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
         }
     }

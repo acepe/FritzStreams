@@ -1,8 +1,8 @@
 apply plugin: 'android'
 
 android {
-    compileSdkVersion 17
-    buildToolsVersion '20'
+    compileSdkVersion 21
+    buildToolsVersion '21.1.2'
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_7
@@ -12,7 +12,7 @@ android {
     defaultConfig {
         applicationId "de.acepe.fritzstreams"
         minSdkVersion 15
-        targetSdkVersion 20
+        targetSdkVersion 21
 
         ndk {
             moduleName "dump"
@@ -23,7 +23,7 @@ android {
 
     buildTypes {
         release {
-            runProguard false
+            minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
         }
     }
@@ -39,5 +39,4 @@ dependencies {
     compile project(':androidffmpeglibrary')
     compile project(':RtmpDump')
     compile project(':android-support-v4-preferencefragment')
-    compile 'com.android.support:appcompat-v7:20.+'
 }
