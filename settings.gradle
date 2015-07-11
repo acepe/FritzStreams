@@ -1,3 +1,2 @@
 include ':fritzStreams', ':android-support-v4-preferencefragment'
-include ':androidffmpeglibrary'
 include ':RtmpDump'

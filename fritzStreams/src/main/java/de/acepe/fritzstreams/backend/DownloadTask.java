@@ -1,9 +1,5 @@
 package de.acepe.fritzstreams.backend;
 
-import static android.net.wifi.WifiManager.WIFI_MODE_FULL_HIGH_PERF;
-
-import java.io.File;
-
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -19,10 +15,14 @@ import android.util.Log;
 
 import com.schriek.rtmpdump.Rtmpdump;
 
+import java.io.File;
+
 import de.acepe.fritzstreams.App;
 import de.acepe.fritzstreams.MainActivity;
 import de.acepe.fritzstreams.R;
 import de.acepe.fritzstreams.util.Utilities;
+
+import static android.net.wifi.WifiManager.WIFI_MODE_FULL_HIGH_PERF;
 
 public class DownloadTask extends AsyncTask<Void, Void, TaskResult> {
 
@@ -71,15 +71,14 @@ public class DownloadTask extends AsyncTask<Void, Void, TaskResult> {
         }
 
         String command = String.format(App.RTMP_DUMP_FORMAT,
-                                       mDownloadInformation.getUrl(),
-                                       mDownloadInformation.getOutFileFLV());
+                mDownloadInformation.getUrl(),
+                mDownloadInformation.getOutFileFLV());
 
         showNotification(R.string.downloading_notification_title, mDownloadInformation.getFileBaseName());
 
         Log.i(TAG_RTMPDUMP, "downloading: " + command);
         dump = new Rtmpdump();
         int returnValue = dump.parseString(command);
-
         return returnValue == 0 ? TaskResult.successful : TaskResult.failed;
     }
 
@@ -151,10 +150,10 @@ public class DownloadTask extends AsyncTask<Void, Void, TaskResult> {
         PendingIntent pIntent = PendingIntent.getActivity(mContext, 0, intent, 0);
 
         return new NotificationCompat.Builder(mContext).setContentTitle(title)
-                                                       .setContentText(text)
-                                                       .setSmallIcon(R.drawable.ic_launcher)
-                                                       .setContentIntent(pIntent)
-                                                       .build();
+                .setContentText(text)
+                .setSmallIcon(R.drawable.ic_launcher)
+                .setContentIntent(pIntent)
+                .build();
     }
 
 }
