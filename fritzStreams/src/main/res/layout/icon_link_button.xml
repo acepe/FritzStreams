@@ -1,39 +1,47 @@
 <?xml version="1.0" encoding="utf-8"?>
 <merge xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="horizontal"
     android:layout_width="0dp"
     android:layout_height="wrap_content"
     android:layout_gravity="center_vertical"
-    android:layout_weight="1">
+    android:layout_weight="1"
+    android:orientation="horizontal">
 
-    <ImageButton
+
+<ImageButton
         android:id="@+id/ibDownload"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginRight="10dp"
+        android:layout_centerVertical="true"
         android:layout_marginEnd="10dp"
-        android:scaleType="fitCenter"
+        android:layout_marginRight="10dp"
         android:background="@android:color/transparent"
-        android:src="@drawable/stat_sys_download_anim0"
-        android:layout_centerVertical="true" />
+        android:scaleType="fitCenter"
+        android:src="@drawable/stat_sys_download_anim0" />
 
-    <TextView
-        android:id="@+id/tvStreamCategory"
-        style="@android:style/TextAppearance.Large"
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerVertical="true"
-        android:textColor="@color/red_fritz" />
+        android:layout_weight="0.3"
+        android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/tvStreamGenre"
-        style="@android:style/TextAppearance.DeviceDefault.Large"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="2dp"
-        android:layout_marginStart="2dp"
-        android:layout_centerVertical="true"
-        android:textColor="@color/red_fritz" />
+        <TextView
+            android:id="@+id/tvStreamCategory"
+            style="@android:style/TextAppearance.Medium"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:textColor="@color/red_fritz" />
 
+        <TextView
+            android:id="@+id/tvStreamGenre"
+            style="@android:style/TextAppearance.DeviceDefault.Small"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="2dp"
+            android:layout_marginStart="2dp"
+            android:text=" mit someone and somenvksnv"
+            android:textColor="@color/red_fritz" />
+    </LinearLayout>
 
 </merge>

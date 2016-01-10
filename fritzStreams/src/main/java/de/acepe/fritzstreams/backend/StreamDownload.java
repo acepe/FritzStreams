@@ -1,51 +1,48 @@
 package de.acepe.fritzstreams.backend;
 
 import java.io.File;
-import java.util.Calendar;
 
 import android.content.Context;
 import android.content.res.Resources;
+import android.media.MediaScannerConnection;
 import android.net.Uri;
+
 import de.acepe.fritzstreams.App;
+import de.acepe.fritzstreams.util.Utilities;
 
-public class StreamDownload implements DownloadTask.Callback, ConvertTask.Callback {
+public class StreamDownload implements DownloadTask.Callback {
 
-    private String mDownloadedKB = "0";
+    private int mDownloadedKB = 0;
     private int mCurrentProgress;
     private DownloadTask mDownloadTask;
-    private ConvertTask mConvertTask;
+    private int size;
 
     public enum State {
-        waiting, downloading, converting, failed, finished, onlyWifi, cancelled
+        waiting, downloading, failed, finished, onlyWifi, cancelled
     }
 
-    private final DownloadInformation mDownloadInformation;
-    private Context context;
+    private final StreamInfo mStreamInfo;
+    private Context mContext;
     private State state;
 
-    public StreamDownload(Context context, Calendar cal, Stream stream) {
-        this.context = context;
+    public StreamDownload(Context mContext, StreamInfo streamInfo) {
+        this.mContext = mContext;
         this.state = State.waiting;
-        mDownloadInformation = new DownloadInformation(context, cal, stream);
+        mStreamInfo = streamInfo;
     }
 
     public void downloadAndConvert() {
         App.activeDownload = this;
         state = State.downloading;
-        mDownloadTask = new DownloadTask(context, mDownloadInformation, this);
+        mDownloadTask = new DownloadTask(mContext, mStreamInfo, this);
         mDownloadTask.execute();
     }
 
     public void cancel() {
-        switch (state) {
-            case downloading:
-                mDownloadTask.stop();
-                break;
-            case converting:
-                mConvertTask.stop();
-                break;
-            default:
-                App.downloaders.remove(this);
+        if (state == State.downloading) {
+            mDownloadTask.cancel(true);
+        } else {
+            App.downloaders.remove(this);
         }
     }
 
@@ -53,28 +50,25 @@ public class StreamDownload implements DownloadTask.Callback, ConvertTask.Callba
         return mCurrentProgress;
     }
 
-    public void setDownloadedKB(String mDownloadedKB) {
-        this.mDownloadedKB = mDownloadedKB;
-    }
-
     public String getTitle() {
-        return mDownloadInformation.getDisplayStreamCategory()
-               + mDownloadInformation.getDisplayStreamType()
-               + " "
-               + mDownloadInformation.getDisplayDate();
+        return mStreamInfo.getTitle() + " " + mStreamInfo.getSubtitle();
     }
 
     public String getSubtitle() {
-        Resources res = context.getResources();
-        String localizedState = res.getString(res.getIdentifier(state.name(), "string", context.getPackageName()));
+        Resources res = mContext.getResources();
+        String localizedState = res.getString(res.getIdentifier(state.name(), "string", mContext.getPackageName()));
         if (state == State.downloading)
-            return localizedState + ": " + mDownloadedKB;
+            return localizedState
+                   + ": "
+                   + Utilities.humanReadableBytes(mDownloadedKB, false)
+                   + " / "
+                   + Utilities.humanReadableBytes(size, false);
 
         return localizedState;
     }
 
     public Uri getOutFileUri() {
-        File outFileMp3 = new File(mDownloadInformation.getOutFileMp3());
+        File outFileMp3 = new File(mStreamInfo.getFilename());
         return Uri.fromFile(outFileMp3);
     }
 
@@ -84,32 +78,12 @@ public class StreamDownload implements DownloadTask.Callback, ConvertTask.Callba
 
     @Override
     public void onDownloadFinished(TaskResult taskResult) {
-        if (taskResult == TaskResult.successful) {
-            state = State.converting;
-            mConvertTask = new ConvertTask(context, mDownloadInformation, StreamDownload.this);
-            mConvertTask.execute();
-            return;
-        }
-
-        switch (taskResult) {
-            case failed:
-                state = State.failed;
-                break;
-            case onlyWifi:
-                state = State.onlyWifi;
-                break;
-            case cancelled:
-                state = State.cancelled;
-                break;
-        }
-        App.activeDownload = null;
-        startNext();
-    }
-
-    @Override
-    public void onConvertFinished(TaskResult taskResult) {
         switch (taskResult) {
             case successful:
+                MediaScannerConnection.scanFile(mContext,
+                                                new String[] { new File(mStreamInfo.getFilename()).getAbsolutePath() },
+                                                null,
+                                                null);
                 state = State.finished;
                 break;
             case failed:
@@ -123,13 +97,22 @@ public class StreamDownload implements DownloadTask.Callback, ConvertTask.Callba
                 break;
         }
         App.activeDownload = null;
-
         startNext();
     }
 
     @Override
     public void setCurrentProgress(int currentProgress) {
-        this.mCurrentProgress = currentProgress;
+        mCurrentProgress = currentProgress;
+    }
+
+    @Override
+    public void setDownloadedKB(int downloadedKB) {
+        mDownloadedKB = downloadedKB;
+    }
+
+    @Override
+    public void setSize(int size) {
+        this.size = size;
     }
 
     private void startNext() {
