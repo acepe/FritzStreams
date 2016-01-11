@@ -1,11 +1,10 @@
 package de.acepe.fritzstreams;
 
-import java.util.LinkedList;
 import java.util.Locale;
 
 import android.app.Application;
 
-import de.acepe.fritzstreams.backend.StreamDownload;
+import de.acepe.fritzstreams.backend.Downloader;
 
 public class App {
     public static final Locale GERMANY = Locale.GERMANY;
@@ -17,8 +16,6 @@ public class App {
 
     public static Application mApp;
 
-    public static LinkedList<StreamDownload> downloaders = new LinkedList<>();
-
-    public static StreamDownload activeDownload;
+    public static Downloader downloader;
 
 }

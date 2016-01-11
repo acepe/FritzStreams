@@ -10,7 +10,6 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import de.acepe.fritzstreams.App;
 import de.acepe.fritzstreams.R;
@@ -27,7 +26,7 @@ public class DownloadAdapter extends ArrayAdapter<StreamDownload> {
 
     @Override
     public View getView(int position, View downloadRow, ViewGroup parent) {
-        StreamDownload downloader = App.downloaders.get(position);
+        StreamDownload downloader = App.downloader.getDownload(position);
         DownloadViewHolder downloadViewHolder;
 
         if (downloadRow == null) {
@@ -77,11 +76,8 @@ public class DownloadAdapter extends ArrayAdapter<StreamDownload> {
     private View.OnClickListener oclCancel = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            StreamDownload downloader = (StreamDownload) v.getTag();
-            if (downloader.getState() != StreamDownload.State.finished) {
-                Toast.makeText(mContext, R.string.download_noti_canceled, Toast.LENGTH_SHORT).show();
-            }
-            downloader.cancel();
+            StreamDownload download = (StreamDownload) v.getTag();
+            App.downloader.cancelDownload(download);
             notifyDataSetChanged();
         }
     };

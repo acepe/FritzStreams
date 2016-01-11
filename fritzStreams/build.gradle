@@ -1,4 +1,4 @@
-apply plugin: 'android'
+apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 21
@@ -22,6 +22,7 @@ android {
         }
     }
 }
+
 dependencies {
     compile project(':android-support-v4-preferencefragment')
     compile 'org.jsoup:jsoup:1.8.3'

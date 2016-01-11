@@ -17,6 +17,7 @@ import org.jsoup.select.Elements;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Environment;
 import android.preference.PreferenceManager;
@@ -25,6 +26,7 @@ import de.acepe.fritzstreams.App;
 import de.acepe.fritzstreams.R;
 
 public class StreamInfo {
+
     public enum Stream {
         SOUNDGARDEN, NIGHTFLIGHT
     }
@@ -139,7 +141,7 @@ public class StreamInfo {
     }
 
     private String pathForMP3File() {
-        return getDownloadDir() + File.separator + getOutFileName();
+        return getDownloadDir() + File.separator + getFileName();
     }
 
     private String getDownloadDir() {
@@ -148,29 +150,23 @@ public class StreamInfo {
         return sharedPreferences.getString(App.SP_DOWNLOAD_DIR, defaultPath);
     }
 
-    private String getOutFileName() {
+    private String getFileName() {
         return mTitle
                + "_"
                + new SimpleDateFormat("yyyy-MM-dd", App.GERMANY).format(mDate.getTime())
                + App.FILE_EXTENSION_MP3;
     }
 
-    // TODO: remove?
-    private String getOutFileName(String outFileWithoutExtension, int count) {
-        String outFileName = outFileWithoutExtension + (count == 0 ? "" : "(" + count + ")") + App.FILE_EXTENSION_MP3;
-        final File outFile = new File(outFileName);
-        if (outFile.exists())
-            return getOutFileName(outFileWithoutExtension, ++count);
+    public Uri getFileUri() {
+        return Uri.fromFile(new File(getFilename()));
+    }
 
-        return outFileName;
+    public String getPath() {
+        return new File(getFilename()).getAbsolutePath();
     }
 
     public String getStreamURL() {
         return mStreamURL;
-    }
-
-    public Stream getStream() {
-        return mStream;
     }
 
     public String getFilename() {

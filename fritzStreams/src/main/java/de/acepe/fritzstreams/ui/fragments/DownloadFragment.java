@@ -55,7 +55,7 @@ public class DownloadFragment extends Fragment {
         mFreeSpace = (TextView) view.findViewById(R.id.downloads_freespace);
 
         // Create the adapter
-        mAdapter = new DownloadAdapter(getActivity(), R.layout.download_row, App.downloaders);
+        mAdapter = new DownloadAdapter(getActivity(), R.layout.download_row, App.downloader.getDownloads());
         mList.setAdapter(mAdapter);
 
         setHasOptionsMenu(true);
@@ -76,8 +76,8 @@ public class DownloadFragment extends Fragment {
 
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-            if (App.downloaders.get(position).getState() == StreamDownload.State.finished) {
-                Uri outFile = App.downloaders.get(position).getOutFileUri();
+            if (App.downloader.getState(position) == StreamDownload.State.finished) {
+                Uri outFile = App.downloader.getOutFileUri(position);
 
                 Intent mediaIntent = new Intent();
                 mediaIntent.setAction(Intent.ACTION_VIEW);
@@ -94,9 +94,9 @@ public class DownloadFragment extends Fragment {
     };
 
     /**
-     * Creates a timer task for refeshing the download list
+     * Creates a timer task for refeshing the scheduleDownload list
      *
-     * @return Task to update download list
+     * @return Task to update scheduleDownload list
      */
     private TimerTask createTimerTask() {
         return new TimerTask() {
@@ -117,14 +117,13 @@ public class DownloadFragment extends Fragment {
                     }
 
                     mAdapter.notifyDataSetChanged();
-                    if (App.downloaders.isEmpty()) {
+                    if (App.downloader.isEmpty()) {
                         mList.setEmptyView(mEmptyDownloads);
                     }
 
                     long freeSpaceExternal = (long) Utilities.getFreeSpaceExternal();
-                    mFreeSpace.setText(getActivity().getString(R.string.download_freespace)
-                                       + ": "
-                                       + Utilities.humanReadableBytes(freeSpaceExternal, false));
+                    mFreeSpace.setText(getActivity().getString(R.string.download_freespace,
+                                                               Utilities.humanReadableBytes(freeSpaceExternal, false)));
                 }
             };
         };

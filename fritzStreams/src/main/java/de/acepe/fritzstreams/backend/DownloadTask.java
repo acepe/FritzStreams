@@ -33,28 +33,24 @@ public class DownloadTask extends AsyncTask<Void, Void, TaskResult> {
 
     public interface Callback {
         void onDownloadFinished(TaskResult succeeded);
-
-        void setCurrentProgress(int currentProgress);
-
-        void setDownloadedKB(int downloadedKB);
-
-        void setSize(int size);
     }
 
     private static final String TAG = "DownloadTask";
 
     private final Context mContext;
-    private final StreamInfo mStreamInfo;
+    private StreamDownload mStreamDownload;
+    private StreamInfo mStreamInfo;
     private final Callback mCallback;
     private final SharedPreferences mSharedPref;
 
     private WifiManager.WifiLock mWifiLock;
     private PowerManager.WakeLock mWakeLock;
 
-    public DownloadTask(Context context, StreamInfo mStreamInfo, Callback callback) {
+    public DownloadTask(Context context, StreamDownload mStreamDownload, Callback callback) {
         this.mContext = context;
-        this.mStreamInfo = mStreamInfo;
+        this.mStreamDownload = mStreamDownload;
         this.mCallback = callback;
+        mStreamInfo = mStreamDownload.getStreamInfo();
 
         mSharedPref = PreferenceManager.getDefaultSharedPreferences(mContext);
     }
@@ -86,18 +82,19 @@ public class DownloadTask extends AsyncTask<Void, Void, TaskResult> {
         String pathname = mStreamInfo.getFilename();
         File file = new File(pathname);
 
-        URLConnection connection = null;
+        URLConnection connection;
         try {
-            connection = new URL(mStreamInfo.getStreamURL()).openConnection();
+            connection = new URL(mStreamDownload.getStreamInfo().getStreamURL()).openConnection();
         } catch (IOException e) {
             return TaskResult.failed;
         }
         try (InputStream is = connection.getInputStream();
                 OutputStream outstream = new BufferedOutputStream(new FileOutputStream(file))) {
             int size = connection.getContentLength();
+
             Log.d(TAG, "Size is: " + size);
-            mCallback.setCurrentProgress(0);
-            mCallback.setSize(size);
+            mStreamDownload.setCurrentProgress(0);
+            mStreamDownload.setSize(size);
 
             byte[] buffer = new byte[4096];
             int downloadedSum = 0;
@@ -107,8 +104,8 @@ public class DownloadTask extends AsyncTask<Void, Void, TaskResult> {
                     break;
                 }
                 downloadedSum += len;
-                mCallback.setCurrentProgress((int) (downloadedSum / (float) size * 100));
-                mCallback.setDownloadedKB(downloadedSum);
+                mStreamDownload.setCurrentProgress((int) (downloadedSum / (float) size * 100));
+                mStreamDownload.setDownloadedKB(downloadedSum);
                 outstream.write(buffer, 0, len);
                 Log.d(TAG, "Downloaded Bytes: " + downloadedSum + " / " + size);
             }

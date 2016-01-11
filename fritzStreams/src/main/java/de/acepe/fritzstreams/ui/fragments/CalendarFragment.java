@@ -11,7 +11,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CalendarView;
-import android.widget.Toast;
 
 import de.acepe.fritzstreams.App;
 import de.acepe.fritzstreams.R;
@@ -94,16 +93,7 @@ public class CalendarFragment extends Fragment {
         if (!streamInfo.isInited())
             return;
 
-        StreamDownload streamDownload = new StreamDownload(getActivity(), streamInfo);
-        App.downloaders.add(streamDownload);
-        if (!isDownloadInProgress()) {
-            Toast.makeText(getActivity(), R.string.download_noti_started, Toast.LENGTH_SHORT).show();
-            streamDownload.downloadAndConvert();
-        }
-    }
-
-    private boolean isDownloadInProgress() {
-        return App.activeDownload != null;
+        App.downloader.scheduleDownload(new StreamDownload(getActivity(), streamInfo));
     }
 
 }
