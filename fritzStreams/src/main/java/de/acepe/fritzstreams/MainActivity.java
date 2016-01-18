@@ -10,6 +10,8 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
+
+import de.acepe.fritzstreams.backend.Downloader;
 import de.acepe.fritzstreams.ui.fragments.CalendarFragment;
 import de.acepe.fritzstreams.ui.fragments.DownloadFragment;
 import de.acepe.fritzstreams.ui.fragments.SettingsFragment;
@@ -22,9 +24,10 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
 
         App.mApp = getApplication();
+        App.downloader = new Downloader(this);
+
         setContentView(R.layout.main_activity);
 
         mFragments.add(new CalendarFragment());

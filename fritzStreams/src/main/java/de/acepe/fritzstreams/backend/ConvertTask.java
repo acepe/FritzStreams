@@ -1,5 +1,7 @@
 package de.acepe.fritzstreams.backend;
 
+import java.io.File;
+
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -9,11 +11,8 @@ import android.media.MediaScannerConnection;
 import android.os.AsyncTask;
 import android.support.v4.app.NotificationCompat;
 
-import java.io.File;
-
 import de.acepe.fritzstreams.MainActivity;
 import de.acepe.fritzstreams.R;
-import de.acepe.fritzstreams.backend.flv.FLV;
 
 public class ConvertTask extends AsyncTask<Void, Void, Boolean> {
 
@@ -24,25 +23,21 @@ public class ConvertTask extends AsyncTask<Void, Void, Boolean> {
     }
 
     private final Context mContext;
-    private final DownloadInformation mDownloadInformation;
+    private final StreamInfo mStreamInfo;
     private final Callback mCallback;
     private boolean mCancelled;
 
-    public ConvertTask(Context context, DownloadInformation downloadInformation, Callback callback) {
+    public ConvertTask(Context context, StreamInfo streamInfo, Callback callback) {
         this.mContext = context;
-        this.mDownloadInformation = downloadInformation;
+        this.mStreamInfo = streamInfo;
         this.mCallback = callback;
     }
 
     @Override
     protected Boolean doInBackground(Void... commands) {
-        showNotification(R.string.converting_notification_title, mDownloadInformation.getFileBaseName());
-
-        String outFileMp3 = mDownloadInformation.getOutFileMp3();
-        FLV flv = new FLV(mDownloadInformation.getOutFileFLV(), outFileMp3);
-        flv.convert();
-
-        MediaScannerConnection.scanFile(mContext, new String[]{new File(outFileMp3).getAbsolutePath()}, null, null);
+        // TODO:
+        String outFileMp3 = mStreamInfo.getFilename();
+        MediaScannerConnection.scanFile(mContext, new String[] { new File(outFileMp3).getAbsolutePath() }, null, null);
         return true;
     }
 
@@ -62,26 +57,25 @@ public class ConvertTask extends AsyncTask<Void, Void, Boolean> {
 
     private void onFinished(Boolean succeeded) {
         if (succeeded) {
-            showNotification(R.string.finished_notification_title, mDownloadInformation.getFileBaseName());
+            showNotification(R.string.finished_notification_title, mStreamInfo.getTitle());
             mCallback.onConvertFinished(TaskResult.successful);
             return;
         }
 
         if (mCancelled) {
-            showNotification(R.string.download_cancelled_notification_title, mDownloadInformation.getFileBaseName());
+            showNotification(R.string.download_cancelled_notification_title, mStreamInfo.getTitle());
             deleteDownloadFiles();
             mCallback.onConvertFinished(TaskResult.cancelled);
             return;
         }
 
         deleteDownloadFiles();
-        showNotification(R.string.download_failed_notification_title, mDownloadInformation.getFileBaseName());
+        showNotification(R.string.download_failed_notification_title, mStreamInfo.getTitle());
         mCallback.onConvertFinished(TaskResult.failed);
     }
 
     private void deleteDownloadFiles() {
-        deleteFile(mDownloadInformation.getOutFileFLV());
-        deleteFile(mDownloadInformation.getOutFileMp3());
+        deleteFile(mStreamInfo.getFilename());
     }
 
     private void deleteFile(String outFileFLV) {
@@ -105,10 +99,10 @@ public class ConvertTask extends AsyncTask<Void, Void, Boolean> {
         PendingIntent pIntent = PendingIntent.getActivity(mContext, 0, intent, 0);
 
         return new NotificationCompat.Builder(mContext).setContentTitle(title)
-                .setContentText(text)
-                .setSmallIcon(R.drawable.ic_launcher)
-                .setContentIntent(pIntent)
-                .build();
+                                                       .setContentText(text)
+                                                       .setSmallIcon(R.drawable.ic_launcher)
+                                                       .setContentIntent(pIntent)
+                                                       .build();
     }
 
 }

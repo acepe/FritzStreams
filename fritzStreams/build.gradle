@@ -1,4 +1,4 @@
-apply plugin: 'android'
+apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 21
@@ -11,14 +11,8 @@ android {
 
     defaultConfig {
         applicationId "de.acepe.fritzstreams"
-        minSdkVersion 15
+        minSdkVersion 19
         targetSdkVersion 21
-
-        ndk {
-            moduleName "dump"
-            cFlags "-D__STDC_CONSTANT_MACROS -DNO_CRYPTO -DRTMPDUMP_VERSION=\\\"v2.4\\\""
-            ldLibs "log"
-        }
     }
 
     buildTypes {
@@ -27,15 +21,9 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
         }
     }
-    sourceSets {
-        main {
-            jniLibs.srcDirs = ['jniLibs']
-            // jni.srcDirs = [] //disable automatic ndk-build
-        }
-    }
-
 }
+
 dependencies {
-    compile project(':RtmpDump')
     compile project(':android-support-v4-preferencefragment')
+    compile 'org.jsoup:jsoup:1.8.3'
 }

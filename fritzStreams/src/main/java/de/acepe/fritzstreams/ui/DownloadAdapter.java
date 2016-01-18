@@ -10,7 +10,6 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import de.acepe.fritzstreams.App;
 import de.acepe.fritzstreams.R;
@@ -26,37 +25,35 @@ public class DownloadAdapter extends ArrayAdapter<StreamDownload> {
     }
 
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-        StreamDownload downloader = App.downloaders.get(position);
+    public View getView(int position, View downloadRow, ViewGroup parent) {
+        StreamDownload downloader = App.downloader.getDownload(position);
         DownloadViewHolder downloadViewHolder;
 
-        if (convertView == null) {
-            convertView = ((Activity) mContext).getLayoutInflater().inflate(R.layout.download_row, parent, false);
+        if (downloadRow == null) {
+            downloadRow = ((Activity) mContext).getLayoutInflater().inflate(R.layout.download_row, parent, false);
 
             downloadViewHolder = new DownloadViewHolder();
 
-            downloadViewHolder.title = (TextView) convertView.findViewById(R.id.tvDlTitle);
-            downloadViewHolder.subtitle = (TextView) convertView.findViewById(R.id.tvDlSubtitle);
-            downloadViewHolder.progress = (ProgressBar) convertView.findViewById(R.id.pbDlProgress);
-            downloadViewHolder.cancel = (ImageButton) convertView.findViewById(R.id.ibCancelDl);
+            downloadViewHolder.title = (TextView) downloadRow.findViewById(R.id.tvDlTitle);
+            downloadViewHolder.subtitle = (TextView) downloadRow.findViewById(R.id.tvDlSubtitle);
+            downloadViewHolder.progress = (ProgressBar) downloadRow.findViewById(R.id.pbDlProgress);
+            downloadViewHolder.progress.setIndeterminate(false);
+            downloadViewHolder.progress.setMax(100);
 
-            convertView.setTag(downloadViewHolder);
+            downloadViewHolder.cancel = (ImageButton) downloadRow.findViewById(R.id.ibCancelDl);
+
+            downloadRow.setTag(downloadViewHolder);
         } else {
-            downloadViewHolder = (DownloadViewHolder) convertView.getTag();
+            downloadViewHolder = (DownloadViewHolder) downloadRow.getTag();
         }
 
-        convertView.setBackgroundResource(R.drawable.selector_selected);
+        downloadRow.setBackgroundResource(R.drawable.selector_selected);
 
         downloadViewHolder.cancel.setOnClickListener(oclCancel);
         downloadViewHolder.cancel.setTag(downloader);
 
         switch (downloader.getState()) {
             case downloading:
-                downloadViewHolder.progress.setIndeterminate(true);
-                break;
-            case converting:
-                downloadViewHolder.progress.setIndeterminate(false);
-                downloadViewHolder.progress.setMax(100);
                 downloadViewHolder.progress.setProgress(downloader.getCurrentProgress());
                 break;
             default:
@@ -66,7 +63,7 @@ public class DownloadAdapter extends ArrayAdapter<StreamDownload> {
         downloadViewHolder.title.setText(downloader.getTitle());
         downloadViewHolder.subtitle.setText(downloader.getSubtitle());
 
-        return convertView;
+        return downloadRow;
     }
 
     private class DownloadViewHolder {
@@ -79,11 +76,8 @@ public class DownloadAdapter extends ArrayAdapter<StreamDownload> {
     private View.OnClickListener oclCancel = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            StreamDownload downloader = (StreamDownload) v.getTag();
-            if (downloader.getState() != StreamDownload.State.finished) {
-                Toast.makeText(mContext, R.string.download_noti_canceled, Toast.LENGTH_SHORT).show();
-            }
-            downloader.cancel();
+            StreamDownload download = (StreamDownload) v.getTag();
+            App.downloader.cancelDownload(download);
             notifyDataSetChanged();
         }
     };

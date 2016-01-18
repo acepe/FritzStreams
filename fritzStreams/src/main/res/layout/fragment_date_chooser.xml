@@ -15,7 +15,7 @@
         android:id="@+id/calendarView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="0.7"
+        android:layout_weight="0.5"
         android:firstDayOfWeek="2"
         android:minDate="02/15/2014" />
 
@@ -24,12 +24,6 @@
         android:layout_height="0dp"
         android:layout_weight="0.3"
         android:orientation="vertical">
-
-        <TextView
-            android:id="@+id/dayOfWeekLabel"
-            style="@android:style/TextAppearance.Medium"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
 
         <de.acepe.fritzstreams.ui.components.IconLinkButton
             android:id="@+id/ilbDownloadNightflight"
