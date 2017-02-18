@@ -1,0 +1,139 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:myapp="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/LinearLayout1"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/yellow_fritz"
+    android:orientation="vertical"
+    tools:context="de.acepe.fritzstreams.MainActivity">
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="@dimen/streams_padding">
+
+        <de.acepe.fritzstreams.ui.components.StreamView
+            android:id="@+id/ilbDownloadSoundgarden"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            myapp:categoryText="Titel ddsddcf ddddsd aaasdasdasd sssa "
+            myapp:genreText="mit Someone and someother" />
+
+        <de.acepe.fritzstreams.ui.components.StreamView
+            android:id="@+id/ilbDownloadNightflight"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            myapp:categoryText="Titel"
+            myapp:genreText="mit Someone and someother" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1" />
+
+    <RadioGroup
+        android:id="@+id/daysToggleGroup"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/yellow_fritz_dark"
+        android:orientation="horizontal"
+        android:padding="@dimen/toggle_margin">
+
+        <ToggleButton
+            style="@android:style/TextAppearance.Medium"
+            android:id="@+id/day1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/toggle_margin"
+            android:layout_weight="1"
+            android:background="@drawable/toggle_selector"
+            android:textColor="@color/white"
+            android:textOff="@string/mondayButton"
+            android:textOn="@string/mondayButton"
+            android:textStyle="bold" />
+
+        <ToggleButton
+            style="@android:style/TextAppearance.Medium"
+            android:id="@+id/day2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/toggle_margin"
+            android:layout_weight="1"
+            android:background="@drawable/toggle_selector"
+            android:textColor="@color/white"
+            android:textOff="@string/tuesdayButton"
+            android:textOn="@string/tuesdayButton"
+            android:textStyle="bold" />
+
+        <ToggleButton
+            style="@android:style/TextAppearance.Medium"
+            android:id="@+id/day3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/toggle_margin"
+            android:layout_weight="1"
+            android:background="@drawable/toggle_selector"
+            android:textColor="@color/white"
+            android:textOff="@string/wednesdayButton"
+            android:textOn="@string/wednesdayButton"
+            android:textStyle="bold" />
+
+        <ToggleButton
+            style="@android:style/TextAppearance.Medium"
+            android:id="@+id/day4"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/toggle_margin"
+            android:layout_weight="1"
+            android:background="@drawable/toggle_selector"
+            android:textColor="@color/white"
+            android:textOff="@string/thursdayButton"
+            android:textOn="@string/thursdayButton"
+            android:textStyle="bold" />
+
+        <ToggleButton
+            style="@android:style/TextAppearance.Medium"
+            android:id="@+id/day5"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/toggle_margin"
+            android:layout_weight="1"
+            android:background="@drawable/toggle_selector"
+            android:textColor="@color/white"
+            android:textOff="@string/fridayButton"
+            android:textOn="@string/fridayButton"
+            android:textStyle="bold" />
+
+        <ToggleButton
+            style="@android:style/TextAppearance.Medium"
+            android:id="@+id/day6"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/toggle_margin"
+            android:layout_weight="1"
+            android:background="@drawable/toggle_selector"
+            android:textColor="@color/white"
+            android:textOff="@string/saturdayButton"
+            android:textOn="@string/saturdayButton"
+            android:textStyle="bold" />
+
+        <ToggleButton
+            style="@android:style/TextAppearance.Medium"
+            android:id="@+id/day7"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/toggle_margin"
+            android:layout_weight="1"
+            android:background="@drawable/toggle_selector"
+            android:textColor="@color/white"
+            android:textOff="@string/sundayButton"
+            android:textOn="@string/sundayButton"
+            android:textStyle="bold" />
+    </RadioGroup>
+</LinearLayout>

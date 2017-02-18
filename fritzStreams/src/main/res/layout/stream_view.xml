@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/stream_padding"
+        android:layout_weight="1"
+        android:background="@color/yellow_fritz_dark"
+        android:orientation="vertical"
+        android:padding="@dimen/streams_padding">
+
+        <TextView
+            android:id="@+id/tvStreamCategory"
+            style="@android:style/TextAppearance.Medium"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Title of Stream"
+            android:textStyle="bold"
+            android:textColor="@color/red_fritz"
+            android:textSize="@dimen/text_title" />
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="0.9"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:id="@+id/ivDownload"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:adjustViewBounds="true"
+                android:padding="@dimen/streams_padding"
+                android:src="@drawable/sampleimage" />
+
+            <TextView
+                android:id="@+id/tvStreamGenre"
+                style="@android:style/TextAppearance.DeviceDefault.Small"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_margin="@dimen/streams_padding"
+                android:padding="@dimen/streams_padding"
+                android:layout_weight="1"
+                android:background="@color/dark_overlay"
+                android:text="subtitle of Stream bla bla"
+                android:textColor="@color/white"
+                android:textSize="@dimen/text_subtitle" />
+
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/btndownload"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/button_selector"
+            android:enabled="false"
+            android:text="@string/download"
+            android:textColor="@color/white"
+            android:textStyle="bold" />
+
+    </LinearLayout>
+
+
+</merge>

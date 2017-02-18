@@ -4,7 +4,7 @@
     <string name="app_name">Fritz Musikstreams</string>
     <string name="stream_nightflight">Nightflight: </string>
     <string name="stream_soundgarden">Soundgarden: </string>
-    <string name="error">error...</string>
+    <string name="error">error…</string>
     <string name="download">Download</string>
     <string name="downloading_notification_title">Downloading stream</string>
     <string name="converting_notification_title">Converting stream</string>
@@ -14,7 +14,7 @@
     <string name="download_succeeded_notification_title">Download completed</string>
 
     <string-array name="navigation_array">
-        <item>Calendar</item>
+        <item>Streams</item>
         <item>Downloads</item>
         <item>Settings</item>
     </string-array>
@@ -40,6 +40,14 @@
     <string name="download_noti_canceled">Download cancelled</string>
     <string name="download_noti_started">Download started</string>
     <string name="download_only_wifi_notification_title">Download cancelled: not connected to WiFi.</string>
-    <string name="app_not_available">No audio player found...</string>
+    <string name="app_not_available">No audio player found…</string>
+
+    <string name="mondayButton">Mo</string>
+    <string name="tuesdayButton">Di</string>
+    <string name="wednesdayButton">Mi</string>
+    <string name="thursdayButton">Do</string>
+    <string name="fridayButton">Fr</string>
+    <string name="saturdayButton">Sa</string>
+    <string name="sundayButton">So</string>
 
 </resources>

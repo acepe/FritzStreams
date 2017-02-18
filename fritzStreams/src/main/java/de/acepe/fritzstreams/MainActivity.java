@@ -12,7 +12,7 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 
 import de.acepe.fritzstreams.backend.Downloader;
-import de.acepe.fritzstreams.ui.fragments.CalendarFragment;
+import de.acepe.fritzstreams.ui.fragments.StreamsOverviewFragment;
 import de.acepe.fritzstreams.ui.fragments.DownloadFragment;
 import de.acepe.fritzstreams.ui.fragments.SettingsFragment;
 
@@ -30,7 +30,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 
         setContentView(R.layout.main_activity);
 
-        mFragments.add(new CalendarFragment());
+        mFragments.add(new StreamsOverviewFragment());
         mFragments.add(new DownloadFragment());
         mFragments.add(new SettingsFragment());
 

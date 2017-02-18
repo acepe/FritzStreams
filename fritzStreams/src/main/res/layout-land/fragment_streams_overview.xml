@@ -1,0 +1,97 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:myapp="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/LinearLayout1"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="de.acepe.fritzstreams.MainActivity">
+
+    <RadioGroup
+        android:id="@+id/daysToggleGroup"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:orientation="horizontal">
+
+        <ToggleButton
+            android:id="@+id/day1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textOff="@string/mondayButton"
+            android:textOn="@string/mondayButton" />
+
+        <ToggleButton
+            android:id="@+id/day2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textOff="@string/tuesdayButton"
+            android:textOn="@string/tuesdayButton" />
+
+        <ToggleButton
+            android:id="@+id/day3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textOff="@string/wednesdayButton"
+            android:textOn="@string/wednesdayButton" />
+
+        <ToggleButton
+            android:id="@+id/day4"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textOff="@string/thursdayButton"
+            android:textOn="@string/thursdayButton" />
+
+        <ToggleButton
+            android:id="@+id/day5"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textOff="@string/fridayButton"
+            android:textOn="@string/fridayButton" />
+
+        <ToggleButton
+            android:id="@+id/day6"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textOff="@string/saturdayButton"
+            android:textOn="@string/saturdayButton" />
+
+        <ToggleButton
+            android:id="@+id/day7"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textOff="@string/sundayButton"
+            android:textOn="@string/sundayButton" />
+    </RadioGroup>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <de.acepe.fritzstreams.ui.components.StreamView
+            android:id="@+id/ilbDownloadSoundgarden"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            myapp:categoryText="Titel"
+            myapp:genreText="mit Someone and someother" />
+
+        <de.acepe.fritzstreams.ui.components.StreamView
+            android:id="@+id/ilbDownloadNightflight"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            myapp:categoryText="Titel"
+            myapp:genreText="mit Someone and someother" />
+
+
+    </LinearLayout>
+
+</LinearLayout>

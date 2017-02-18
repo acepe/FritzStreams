@@ -2,14 +2,16 @@
 <resources>
     <color name="yellow_fritz">#ffefc700</color>
     <color name="yellow_fritz_bright">#ffffdb12</color>
-    <color name="yellow_fritz_dark">#C4A80E</color>
+    <color name="yellow_fritz_dark">#c4a80e</color>
+    <color name="dark_overlay">#8d000000</color>
 
     <color name="red_fritz">#e80007</color>
-    <color name="red_brighter">#6eff1800</color>
-    <color name="selected_week">#6eff9214</color>
+    <color name="red_fritz_darker">#ac0005</color>
+    <color name="red_fritz_darkest">#861013</color>
 
     <color name="black">#000000</color>
     <color name="white">#ffffff</color>
+    <color name="white_disabled">#c6b6b6b6</color>
 
     <color name="progress_start">#80ffd300</color>
     <color name="progress_center">#80ffb600</color>

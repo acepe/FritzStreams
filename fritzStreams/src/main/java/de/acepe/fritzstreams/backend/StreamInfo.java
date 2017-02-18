@@ -1,16 +1,5 @@
 package de.acepe.fritzstreams.backend;
 
-import android.content.Context;
-import android.content.SharedPreferences;
-import android.net.Uri;
-import android.os.AsyncTask;
-import android.os.Environment;
-import android.preference.PreferenceManager;
-
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.select.Elements;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -22,6 +11,20 @@ import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.select.Elements;
+
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
+import android.os.AsyncTask;
+import android.os.Environment;
+import android.preference.PreferenceManager;
+import android.util.Log;
+
 import de.acepe.fritzstreams.App;
 import de.acepe.fritzstreams.R;
 
@@ -32,7 +35,7 @@ public class StreamInfo {
     }
 
     public interface Callback {
-        void initFinished();
+        void initFinished(StreamInfo streamInfo);
     }
 
     static final String BASE_URL = "http://fritz.de%s";
@@ -42,6 +45,7 @@ public class StreamInfo {
     static final String SUBTITLE_SELECTOR = "#main > article > div.teaserboxgroup.intermediate.count2.even.layoutstandard.layouthalf_2_4 > section > article.manualteaser.first.count1.odd.layoutlaufende_sendung.doctypesendeplatz > div > p";
     static final String DOWNLOAD_SELECTOR = "#main > article > div.teaserboxgroup.first.count1.odd.layoutstandard.layouthalf_2_4 > section > article.manualteaser.last.count2.even.layoutmusikstream.layoutbeitrag_av_nur_av.doctypeteaser > div";
     static final String DOWNLOAD_DESCRIPTOR_ATTRIBUTE = "data-media-ref";
+    static final String IMAGE_SELECTOR = "#main > article > div.teaserboxgroup.intermediate.count2.even.layoutstandard.layouthalf_2_4 > section > article.manualteaser.last.count2.even.layoutstandard.doctypeteaser > aside > div > a > img";
 
     private final Context mContext;
     private final Calendar mDate;
@@ -52,6 +56,7 @@ public class StreamInfo {
     private String mSubtitle;
     private String mStreamURL;
     private String mFilename;
+    private Bitmap mImage;
 
     public StreamInfo(Context mContext, Calendar mDate, Stream mStream) {
         this.mContext = mContext;
@@ -68,8 +73,7 @@ public class StreamInfo {
             }
 
             protected void onPostExecute(Void result) {
-
-                callback.initFinished();
+                callback.initFinished(StreamInfo.this);
             }
         };
         initTask.execute();
@@ -81,6 +85,8 @@ public class StreamInfo {
             mDoc = Jsoup.connect(contentURL).data("query", "Java").userAgent("Mozilla").timeout(3000).get();
             mTitle = extractTitle(TITLE_SELECTOR);
             mSubtitle = extractTitle(SUBTITLE_SELECTOR);
+            downloadImage(extractImageUrl());
+
             mStreamURL = extractDownloadURL();
             mFilename = pathForMP3File();
         } catch (Exception e) {
@@ -88,9 +94,14 @@ public class StreamInfo {
         }
     }
 
-    private String extractTitle(String selector) {
-        Elements info = mDoc.select(selector);
-        return info.text();
+    private void downloadImage(String imageUrl) {
+        try {
+            InputStream in = new java.net.URL(imageUrl).openStream();
+            mImage = BitmapFactory.decodeStream(in);
+        } catch (Exception e) {
+            Log.e("Error", e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     private String buildURL() {
@@ -101,6 +112,11 @@ public class StreamInfo {
 
     private String url(String subUrl) {
         return String.format(BASE_URL, subUrl);
+    }
+
+    private String extractTitle(String selector) {
+        Elements info = mDoc.select(selector);
+        return info.text();
     }
 
     private String extractDownloadURL() {
@@ -129,6 +145,11 @@ public class StreamInfo {
     private String extractDownloadDescriptorUrl() {
         Elements info = mDoc.select(DOWNLOAD_SELECTOR);
         return info.attr(DOWNLOAD_DESCRIPTOR_ATTRIBUTE);
+    }
+
+    private String extractImageUrl() {
+        String imageUrl = mDoc.select(IMAGE_SELECTOR).attr("src");
+        return String.format(BASE_URL, imageUrl);
     }
 
     private static String readAll(Reader rd) throws IOException {
@@ -181,8 +202,20 @@ public class StreamInfo {
         return mSubtitle;
     }
 
+    public Stream getStream() {
+        return mStream;
+    }
+
     public boolean isInited() {
         return getFilename() != null;
+    }
+
+    public Bitmap getImage() {
+        return mImage;
+    }
+
+    public Calendar getDay() {
+        return mDate;
     }
 
 }

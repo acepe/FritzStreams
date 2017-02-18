@@ -28,14 +28,6 @@
         <item name="android:actionModeSplitBackground">@drawable/cab_background_bottom_example
         </item>
         <item name="android:actionModeCloseButtonStyle">@style/ActionButton.CloseMode.Example</item>
-        <item name="android:calendarViewStyle">@style/Widget.CalendarView.Custom</item>
-    </style>
-
-    <style name="Widget.CalendarView.Custom" parent="android:Widget.CalendarView">
-        <item name="android:focusedMonthDateColor">@color/red_fritz</item>
-        <item name="android:unfocusedMonthDateColor">@color/red_brighter</item>
-        <item name="android:weekNumberColor">@color/red_brighter</item>
-        <item name="android:selectedWeekBackgroundColor">@color/yellow_fritz</item>
     </style>
 
     <style name="ActionBar.Solid.Example" parent="@android:style/Widget.Holo.Light.ActionBar.Solid">
