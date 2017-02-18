@@ -12,6 +12,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@color/yellow_fritz_dark"
         android:orientation="vertical"
         android:padding="@dimen/streams_padding">
 
@@ -46,8 +47,8 @@
         android:padding="@dimen/toggle_margin">
 
         <ToggleButton
-            style="@android:style/TextAppearance.Medium"
             android:id="@+id/day1"
+            style="@android:style/TextAppearance.Medium"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/toggle_margin"
@@ -59,8 +60,8 @@
             android:textStyle="bold" />
 
         <ToggleButton
-            style="@android:style/TextAppearance.Medium"
             android:id="@+id/day2"
+            style="@android:style/TextAppearance.Medium"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/toggle_margin"
@@ -72,8 +73,8 @@
             android:textStyle="bold" />
 
         <ToggleButton
-            style="@android:style/TextAppearance.Medium"
             android:id="@+id/day3"
+            style="@android:style/TextAppearance.Medium"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/toggle_margin"
@@ -85,8 +86,8 @@
             android:textStyle="bold" />
 
         <ToggleButton
-            style="@android:style/TextAppearance.Medium"
             android:id="@+id/day4"
+            style="@android:style/TextAppearance.Medium"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/toggle_margin"
@@ -98,8 +99,8 @@
             android:textStyle="bold" />
 
         <ToggleButton
-            style="@android:style/TextAppearance.Medium"
             android:id="@+id/day5"
+            style="@android:style/TextAppearance.Medium"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/toggle_margin"
@@ -111,8 +112,8 @@
             android:textStyle="bold" />
 
         <ToggleButton
-            style="@android:style/TextAppearance.Medium"
             android:id="@+id/day6"
+            style="@android:style/TextAppearance.Medium"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/toggle_margin"
@@ -124,8 +125,8 @@
             android:textStyle="bold" />
 
         <ToggleButton
-            style="@android:style/TextAppearance.Medium"
             android:id="@+id/day7"
+            style="@android:style/TextAppearance.Medium"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/toggle_margin"

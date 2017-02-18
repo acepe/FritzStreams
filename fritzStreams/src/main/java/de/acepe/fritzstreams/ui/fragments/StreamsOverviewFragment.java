@@ -76,6 +76,7 @@ public class StreamsOverviewFragment extends Fragment {
 
     private void onSelectedDayChange(Calendar day) {
         mStreamViewSoundgarden.clearStream();
+
         StreamInfo streamInfoSoundgarden = mSoundgardenStreamsForDay.get(day);
         if (streamInfoSoundgarden == null) {
             mSoundgardenStreamInfo = new StreamInfo(getActivity(), day, SOUNDGARDEN);

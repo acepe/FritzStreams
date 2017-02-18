@@ -6,7 +6,8 @@
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/stream_padding"
         android:layout_weight="1"
-        android:background="@color/yellow_fritz_dark"
+
+        android:background="@color/dark_overlay"
         android:orientation="vertical"
         android:padding="@dimen/streams_padding">
 
@@ -16,9 +17,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Title of Stream"
-            android:textStyle="bold"
             android:textColor="@color/red_fritz"
-            android:textSize="@dimen/text_title" />
+            android:textSize="@dimen/text_title"
+            android:textStyle="bold" />
 
 
         <LinearLayout
@@ -42,9 +43,8 @@
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_margin="@dimen/streams_padding"
-                android:padding="@dimen/streams_padding"
                 android:layout_weight="1"
-                android:background="@color/dark_overlay"
+                android:padding="@dimen/streams_padding"
                 android:text="subtitle of Stream bla bla"
                 android:textColor="@color/white"
                 android:textSize="@dimen/text_subtitle" />
