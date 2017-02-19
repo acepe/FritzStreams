@@ -2,8 +2,8 @@
 <resources>
 
     <string name="app_name">Fritz Musikstreams</string>
-    <string name="stream_nightflight">Nightflight: </string>
-    <string name="stream_soundgarden">Soundgarden: </string>
+    <string name="stream_nightflight">Nightflight:</string>
+    <string name="stream_soundgarden">Soundgarden:</string>
     <string name="error">error…</string>
     <string name="download">Download</string>
     <string name="downloading_notification_title">Downloading stream</string>

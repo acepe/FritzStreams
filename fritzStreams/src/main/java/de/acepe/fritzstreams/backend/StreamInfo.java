@@ -1,11 +1,6 @@
 package de.acepe.fritzstreams.backend;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
+import java.io.*;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
@@ -24,7 +19,6 @@ import android.os.AsyncTask;
 import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.util.Log;
-
 import de.acepe.fritzstreams.App;
 import de.acepe.fritzstreams.R;
 
@@ -218,4 +212,8 @@ public class StreamInfo {
         return mDate;
     }
 
+    @Override
+    public String toString() {
+        return "StreamInfo{" + "mDate=" + mDate + ", mStream=" + mStream + ", mTitle='" + mTitle + '\'' + '}';
+    }
 }

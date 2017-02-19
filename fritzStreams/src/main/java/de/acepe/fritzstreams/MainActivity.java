@@ -1,5 +1,6 @@
 package de.acepe.fritzstreams;
 
+import java.util.Calendar;
 import java.util.LinkedList;
 
 import android.app.ActionBar;
@@ -10,17 +11,24 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
-
+import android.util.Log;
 import de.acepe.fritzstreams.backend.Downloader;
-import de.acepe.fritzstreams.ui.fragments.StreamsOverviewFragment;
+import de.acepe.fritzstreams.backend.StreamInfo;
+import de.acepe.fritzstreams.ui.fragments.CacheFragment;
 import de.acepe.fritzstreams.ui.fragments.DownloadFragment;
 import de.acepe.fritzstreams.ui.fragments.SettingsFragment;
+import de.acepe.fritzstreams.ui.fragments.StreamsOverviewFragment;
 
-public class MainActivity extends FragmentActivity implements ActionBar.TabListener {
+public class MainActivity extends FragmentActivity
+        implements
+            ActionBar.TabListener,
+            StreamsOverviewFragment.StreamsCache {
 
-    private AppSectionsPagerAdapter mAppSectionsPagerAdapter;
+    private static final String TAG_CACHE_FRAGMENT = "CacheFragment";
+    private final LinkedList<Fragment> mFragments = new LinkedList<>();
     private ViewPager mViewPager;
-    private LinkedList<Fragment> mFragments = new LinkedList<>();
+    private ActionBar actionBar;
+    private CacheFragment mCacheFragment;
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -34,9 +42,20 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
         mFragments.add(new DownloadFragment());
         mFragments.add(new SettingsFragment());
 
-        mAppSectionsPagerAdapter = new AppSectionsPagerAdapter(getSupportFragmentManager());
+        FragmentManager fm = getSupportFragmentManager();
+        mCacheFragment = (CacheFragment) fm.findFragmentByTag(TAG_CACHE_FRAGMENT);
 
-        final ActionBar actionBar = getActionBar();
+        // If the Fragment is non-null, then it is currently being
+        // retained across a configuration change.
+        if (mCacheFragment == null) {
+            Log.i(TAG_CACHE_FRAGMENT, "Cache Fragement created in Activity");
+            mCacheFragment = new CacheFragment();
+            fm.beginTransaction().add(mCacheFragment, TAG_CACHE_FRAGMENT).commit();
+        }
+
+        AppSectionsPagerAdapter mAppSectionsPagerAdapter = new AppSectionsPagerAdapter(fm);
+
+        actionBar = getActionBar();
         actionBar.setHomeButtonEnabled(false);
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 
@@ -70,9 +89,19 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
     public void onTabReselected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
     }
 
-    public class AppSectionsPagerAdapter extends FragmentPagerAdapter {
+    @Override
+    public void addStream(StreamInfo streamInfo) {
+        mCacheFragment.addStream(streamInfo);
+    }
 
-        public AppSectionsPagerAdapter(FragmentManager fm) {
+    @Override
+    public StreamInfo getStream(StreamInfo.Stream stream, Calendar day) {
+        return mCacheFragment.getStream(stream, day);
+    }
+
+    private class AppSectionsPagerAdapter extends FragmentPagerAdapter {
+
+        AppSectionsPagerAdapter(FragmentManager fm) {
             super(fm);
         }
 

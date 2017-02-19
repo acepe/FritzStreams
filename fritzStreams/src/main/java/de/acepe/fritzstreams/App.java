@@ -17,7 +17,6 @@ public class App {
     public static final String SP_DOWNLOAD_DIR = "pref_dl_dir";
 
     public static Application mApp;
-
     public static Downloader downloader;
 
 }

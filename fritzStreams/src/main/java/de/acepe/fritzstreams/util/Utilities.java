@@ -1,20 +1,25 @@
 package de.acepe.fritzstreams.util;
 
+import java.util.Calendar;
+
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Environment;
 import android.os.StatFs;
+import android.support.annotation.NonNull;
 import de.acepe.fritzstreams.App;
 
-public class Utilities {
+public final class Utilities {
+
+    private Utilities() {
+    }
 
     /**
      * Get the free space on the external storage device (like sd card)
      *
      * @return The free space in byte
      */
-
     public static double getFreeSpaceExternal() {
         StatFs stat = new StatFs(Environment.getExternalStorageDirectory().getPath());
         return (double) stat.getAvailableBlocks() * (double) stat.getBlockSize();
@@ -40,6 +45,17 @@ public class Utilities {
         NetworkInfo mWifi = connManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
 
         return mWifi.isConnected();
+    }
+
+    @NonNull
+    public static Calendar today() {
+        Calendar date = Calendar.getInstance();
+        date.set(Calendar.HOUR_OF_DAY, 0);
+        date.set(Calendar.HOUR, 0);
+        date.set(Calendar.MINUTE, 0);
+        date.set(Calendar.SECOND, 0);
+        date.set(Calendar.MILLISECOND, 0);
+        return date;
     }
 
     /**

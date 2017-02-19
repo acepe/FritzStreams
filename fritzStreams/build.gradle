@@ -26,4 +26,5 @@ android {
 dependencies {
     compile project(':android-support-v4-preferencefragment')
     compile 'org.jsoup:jsoup:1.8.3'
+    compile 'com.android.support:support-v4:24.2.1'
 }
