@@ -6,6 +6,7 @@
     <string name="stream_soundgarden">Soundgarden:</string>
     <string name="error">error…</string>
     <string name="download">Download</string>
+    <string name="try_again">Reload</string>
     <string name="downloading_notification_title">Downloading stream</string>
     <string name="converting_notification_title">Converting stream</string>
     <string name="finished_notification_title">Converting finished</string>

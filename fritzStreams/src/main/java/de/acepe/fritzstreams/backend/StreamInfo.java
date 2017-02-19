@@ -1,5 +1,7 @@
 package de.acepe.fritzstreams.backend;
 
+import static android.os.AsyncTask.THREAD_POOL_EXECUTOR;
+
 import java.io.*;
 import java.net.URL;
 import java.nio.charset.Charset;
@@ -20,7 +22,6 @@ import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import de.acepe.fritzstreams.App;
-import de.acepe.fritzstreams.R;
 
 public class StreamInfo {
 
@@ -51,6 +52,7 @@ public class StreamInfo {
     private String mStreamURL;
     private String mFilename;
     private Bitmap mImage;
+    private boolean failed;
 
     public StreamInfo(Context mContext, Calendar mDate, Stream mStream) {
         this.mContext = mContext;
@@ -60,32 +62,40 @@ public class StreamInfo {
 
     public void init(final Callback callback) {
         AsyncTask<Void, Void, Void> initTask = new AsyncTask<Void, Void, Void>() {
+            private Exception error;
+
             @Override
             protected Void doInBackground(Void... params) {
-                init();
+                try {
+                    init();
+                } catch (Exception e) {
+                    error = e;
+                }
                 return null;
             }
 
             protected void onPostExecute(Void result) {
-                callback.initFinished(StreamInfo.this);
+                if (error == null) {
+                    callback.initFinished(StreamInfo.this);
+                    failed = false;
+                } else {
+                    callback.initFinished(null);
+                    failed = true;
+                }
             }
         };
-        initTask.execute();
+        initTask.executeOnExecutor(THREAD_POOL_EXECUTOR);
     }
 
-    private void init() {
+    private void init() throws IOException {
         String contentURL = buildURL();
-        try {
-            mDoc = Jsoup.connect(contentURL).data("query", "Java").userAgent("Mozilla").timeout(3000).get();
-            mTitle = extractTitle(TITLE_SELECTOR);
-            mSubtitle = extractTitle(SUBTITLE_SELECTOR);
-            downloadImage(extractImageUrl());
+        mDoc = Jsoup.connect(contentURL).timeout(10000).userAgent("Mozilla").get();
+        mTitle = extractTitle(TITLE_SELECTOR);
+        mSubtitle = extractTitle(SUBTITLE_SELECTOR);
+        downloadImage(extractImageUrl());
 
-            mStreamURL = extractDownloadURL();
-            mFilename = pathForMP3File();
-        } catch (Exception e) {
-            mTitle = mContext.getString(R.string.error);
-        }
+        mStreamURL = extractDownloadURL();
+        mFilename = pathForMP3File();
     }
 
     private void downloadImage(String imageUrl) {
@@ -215,5 +225,9 @@ public class StreamInfo {
     @Override
     public String toString() {
         return "StreamInfo{" + "mDate=" + mDate + ", mStream=" + mStream + ", mTitle='" + mTitle + '\'' + '}';
+    }
+
+    public boolean isFailed() {
+        return failed;
     }
 }

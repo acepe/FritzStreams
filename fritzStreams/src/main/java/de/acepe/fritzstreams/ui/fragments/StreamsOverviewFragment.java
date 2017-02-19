@@ -68,10 +68,10 @@ public class StreamsOverviewFragment extends Fragment {
         configureToggleButtons();
 
         mStreamViewNightflight = (StreamView) view.findViewById(R.id.ilbDownloadNightflight);
-        mStreamViewNightflight.setOnClickListener(oclDownloadNightflight);
+        mStreamViewNightflight.setOnClickListener(new DownloadOnclickListener(NIGHTFLIGHT));
 
         mStreamViewSoundgarden = (StreamView) view.findViewById(R.id.ilbDownloadSoundgarden);
-        mStreamViewSoundgarden.setOnClickListener(oclDownloadSoundgarden);
+        mStreamViewSoundgarden.setOnClickListener(new DownloadOnclickListener(SOUNDGARDEN));
 
         ToggleButton todaysToggle = (ToggleButton) mDaysToggleGroup.getChildAt(mDayButtons.size() - 1);
         todaysToggle.setChecked(true);
@@ -97,25 +97,21 @@ public class StreamsOverviewFragment extends Fragment {
     }
 
     private void onSelectedDayChange(Calendar day) {
-        mStreamViewSoundgarden.clearStream();
+        mSoundgardenStreamInfo = init(SOUNDGARDEN, day);
+        mNightflightStreamInfo = init(NIGHTFLIGHT, day);
+    }
 
-        StreamInfo streamInfoSoundgarden = mStreamsCache.getStream(SOUNDGARDEN, day);
-        if (streamInfoSoundgarden == null) {
-            mSoundgardenStreamInfo = new StreamInfo(getActivity(), day, SOUNDGARDEN);
-            mSoundgardenStreamInfo.init(new InitStreamCallback(mStreamViewSoundgarden));
+    private StreamInfo init(StreamInfo.Stream stream, Calendar day) {
+        StreamView view = stream == NIGHTFLIGHT ? mStreamViewNightflight : mStreamViewSoundgarden;
+        view.clearStream();
+        StreamInfo streamInfo = mStreamsCache.getStream(stream, day);
+        if (streamInfo == null) {
+            streamInfo = new StreamInfo(getActivity(), day, stream);
+            streamInfo.init(new InitStreamCallback(view));
         } else {
-            setStreamView(mStreamViewSoundgarden, streamInfoSoundgarden);
+            setStreamView(view, streamInfo);
         }
-
-        mStreamViewNightflight.clearStream();
-        StreamInfo streamInfoNightflight = mStreamsCache.getStream(NIGHTFLIGHT, day);
-        if (streamInfoNightflight == null) {
-            mNightflightStreamInfo = new StreamInfo(getActivity(), day, NIGHTFLIGHT);
-            mNightflightStreamInfo.init(new InitStreamCallback(mStreamViewNightflight));
-        } else {
-            setStreamView(mStreamViewNightflight, streamInfoNightflight);
-        }
-
+        return streamInfo;
     }
 
     private class InitStreamCallback implements StreamInfo.Callback {
@@ -133,8 +129,12 @@ public class StreamsOverviewFragment extends Fragment {
     }
 
     private void setStreamView(StreamView view, StreamInfo streamInfo) {
-        view.setStreamInfo(streamInfo);
-        mStreamsCache.addStream(streamInfo);
+        if (streamInfo == null) {
+            view.failed();
+        } else {
+            view.setStreamInfo(streamInfo);
+            mStreamsCache.addStream(streamInfo);
+        }
     }
 
     static final RadioGroup.OnCheckedChangeListener toggleListener = new RadioGroup.OnCheckedChangeListener() {
@@ -157,19 +157,24 @@ public class StreamsOverviewFragment extends Fragment {
         }
     };
 
-    private final View.OnClickListener oclDownloadNightflight = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            download(mNightflightStreamInfo);
-        }
-    };
+    private class DownloadOnclickListener implements View.OnClickListener {
+        private final StreamInfo.Stream stream;
 
-    private final View.OnClickListener oclDownloadSoundgarden = new View.OnClickListener() {
+        DownloadOnclickListener(StreamInfo.Stream stream) {
+            this.stream = stream;
+        }
+
         @Override
         public void onClick(View v) {
-            download(mSoundgardenStreamInfo);
+            StreamInfo streamInfo = stream == NIGHTFLIGHT ? mNightflightStreamInfo : mSoundgardenStreamInfo;
+
+            if (streamInfo.isFailed()) {
+                init(stream, streamInfo.getDay());
+            } else {
+                download(streamInfo);
+            }
         }
-    };
+    }
 
     private void download(StreamInfo streamInfo) {
         if (!streamInfo.isInited())

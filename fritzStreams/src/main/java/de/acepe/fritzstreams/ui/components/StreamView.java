@@ -7,17 +7,18 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-
 import de.acepe.fritzstreams.R;
 import de.acepe.fritzstreams.backend.StreamInfo;
+import de.acepe.fritzstreams.util.Utilities;
 
 public class StreamView extends LinearLayout {
 
     public static final String TAG = "StreamView";
-    ImageView imageView;
-    TextView category;
-    TextView genre;
-    Button downloadButton;
+    private ImageView imageView;
+    private TextView category;
+    private TextView genre;
+    private Button downloadButton;
+    private View progressOverlay;
 
     public StreamView(Context context) {
         super(context);
@@ -36,15 +37,30 @@ public class StreamView extends LinearLayout {
 
     private void init(Context context, AttributeSet attrs) {
         View.inflate(context, R.layout.stream_view, this);
-        setDescendantFocusability(FOCUS_BLOCK_DESCENDANTS);
+
+        progressOverlay = findViewById(R.id.progress_overlay);
         category = (TextView) findViewById(R.id.tvStreamCategory);
         genre = (TextView) findViewById(R.id.tvStreamGenre);
         imageView = (ImageView) findViewById(R.id.ivDownload);
         downloadButton = (Button) findViewById(R.id.btndownload);
+
+        clearStream();
     }
 
+    @Override
     public void setOnClickListener(OnClickListener listener) {
         downloadButton.setOnClickListener(listener);
+    }
+
+    public void failed() {
+        imageView.setImageResource(R.drawable.sampleimage);
+        category.setText(R.string.error);
+        genre.setText("");
+        downloadButton.setEnabled(true);
+        downloadButton.setText(R.string.try_again);
+
+        // Show progress overlay (with animation):
+        Utilities.animateView(progressOverlay, View.GONE, 0, 200);
     }
 
     public void clearStream() {
@@ -52,10 +68,9 @@ public class StreamView extends LinearLayout {
         category.setText("");
         genre.setText("");
         downloadButton.setEnabled(false);
-    }
 
-    public void setEnabled(boolean enabled) {
-        downloadButton.setEnabled(enabled);
+        // Show progress overlay (with animation):
+        Utilities.animateView(progressOverlay, View.VISIBLE, 0.4f, 200);
     }
 
     public void setStreamInfo(StreamInfo streamInfo) {
@@ -63,5 +78,10 @@ public class StreamView extends LinearLayout {
         genre.setText(streamInfo.getSubtitle());
         imageView.setImageBitmap(streamInfo.getImage());
         downloadButton.setEnabled(true);
+        downloadButton.setText(R.string.download);
+
+        // Hide progress view (with animation):
+        Utilities.animateView(progressOverlay, View.GONE, 0, 200);
     }
+
 }
