@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android">
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+
+        android:layout_weight="1"
+        android:background="@color/yellow_fritz_dark"
+        android:orientation="horizontal">
+
+
+        <ImageView
+            android:id="@+id/ivDownload"
+            android:layout_width="100dp"
+            android:layout_height="match_parent"
+            android:adjustViewBounds="true"
+            android:padding="@dimen/stream_download_margin"
+            android:scaleType="centerCrop"
+            android:src="@drawable/sampleimage" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_margin="@dimen/stream_download_margin"
+            android:layout_weight="1"
+            android:background="@color/dark_overlay"
+            android:orientation="vertical"
+            android:padding="@dimen/streams_padding">
+
+            <TextView
+                android:id="@+id/tvStreamCategory"
+                style="@android:style/TextAppearance.DeviceDefault.Small"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Title of Stream"
+                android:textColor="@color/red_fritz"
+                android:textSize="@dimen/text_title" />
+
+            <TextView
+                android:id="@+id/tvStreamGenre"
+                style="@android:style/TextAppearance.DeviceDefault.Small"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:text="subtitle of Stream bla bla"
+                android:textColor="@color/white"
+                android:textSize="@dimen/text_subtitle" />
+
+            <ProgressBar
+                android:id="@+id/pbDownloadProgress"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="fill_parent"
+                android:layout_height="5dp"
+                android:indeterminate="false"
+                android:max="100"
+                android:paddingTop="0dp"
+                android:progress="0"
+                android:progressDrawable="@drawable/progress" />
+
+
+        </LinearLayout>
+
+        <ImageButton
+            android:id="@+id/btnCancelDownload"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_margin="@dimen/stream_download_margin"
+            android:background="@color/red_fritz"
+            android:enabled="true"
+            android:src="@drawable/ic_menu_close_clear_cancel"
+            android:textColor="@color/white" />
+
+    </LinearLayout>
+
+</merge>

@@ -8,18 +8,23 @@ import java.util.Calendar;
 import java.util.HashMap;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RadioGroup;
+import android.widget.Toast;
 import android.widget.ToggleButton;
 import de.acepe.fritzstreams.App;
 import de.acepe.fritzstreams.R;
-import de.acepe.fritzstreams.backend.StreamDownload;
+import de.acepe.fritzstreams.backend.DownloadInfo;
 import de.acepe.fritzstreams.backend.StreamInfo;
 import de.acepe.fritzstreams.ui.components.StreamView;
+import de.acepe.fritzstreams.util.Utilities;
 
 public class StreamsOverviewFragment extends Fragment {
 
@@ -27,6 +32,8 @@ public class StreamsOverviewFragment extends Fragment {
         void addStream(StreamInfo streamInfo);
 
         StreamInfo getStream(StreamInfo.Stream stream, Calendar day);
+
+        void scheduleDownload(DownloadInfo streamDownload);
     }
 
     private static final String TAG = "StreamOverviewFragment";
@@ -168,7 +175,7 @@ public class StreamsOverviewFragment extends Fragment {
         public void onClick(View v) {
             StreamInfo streamInfo = stream == NIGHTFLIGHT ? mNightflightStreamInfo : mSoundgardenStreamInfo;
 
-            if (streamInfo.isFailed()) {
+            if (streamInfo.isInitFailed()) {
                 init(stream, streamInfo.getDay());
             } else {
                 download(streamInfo);
@@ -177,10 +184,25 @@ public class StreamsOverviewFragment extends Fragment {
     }
 
     private void download(StreamInfo streamInfo) {
-        if (!streamInfo.isInited())
+        if (!streamInfo.isInited()) {
             return;
+        }
 
-        App.downloader.scheduleDownload(new StreamDownload(getActivity(), streamInfo));
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getContext());
+        if (sharedPref.getBoolean(App.SP_WIFI_ONLY, false) && !Utilities.onWifi(getContext())) {
+            Toast.makeText(getContext(), R.string.download_only_wifi_notification_title, Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        mStreamsCache.scheduleDownload(createDownloadInfo(streamInfo));
+    }
+
+    @NonNull
+    private DownloadInfo createDownloadInfo(StreamInfo streamInfo) {
+        return new DownloadInfo(streamInfo.getTitle(),
+                                streamInfo.getSubtitle(),
+                                streamInfo.getStreamURL(),
+                                streamInfo.getFilename());
     }
 
 }

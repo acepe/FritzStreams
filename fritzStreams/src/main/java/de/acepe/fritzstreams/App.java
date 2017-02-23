@@ -5,8 +5,6 @@ import android.app.Application;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
 
-import de.acepe.fritzstreams.backend.Downloader;
-
 public class App {
     public static final Locale GERMANY = Locale.GERMANY;
 
@@ -17,6 +15,5 @@ public class App {
     public static final String SP_DOWNLOAD_DIR = "pref_dl_dir";
 
     public static Application mApp;
-    public static Downloader downloader;
 
 }

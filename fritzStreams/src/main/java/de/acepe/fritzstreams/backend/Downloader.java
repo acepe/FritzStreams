@@ -1,114 +1,76 @@
 package de.acepe.fritzstreams.backend;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.io.*;
+import java.net.URL;
+import java.net.URLConnection;
 
-import android.content.Context;
-import android.media.MediaScannerConnection;
-import android.net.Uri;
-import android.widget.Toast;
+import android.util.Log;
 
-import de.acepe.fritzstreams.R;
-import de.acepe.fritzstreams.backend.StreamDownload.State;
+public class Downloader {
 
-public class Downloader implements DownloadTask.Callback {
+    private boolean cancelled;
 
-    private final LinkedList<StreamDownload> mDownloads = new LinkedList<>();
-    private final Context mContext;
+    public interface DownloadCallback {
+        void reportProgress(ProgressInfo progressInfo);
 
-    private StreamDownload mActiveDownload;
-    private DownloadTask mDownloadTask;
-
-    public Downloader(Context mContext) {
-        this.mContext = mContext;
+        boolean isCancelled();
     }
 
-    public void scheduleDownload(StreamDownload streamDownload) {
-        mDownloads.add(streamDownload);
-        if (!isDownloadInProgress()) {
-            Toast.makeText(mContext, R.string.download_noti_started, Toast.LENGTH_SHORT).show();
-            downloadNext();
+    private static final String TAG = "Downloader";
+
+    private final DownloadInfo mDownloadInfo;
+    private final DownloadCallback callback;
+
+    public Downloader(DownloadInfo downloadInfo, DownloadCallback callback) {
+        this.mDownloadInfo = downloadInfo;
+        this.callback = callback;
+    }
+
+    public TaskResult download() {
+        String pathname = mDownloadInfo.getFilename();
+        File file = new File(pathname);
+
+        URLConnection connection;
+        try {
+            connection = new URL(mDownloadInfo.getStreamURL()).openConnection();
+        } catch (IOException e) {
+            return TaskResult.failed;
         }
-    }
+        try (InputStream is = connection.getInputStream();
+                OutputStream outstream = new BufferedOutputStream(new FileOutputStream(file))) {
+            int size = connection.getContentLength();
 
-    private void downloadNext() {
-        StreamDownload firstWaiting = findFirstWaiting();
-        if (firstWaiting == null)
-            return;
-        mActiveDownload = firstWaiting;
+            Log.d(TAG, "Size is: " + size);
+            callback.reportProgress(new ProgressInfo(mDownloadInfo.getStreamURL(),
+                                                     0,
+                                                     size,
+                                                     0,
+                                                     ProgressInfo.State.downloading));
 
-        mActiveDownload.setState(State.downloading);
-        mDownloadTask = new DownloadTask(mContext, mActiveDownload, this);
-        mDownloadTask.execute();
-    }
+            byte[] buffer = new byte[4096];
+            int downloadedSum = 0;
+            int len;
+            while ((len = is.read(buffer)) > 0) {
+                if (callback.isCancelled()) {
+                    cancelled = true;
+                    break;
+                }
+                outstream.write(buffer, 0, len);
 
-    @Override
-    public void onDownloadFinished(TaskResult taskResult) {
-        switch (taskResult) {
-            case successful:
-
-                MediaScannerConnection.scanFile(mContext,
-                                                new String[] { mActiveDownload.getStreamInfo().getPath() },
-                                                null,
-                                                null);
-                mActiveDownload.setState(State.finished);
-                break;
-            case failed:
-                mActiveDownload.setState(State.failed);
-                break;
-            case onlyWifi:
-                mActiveDownload.setState(State.onlyWifi);
-                break;
-            case cancelled:
-                mActiveDownload.setState(State.cancelled);
-                break;
+                downloadedSum += len;
+                int progressPercent = (int) (downloadedSum / (float) size * 100);
+                callback.reportProgress(new ProgressInfo(mDownloadInfo.getStreamURL(),
+                                                         progressPercent,
+                                                         size,
+                                                         downloadedSum,
+                                                         ProgressInfo.State.downloading));
+                Log.d(TAG, "Downloaded Bytes: " + downloadedSum + " / " + size);
+            }
+        } catch (IOException e) {
+            return TaskResult.failed;
         }
-        mActiveDownload = null;
-        downloadNext();
-    }
 
-    private boolean isDownloadInProgress() {
-        return mActiveDownload != null;
-    }
-
-    private StreamDownload findFirstWaiting() {
-        for (StreamDownload streamDownload : mDownloads) {
-            if (streamDownload.getState() == State.waiting)
-                return streamDownload;
-        }
-        return null;
-    }
-
-    public boolean isEmpty() {
-        return mDownloads.isEmpty();
-    }
-
-    public State getState(int position) {
-        return mDownloads.get(position).getState();
-    }
-
-    public Uri getOutFileUri(int position) {
-        return mDownloads.get(position).getStreamInfo().getFileUri();
-    }
-
-    public StreamDownload getDownload(int position) {
-        return mDownloads.get(position);
-    }
-
-    public List<StreamDownload> getDownloads() {
-        return mDownloads;
-    }
-
-    public void cancelDownload(StreamDownload download) {
-        if (download.getState() != StreamDownload.State.finished) {
-            Toast.makeText(mContext, R.string.download_noti_canceled, Toast.LENGTH_SHORT).show();
-        }
-        if (download == mActiveDownload && mActiveDownload.getState() == State.downloading) {
-            mDownloadTask.cancel(true);
-            downloadNext();
-        } else {
-            mDownloads.remove(download);
-        }
+        return cancelled ? TaskResult.cancelled : TaskResult.successful;
     }
 
 }

@@ -12,7 +12,8 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
-import de.acepe.fritzstreams.backend.Downloader;
+import de.acepe.fritzstreams.backend.DownloadInfo;
+import de.acepe.fritzstreams.backend.DownloadServiceAdapter;
 import de.acepe.fritzstreams.backend.StreamInfo;
 import de.acepe.fritzstreams.ui.fragments.CacheFragment;
 import de.acepe.fritzstreams.ui.fragments.DownloadFragment;
@@ -22,29 +23,28 @@ import de.acepe.fritzstreams.ui.fragments.StreamsOverviewFragment;
 public class MainActivity extends FragmentActivity
         implements
             ActionBar.TabListener,
+            DownloadFragment.DownloadServiceAdapterSupplier,
             StreamsOverviewFragment.StreamsCache {
 
     private static final String TAG_CACHE_FRAGMENT = "CacheFragment";
+    private static final String TAG_DOWNLOAD_FRAGMENT = "DownloadFragment";
+
     private final LinkedList<Fragment> mFragments = new LinkedList<>();
     private ViewPager mViewPager;
     private ActionBar actionBar;
+
     private CacheFragment mCacheFragment;
+    private DownloadFragment mDownloadFragment;
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         App.mApp = getApplication();
-        App.downloader = new Downloader(this);
 
         setContentView(R.layout.main_activity);
 
-        mFragments.add(new StreamsOverviewFragment());
-        mFragments.add(new DownloadFragment());
-        mFragments.add(new SettingsFragment());
-
         FragmentManager fm = getSupportFragmentManager();
         mCacheFragment = (CacheFragment) fm.findFragmentByTag(TAG_CACHE_FRAGMENT);
-
         // If the Fragment is non-null, then it is currently being
         // retained across a configuration change.
         if (mCacheFragment == null) {
@@ -52,6 +52,11 @@ public class MainActivity extends FragmentActivity
             mCacheFragment = new CacheFragment();
             fm.beginTransaction().add(mCacheFragment, TAG_CACHE_FRAGMENT).commit();
         }
+
+        mDownloadFragment = new DownloadFragment();
+        mFragments.add(new StreamsOverviewFragment());
+        mFragments.add(mDownloadFragment);
+        mFragments.add(new SettingsFragment());
 
         AppSectionsPagerAdapter mAppSectionsPagerAdapter = new AppSectionsPagerAdapter(fm);
 
@@ -97,6 +102,16 @@ public class MainActivity extends FragmentActivity
     @Override
     public StreamInfo getStream(StreamInfo.Stream stream, Calendar day) {
         return mCacheFragment.getStream(stream, day);
+    }
+
+    @Override
+    public void scheduleDownload(DownloadInfo streamDownload) {
+        mCacheFragment.scheduleDownload(streamDownload);
+    }
+
+    @Override
+    public DownloadServiceAdapter getDownloader() {
+        return mCacheFragment.getDownloadServiceAdapter();
     }
 
     private class AppSectionsPagerAdapter extends FragmentPagerAdapter {

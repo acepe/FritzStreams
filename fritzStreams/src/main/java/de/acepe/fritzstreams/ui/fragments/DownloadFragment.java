@@ -1,8 +1,10 @@
 package de.acepe.fritzstreams.ui.fragments;
 
-import java.util.Timer;
-import java.util.TimerTask;
+import java.io.File;
+import java.util.HashMap;
+import java.util.List;
 
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -10,74 +12,95 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ListView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import de.acepe.fritzstreams.App;
 import de.acepe.fritzstreams.R;
-import de.acepe.fritzstreams.backend.StreamDownload;
-import de.acepe.fritzstreams.ui.DownloadAdapter;
+import de.acepe.fritzstreams.backend.DownloadInfo;
+import de.acepe.fritzstreams.backend.DownloadServiceAdapter;
+import de.acepe.fritzstreams.backend.ProgressInfo;
+import de.acepe.fritzstreams.ui.components.StreamDownloadView;
 import de.acepe.fritzstreams.util.Utilities;
 
-public class DownloadFragment extends Fragment {
+public class DownloadFragment extends Fragment implements DownloadServiceAdapter.ResultReceiver {
 
-    private Timer mUpdateTimer;
-    private ListView mList;
-    private View mEmptyDownloads;
-    private DownloadAdapter mAdapter;
-    private TextView mFreeSpace;
-
-    @Override
-    public void onResume() {
-        super.onResume();
-
-        mUpdateTimer = new Timer();
-        mUpdateTimer.scheduleAtFixedRate(createTimerTask(), 250, 250);
+    public interface DownloadServiceAdapterSupplier {
+        DownloadServiceAdapter getDownloader();
     }
 
-    @Override
-    public void onPause() {
-        super.onPause();
+    private final HashMap<DownloadInfo, StreamDownloadView> downloadViews = new HashMap<>();
 
-        if (mUpdateTimer != null) {
-            mUpdateTimer.cancel();
-        }
+    private LinearLayout mDownloadsContainer;
+    private TextView mFreeSpace;
+    private View view;
+    private DownloadServiceAdapterSupplier mDownloaderSupplier;
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        mDownloaderSupplier = (DownloadServiceAdapterSupplier) context;
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.download_fragment, container, false);
+        view = inflater.inflate(R.layout.download_fragment, container, false);
 
-        mList = (ListView) view.findViewById(R.id.downloads);
-        mEmptyDownloads = view.findViewById(R.id.downloads_empty);
+        mDownloadsContainer = (LinearLayout) view.findViewById(R.id.llDownloadsContainer);
         mFreeSpace = (TextView) view.findViewById(R.id.downloads_freespace);
-
-        // Create the adapter
-        mAdapter = new DownloadAdapter(getActivity(), R.layout.download_row, App.downloader.getDownloads());
-        mList.setAdapter(mAdapter);
 
         setHasOptionsMenu(true);
 
+        mDownloaderSupplier.getDownloader().registerResultReceiver(this);
+        mDownloaderSupplier.getDownloader().queryDownloadInfos();
         return view;
     }
 
     @Override
-    public void onViewCreated(final View view, final Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        mList.setFastScrollEnabled(true);
-        mList.setTextFilterEnabled(true);
-        mList.setSelector(android.R.color.transparent);
-        mList.setOnItemClickListener(oiclDownload);
+    public void onDetach() {
+        super.onDetach();
+        mDownloaderSupplier = null;
     }
 
-    private AdapterView.OnItemClickListener oiclDownload = new AdapterView.OnItemClickListener() {
+    @Override
+    public void downloadsInQueue(List<DownloadInfo> downloads) {
+        mDownloadsContainer.removeAllViews();
+        for (DownloadInfo download : downloads) {
+            addDownload(download);
+        }
+    }
 
+    @Override
+    public void currentProgress(ProgressInfo progressInfo) {
+        for (DownloadInfo downloadInfo : downloadViews.keySet()) {
+            if (downloadInfo.getStreamURL().equals(progressInfo.getUrl())) {
+                StreamDownloadView view = downloadViews.get(downloadInfo);
+                view.setProgress(progressInfo);
+
+//                long freeSpaceExternal = (long) Utilities.getFreeSpaceExternal();
+//                mFreeSpace.setText(getActivity().getString(R.string.download_freespace,
+//                                                           Utilities.humanReadableBytes(freeSpaceExternal, false)));
+                return;
+            }
+        }
+    }
+
+    private void addDownload(DownloadInfo download) {
+        StreamDownloadView downloadView = new StreamDownloadView(view.getContext());
+        downloadView.setDownload(download);
+        mDownloadsContainer.addView(downloadView);
+
+        downloadViews.put(download, downloadView);
+        downloadView.setButtonAction(new CancelOrOpenAction());
+    }
+
+    private class CancelOrOpenAction implements StreamDownloadView.Action {
         @Override
-        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-            if (App.downloader.getState(position) == StreamDownload.State.finished) {
-                Uri outFile = App.downloader.getOutFileUri(position);
+        public void execute(DownloadInfo downloadInfo, ProgressInfo.State state) {
+            if (state == ProgressInfo.State.downloading || state == ProgressInfo.State.waiting) {
+                mDownloaderSupplier.getDownloader().cancelDownload(downloadInfo);
+            } else if (state == ProgressInfo.State.finished) {
+
+                Uri outFile = Uri.fromFile(new File(downloadInfo.getFilename()));
 
                 Intent mediaIntent = new Intent();
                 mediaIntent.setAction(Intent.ACTION_VIEW);
@@ -89,43 +112,9 @@ public class DownloadFragment extends Fragment {
                 } else {
                     Toast.makeText(getActivity(), R.string.app_not_available, Toast.LENGTH_LONG).show();
                 }
+
             }
         }
-    };
-
-    /**
-     * Creates a timer task for refeshing the scheduleDownload list
-     *
-     * @return Task to update scheduleDownload list
-     */
-    private TimerTask createTimerTask() {
-        return new TimerTask() {
-
-            @Override
-            public void run() {
-                if (mAdapter == null || getActivity() == null)
-                    return;
-
-                getActivity().runOnUiThread(updateFreespace);
-            }
-
-            private Runnable updateFreespace = new Runnable() {
-                @Override
-                public void run() {
-                    if (getActivity() == null) {
-                        return;
-                    }
-
-                    mAdapter.notifyDataSetChanged();
-                    if (App.downloader.isEmpty()) {
-                        mList.setEmptyView(mEmptyDownloads);
-                    }
-
-                    long freeSpaceExternal = (long) Utilities.getFreeSpaceExternal();
-                    mFreeSpace.setText(getActivity().getString(R.string.download_freespace,
-                                                               Utilities.humanReadableBytes(freeSpaceExternal, false)));
-                }
-            };
-        };
     }
+
 }

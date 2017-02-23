@@ -10,6 +10,8 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
+import de.acepe.fritzstreams.backend.DownloadInfo;
+import de.acepe.fritzstreams.backend.DownloadServiceAdapter;
 import de.acepe.fritzstreams.backend.StreamInfo;
 
 /**
@@ -21,6 +23,8 @@ public class CacheFragment extends Fragment {
 
     private HashMap<Calendar, StreamInfo> mSoundgardenStreamsForDay;
     private HashMap<Calendar, StreamInfo> mNightflightStreamsForDay;
+    private Context mContext;
+    private DownloadServiceAdapter downloadServiceAdapter;
 
     /**
      * This method will only be called once when the retained Fragment is first created.
@@ -36,9 +40,8 @@ public class CacheFragment extends Fragment {
         mSoundgardenStreamsForDay = new HashMap<>();
         mNightflightStreamsForDay = new HashMap<>();
 
-        // Create and execute the background task.
-        // mTask = new DummyTask();
-        // mTask.execute();
+        downloadServiceAdapter = new DownloadServiceAdapter();
+        downloadServiceAdapter.attach(mContext);
     }
 
     /**
@@ -48,6 +51,10 @@ public class CacheFragment extends Fragment {
     @Override
     public void onAttach(Context activity) {
         super.onAttach(activity);
+        mContext = activity;
+        if (downloadServiceAdapter != null) {
+            downloadServiceAdapter.attach(mContext);
+        }
     }
 
     /**
@@ -56,6 +63,8 @@ public class CacheFragment extends Fragment {
     @Override
     public void onDetach() {
         super.onDetach();
+        downloadServiceAdapter.detach();
+        mContext = null;
     }
 
     public void addStream(StreamInfo streamInfo) {
@@ -76,4 +85,11 @@ public class CacheFragment extends Fragment {
         return streamsForDay.get(day);
     }
 
+    public void scheduleDownload(DownloadInfo downloadInfo) {
+        downloadServiceAdapter.addDownload(downloadInfo);
+    }
+
+    public DownloadServiceAdapter getDownloadServiceAdapter() {
+        return downloadServiceAdapter;
+    }
 }

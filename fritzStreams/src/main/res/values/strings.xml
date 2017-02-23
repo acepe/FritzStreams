@@ -50,5 +50,6 @@
     <string name="fridayButton">Fr</string>
     <string name="saturdayButton">Sa</string>
     <string name="sundayButton">So</string>
+    <string name="cancel" />
 
 </resources>

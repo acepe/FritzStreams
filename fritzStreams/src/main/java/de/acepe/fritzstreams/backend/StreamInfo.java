@@ -227,7 +227,7 @@ public class StreamInfo {
         return "StreamInfo{" + "mDate=" + mDate + ", mStream=" + mStream + ", mTitle='" + mTitle + '\'' + '}';
     }
 
-    public boolean isFailed() {
+    public boolean isInitFailed() {
         return failed;
     }
 }
