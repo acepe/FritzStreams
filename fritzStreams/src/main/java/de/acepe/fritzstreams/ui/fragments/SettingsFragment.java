@@ -8,6 +8,9 @@ import android.os.Environment;
 import android.preference.Preference;
 import android.preference.PreferenceManager;
 import android.support.v4.preference.PreferenceFragment;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Toast;
 import de.acepe.fritzstreams.App;
 import de.acepe.fritzstreams.R;
@@ -36,7 +39,7 @@ public class SettingsFragment extends PreferenceFragment {
             public void directorySelected(File directory) {
                 SharedPreferences.Editor editor = getPreferenceScreen().getSharedPreferences().edit();
                 editor.putString(App.SP_DOWNLOAD_DIR, directory.getAbsolutePath());
-                editor.commit();
+                editor.apply();
 
                 mDownloadDir.setSummary(directory.getAbsolutePath());
             }
@@ -47,7 +50,15 @@ public class SettingsFragment extends PreferenceFragment {
         mDownloadDir.setSummary(path);
     }
 
-    private Preference.OnPreferenceClickListener opclDownloadDir = new Preference.OnPreferenceClickListener() {
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View view = super.onCreateView(inflater, container, savedInstanceState);
+        view.setBackgroundColor(getResources().getColor(R.color.yellow_fritz));
+
+        return view;
+    }
+
+    private final Preference.OnPreferenceClickListener opclDownloadDir = new Preference.OnPreferenceClickListener() {
         @Override
         public boolean onPreferenceClick(Preference preference) {
             if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
