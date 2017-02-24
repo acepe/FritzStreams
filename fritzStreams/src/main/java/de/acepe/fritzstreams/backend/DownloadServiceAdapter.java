@@ -18,7 +18,7 @@ public class DownloadServiceAdapter {
     public interface ResultReceiver {
         void downloadsInQueue(List<DownloadInfo> downloadInfoList);
 
-        void currentProgress(ProgressInfo progressInfo);
+        void currentProgress(DownloadInfo downloadInfo);
     }
 
     private static final String TAG = "ServiceAdapter";
@@ -41,15 +41,25 @@ public class DownloadServiceAdapter {
 
     public void detach() {
         LocalBroadcastManager.getInstance(mContext).unregisterReceiver(mDownloadStateReceiver);
+        resultReceivers.clear();
         mContext = null;
     }
 
+    public void detachFromService() {
+        Intent intent = new Intent(mContext, DownloadService.class);
+        intent.putExtra(Constants.SERVICE_REQUEST, Constants.REQUEST_PERMISSION_TO_DIE_ACTION);
+        mContext.startService(intent);
+    }
+
     public void registerResultReceiver(ResultReceiver resultReceiver) {
+        Log.i(TAG, "adding Result Receiver");
         resultReceivers.add(resultReceiver);
     }
 
     public void removeResultReceiver(ResultReceiver resultReceiver) {
+        Log.i(TAG, "Removing Result Receiver");
         resultReceivers.remove(resultReceiver);
+        Log.i(TAG, "now: " + resultReceivers.size());
     }
 
     public void queryDownloadInfos() {
@@ -65,6 +75,13 @@ public class DownloadServiceAdapter {
         mContext.startService(intent);
     }
 
+    public void removeDownload(DownloadInfo download) {
+        Intent intent = new Intent(mContext, DownloadService.class);
+        intent.putExtra(Constants.SERVICE_REQUEST, Constants.REQUEST_REMOVE_DOWNLOAD_ACTION);
+        intent.putExtra(Constants.DOWNLOAD_INFO, download);
+        mContext.startService(intent);
+    }
+
     public void cancelDownload(DownloadInfo download) {
         Intent intent = new Intent(mContext, DownloadService.class);
         intent.putExtra(Constants.SERVICE_REQUEST, Constants.REQUEST_CANCEL_DOWNLOAD_ACTION);
@@ -75,7 +92,6 @@ public class DownloadServiceAdapter {
     // Broadcast receiver for receiving status updates from the DownloadService
     private final class DownloadStateReceiver extends BroadcastReceiver {
 
-        // Prevents instantiation
         private DownloadStateReceiver() {
         }
 
@@ -83,8 +99,9 @@ public class DownloadServiceAdapter {
         @Override
         public void onReceive(Context context, Intent intent) {
             Bundle extras = intent.getExtras();
-            ProgressInfo progress = (ProgressInfo) extras.get(Constants.CURRENT_DOWNLOAD_PROGRESS_REPORT);
+            DownloadInfo progress = (DownloadInfo) extras.get(Constants.CURRENT_DOWNLOAD_PROGRESS_REPORT);
             if (progress != null) {
+                Log.i(TAG, "resultreceivers: " + resultReceivers.size());
                 for (ResultReceiver resultReceiver : resultReceivers) {
                     resultReceiver.currentProgress(progress);
                 }
@@ -92,9 +109,6 @@ public class DownloadServiceAdapter {
             @SuppressWarnings("unchecked")
             ArrayList<DownloadInfo> downloadQueue = (ArrayList<DownloadInfo>) extras.get(Constants.QUERY_DOWNLOADS);
             if (downloadQueue != null) {
-                for (DownloadInfo downloadInfo : downloadQueue) {
-                    Log.i(TAG, downloadInfo.toString());
-                }
                 for (ResultReceiver resultReceiver : resultReceivers) {
                     resultReceiver.downloadsInQueue(downloadQueue);
                 }

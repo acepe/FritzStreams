@@ -67,6 +67,12 @@ public class CacheFragment extends Fragment {
         mContext = null;
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        downloadServiceAdapter.detachFromService();
+    }
+
     public void addStream(StreamInfo streamInfo) {
         if (streamInfo.getStream() == SOUNDGARDEN) {
             mSoundgardenStreamsForDay.put(streamInfo.getDay(), streamInfo);
