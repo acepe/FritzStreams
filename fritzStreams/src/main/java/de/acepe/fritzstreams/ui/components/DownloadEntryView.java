@@ -4,6 +4,7 @@ import java.io.File;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Typeface;
 import android.net.Uri;
 import android.util.AttributeSet;
 import android.view.View;
@@ -11,42 +12,42 @@ import android.widget.*;
 import de.acepe.fritzstreams.R;
 import de.acepe.fritzstreams.backend.DownloadInfo;
 
-public class StreamDownloadView extends LinearLayout {
+public class DownloadEntryView extends LinearLayout {
 
     public interface Action {
         void execute(DownloadInfo t);
     }
 
     public static final String TAG = "StreamDownloadView";
-    private ImageView mImageView;
-    private TextView mCategory;
-    private TextView mGenre;
-    private ImageButton mCancelButton;
+    private TextView mTitle;
+    private TextView mSubTitle;
+    private Button mCancelButton;
     private ProgressBar mDownloadProgress;
     private DownloadInfo mDownload;
 
-    public StreamDownloadView(Context context) {
+    public DownloadEntryView(Context context) {
         super(context);
         init(context, null);
     }
 
-    public StreamDownloadView(Context context, AttributeSet attrs) {
+    public DownloadEntryView(Context context, AttributeSet attrs) {
         super(context, attrs);
         init(context, attrs);
     }
 
-    public StreamDownloadView(Context context, AttributeSet attrs, int defStyle) {
+    public DownloadEntryView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
         init(context, attrs);
     }
 
     private void init(Context context, AttributeSet attrs) {
-        View.inflate(context, R.layout.stream_view_download, this);
+        Typeface font = Typeface.createFromAsset(context.getAssets(), "fontawesome-webfont.ttf");
+        View.inflate(context, R.layout.download_entry_view, this);
 
-        mCategory = (TextView) findViewById(R.id.tvStreamCategory);
-        mGenre = (TextView) findViewById(R.id.tvStreamGenre);
-        mImageView = (ImageView) findViewById(R.id.ivDownload);
-        mCancelButton = (ImageButton) findViewById(R.id.btnCancelDownload);
+        mTitle = (TextView) findViewById(R.id.tvStreamCategory);
+        mSubTitle = (TextView) findViewById(R.id.tvStreamGenre);
+        mCancelButton = (Button) findViewById(R.id.btnCancelDownload);
+        mCancelButton.setTypeface(font);
         mDownloadProgress = (ProgressBar) findViewById(R.id.pbDownloadProgress);
 
         setOnClickListener(new OnClickListener() {
@@ -70,13 +71,14 @@ public class StreamDownloadView extends LinearLayout {
 
     public void setDownload(DownloadInfo download) {
         mDownload = download;
-        mCategory.setText(download.getTitle());
-        mGenre.setText(download.getSubtitle());
-        // mImageView.setImageBitmap(download.getImage());
+        mTitle.setText(download.getTitle());
+        mSubTitle.setText(download.getSubtitle());
 
         boolean isDownloading = download.getState() == DownloadInfo.State.downloading;
         if (isDownloading) {
             mDownloadProgress.setProgress(download.getProgressPercent());
+        } else if (download.getState() != DownloadInfo.State.waiting) {
+            mCancelButton.setText(R.string.icon_remove);
         }
         mDownloadProgress.setVisibility(isDownloading ? View.VISIBLE : View.INVISIBLE);
     }

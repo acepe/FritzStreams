@@ -52,4 +52,6 @@
     <string name="sundayButton">So</string>
     <string name="cancel" />
 
+    <string name="icon_cancel">&#xf05e;</string>
+    <string name="icon_remove">&#xf00d;</string>
 </resources>

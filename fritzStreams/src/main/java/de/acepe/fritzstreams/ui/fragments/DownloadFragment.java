@@ -1,5 +1,6 @@
 package de.acepe.fritzstreams.ui.fragments;
 
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 
@@ -14,20 +15,24 @@ import android.widget.TextView;
 import de.acepe.fritzstreams.R;
 import de.acepe.fritzstreams.backend.DownloadInfo;
 import de.acepe.fritzstreams.backend.DownloadServiceAdapter;
-import de.acepe.fritzstreams.ui.components.StreamDownloadView;
+import de.acepe.fritzstreams.ui.components.DownloadEntryView;
+import de.acepe.fritzstreams.util.Utilities;
 
 public class DownloadFragment extends Fragment implements DownloadServiceAdapter.ResultReceiver {
+
+    private static final long UPDATE_INTERVAL_IN_MS = 3000;
 
     public interface DownloadServiceAdapterSupplier {
         DownloadServiceAdapter getDownloader();
     }
 
-    private final HashMap<DownloadInfo, StreamDownloadView> downloadViews = new HashMap<>();
+    private final HashMap<DownloadInfo, DownloadEntryView> downloadViews = new HashMap<>();
 
     private LinearLayout mDownloadsContainer;
     private TextView mFreeSpace;
     private View view;
     private DownloadServiceAdapterSupplier mDownloaderSupplier;
+    private long lastUpdateFreeSpace;
 
     @Override
     public void onAttach(Context context) {
@@ -58,6 +63,7 @@ public class DownloadFragment extends Fragment implements DownloadServiceAdapter
         super.onResume();
         mDownloaderSupplier.getDownloader().registerResultReceiver(this);
         mDownloaderSupplier.getDownloader().queryDownloadInfos();
+        updateFreeSpace();
     }
 
     @Override
@@ -75,20 +81,28 @@ public class DownloadFragment extends Fragment implements DownloadServiceAdapter
     }
 
     @Override
-    public void currentProgress(DownloadInfo downloadInfo) {
+    public void updateProgress(DownloadInfo downloadInfo) {
         if (!downloadViews.containsKey(downloadInfo)) {
             addDownload(downloadInfo);
         }
-        StreamDownloadView view = downloadViews.get(downloadInfo);
+        DownloadEntryView view = downloadViews.get(downloadInfo);
         view.setDownload(downloadInfo);
 
-        // long freeSpaceExternal = (long) Utilities.getFreeSpaceExternal();
-        // mFreeSpace.setText(getActivity().getString(R.string.download_freespace,
-        // Utilities.humanReadableBytes(freeSpaceExternal, false)));
+        long now = Calendar.getInstance().getTimeInMillis();
+        if (lastUpdateFreeSpace == 0 || lastUpdateFreeSpace < now - UPDATE_INTERVAL_IN_MS) {
+            updateFreeSpace();
+            lastUpdateFreeSpace = now;
+        }
+    }
+
+    private void updateFreeSpace() {
+        long freeSpaceExternal = Utilities.getFreeSpaceExternal();
+        mFreeSpace.setText(getActivity().getString(R.string.download_freespace,
+                Utilities.humanReadableBytes(freeSpaceExternal, false)));
     }
 
     private void addDownload(DownloadInfo download) {
-        StreamDownloadView downloadView = new StreamDownloadView(view.getContext());
+        DownloadEntryView downloadView = new DownloadEntryView(view.getContext());
         downloadView.setDownload(download);
         mDownloadsContainer.addView(downloadView);
 
@@ -96,7 +110,7 @@ public class DownloadFragment extends Fragment implements DownloadServiceAdapter
         downloadView.setButtonAction(new CancelOrOpenAction());
     }
 
-    private class CancelOrOpenAction implements StreamDownloadView.Action {
+    private class CancelOrOpenAction implements DownloadEntryView.Action {
         @Override
         public void execute(DownloadInfo downloadInfo) {
             switch (downloadInfo.getState()) {

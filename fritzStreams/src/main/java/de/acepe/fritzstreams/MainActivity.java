@@ -27,7 +27,6 @@ public class MainActivity extends FragmentActivity
             StreamsOverviewFragment.StreamsCache {
 
     private static final String TAG_CACHE_FRAGMENT = "CacheFragment";
-    private static final String TAG_DOWNLOAD_FRAGMENT = "DownloadFragment";
 
     private final LinkedList<Fragment> mFragments = new LinkedList<>();
     private ViewPager mViewPager;

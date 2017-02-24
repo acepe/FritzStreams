@@ -52,15 +52,16 @@
 
         </LinearLayout>
 
-        <ImageButton
+        <Button
             android:id="@+id/btnCancelDownload"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_margin="@dimen/stream_download_margin"
             android:background="@color/red_fritz"
             android:enabled="true"
-            android:src="@drawable/ic_menu_close_clear_cancel"
-            android:textColor="@color/white" />
+            android:text="@string/icon_cancel"
+            android:textColor="@color/white"
+            android:textSize="@dimen/text_title" />
 
     </LinearLayout>
 

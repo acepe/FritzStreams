@@ -23,9 +23,9 @@ public final class Utilities {
      *
      * @return The free space in byte
      */
-    public static double getFreeSpaceExternal() {
+    public static long getFreeSpaceExternal() {
         StatFs stat = new StatFs(Environment.getExternalStorageDirectory().getPath());
-        return (double) stat.getAvailableBlocks() * (double) stat.getBlockSize();
+        return stat.getAvailableBlocksLong() * stat.getBlockSizeLong();
     }
 
     /**
@@ -33,9 +33,9 @@ public final class Utilities {
      *
      * @return The free space in byte
      */
-    public static double getFreeSpaceInternal() {
+    public static long getFreeSpaceInternal() {
         StatFs stat = new StatFs(App.mApp.getFilesDir().getPath());
-        return (double) stat.getAvailableBlocks() * (double) stat.getBlockSize();
+        return stat.getAvailableBlocksLong() * stat.getBlockSizeLong();
     }
 
     /**

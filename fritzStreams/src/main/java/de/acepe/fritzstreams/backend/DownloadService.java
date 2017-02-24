@@ -47,6 +47,7 @@ public class DownloadService extends Service {
             while ((download = findNext()) != null) {
                 Log.i(TAG + "-Handler", "Starting Download " + download);
                 new Downloader(download, callback).download();
+                reportQueue();
             }
 
             // Stop the service using the startId, so that we don't stop
@@ -161,7 +162,6 @@ public class DownloadService extends Service {
 
     @Override
     public void onDestroy() {
-        Toast.makeText(this, "service done", Toast.LENGTH_SHORT).show();
         releaseLocks();
     }
 

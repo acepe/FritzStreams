@@ -11,14 +11,13 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
-import android.util.Log;
 
 public class DownloadServiceAdapter {
 
     public interface ResultReceiver {
         void downloadsInQueue(List<DownloadInfo> downloadInfoList);
 
-        void currentProgress(DownloadInfo downloadInfo);
+        void updateProgress(DownloadInfo downloadInfo);
     }
 
     private static final String TAG = "ServiceAdapter";
@@ -52,14 +51,11 @@ public class DownloadServiceAdapter {
     }
 
     public void registerResultReceiver(ResultReceiver resultReceiver) {
-        Log.i(TAG, "adding Result Receiver");
         resultReceivers.add(resultReceiver);
     }
 
     public void removeResultReceiver(ResultReceiver resultReceiver) {
-        Log.i(TAG, "Removing Result Receiver");
         resultReceivers.remove(resultReceiver);
-        Log.i(TAG, "now: " + resultReceivers.size());
     }
 
     public void queryDownloadInfos() {
@@ -101,9 +97,8 @@ public class DownloadServiceAdapter {
             Bundle extras = intent.getExtras();
             DownloadInfo progress = (DownloadInfo) extras.get(Constants.CURRENT_DOWNLOAD_PROGRESS_REPORT);
             if (progress != null) {
-                Log.i(TAG, "resultreceivers: " + resultReceivers.size());
                 for (ResultReceiver resultReceiver : resultReceivers) {
-                    resultReceiver.currentProgress(progress);
+                    resultReceiver.updateProgress(progress);
                 }
             }
             @SuppressWarnings("unchecked")
