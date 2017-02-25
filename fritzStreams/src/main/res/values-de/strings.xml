@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string-array name="navigation_array">
+        <item>Streams</item>
+        <item>Downloads</item>
+        <item>Einstellungen</item>
+    </string-array>
+
+    <string name="app_name">Fritz Musikstreams</string>
+    <string name="already_in_queue">Download bereits eingeplant</string>
+    <string name="app_not_available">Kein Audio-Player gefunden</string>
+    <string name="cancelled">Download abgebrochen…</string>
+    <string name="download">Download</string>
+    <string name="download_freespace">Freier Speicher: %1$s</string>
+    <string name="download_noti_not_mounted">Kein Speicher gefunden</string>
+    <string name="download_only_wifi_notification_title">Download abgebrochen: nicht mit WLAN verbunden</string>
+    <string name="download_started">Download gestartet</string>
+    <string name="error">Keine Verbindung…</string>
+    <string name="failed">Download fehlgeschlagen…</string>
+    <string name="file_dialog_set_dir">Ordner auswählen</string>
+    <string name="finished">Download abgeschlossen</string>
+    <string name="fridayButton">Fr</string>
+    <string name="mondayButton">Mo</string>
+    <string name="onlyWifi">Nicht mit WLAN verbunden</string>
+    <string name="pref_dl_dir">Download-Ordner auswählen</string>
+    <string name="pref_dl_wifi_only">Nur im WLAN</string>
+    <string name="pref_dl_wifi_only_summary">Download nur wenn mit WLAN verbunden</string>
+    <string name="saturdayButton">Sa</string>
+    <string name="sundayButton">So</string>
+    <string name="thursdayButton">Do</string>
+    <string name="try_again">Neuladen</string>
+    <string name="tuesdayButton">Di</string>
+    <string name="waiting">Download ausstehend</string>
+    <string name="wednesdayButton">Mi</string>
+</resources>

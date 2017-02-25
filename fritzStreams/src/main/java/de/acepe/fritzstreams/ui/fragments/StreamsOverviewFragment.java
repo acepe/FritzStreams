@@ -192,6 +192,7 @@ public class StreamsOverviewFragment extends Fragment {
             Toast.makeText(getContext(), R.string.download_only_wifi_notification_title, Toast.LENGTH_SHORT).show();
             return;
         }
+        Toast.makeText(getContext(), R.string.download_started, Toast.LENGTH_SHORT).show();
 
         mStreamsCache.scheduleDownload(createDownloadInfo(streamInfo));
     }
