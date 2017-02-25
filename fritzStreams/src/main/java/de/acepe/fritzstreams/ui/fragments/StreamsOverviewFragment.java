@@ -19,8 +19,8 @@ import android.view.ViewGroup;
 import android.widget.RadioGroup;
 import android.widget.Toast;
 import android.widget.ToggleButton;
-import de.acepe.fritzstreams.App;
 import de.acepe.fritzstreams.R;
+import de.acepe.fritzstreams.backend.Constants;
 import de.acepe.fritzstreams.backend.DownloadInfo;
 import de.acepe.fritzstreams.backend.StreamInfo;
 import de.acepe.fritzstreams.ui.components.StreamView;
@@ -95,7 +95,7 @@ public class StreamsOverviewFragment extends Fragment {
             Calendar date = today();
             date.add(Calendar.DAY_OF_YEAR, -i);
 
-            String text = App.DAY_FORMAT.format(date.getTime());
+            String text = Constants.DAY_FORMAT.format(date.getTime());
             view.setTextOff(text);
             view.setTextOn(text);
             view.setText(text);
@@ -188,7 +188,7 @@ public class StreamsOverviewFragment extends Fragment {
         }
 
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getContext());
-        if (sharedPref.getBoolean(App.SP_WIFI_ONLY, false) && !Utilities.onWifi(getContext())) {
+        if (sharedPref.getBoolean(Constants.SP_WIFI_ONLY, false) && !Utilities.onWifi(getContext())) {
             Toast.makeText(getContext(), R.string.download_only_wifi_notification_title, Toast.LENGTH_SHORT).show();
             return;
         }

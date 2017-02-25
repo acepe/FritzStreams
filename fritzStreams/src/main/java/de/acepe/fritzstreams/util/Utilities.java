@@ -11,7 +11,6 @@ import android.os.Environment;
 import android.os.StatFs;
 import android.support.annotation.NonNull;
 import android.view.View;
-import de.acepe.fritzstreams.App;
 
 public final class Utilities {
 
@@ -25,16 +24,6 @@ public final class Utilities {
      */
     public static long getFreeSpaceExternal() {
         StatFs stat = new StatFs(Environment.getExternalStorageDirectory().getPath());
-        return stat.getAvailableBlocksLong() * stat.getBlockSizeLong();
-    }
-
-    /**
-     * Get the free space on the internal storage device
-     *
-     * @return The free space in byte
-     */
-    public static long getFreeSpaceInternal() {
-        StatFs stat = new StatFs(App.mApp.getFilesDir().getPath());
         return stat.getAvailableBlocksLong() * stat.getBlockSizeLong();
     }
 

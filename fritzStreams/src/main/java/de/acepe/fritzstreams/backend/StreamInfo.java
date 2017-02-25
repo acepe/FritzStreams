@@ -21,7 +21,6 @@ import android.os.AsyncTask;
 import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.util.Log;
-import de.acepe.fritzstreams.App;
 
 public class StreamInfo {
 
@@ -110,7 +109,7 @@ public class StreamInfo {
 
     private String buildURL() {
         String contentURL = url(mStream == Stream.NIGHTFLIGHT ? NIGHTFLIGHT_URL : SOUNDGARDEN_URL);
-        String ddMM = new SimpleDateFormat(App.FILE_DATE_FORMAT, App.GERMANY).format(mDate.getTime());
+        String ddMM = new SimpleDateFormat(Constants.FILE_DATE_FORMAT, Constants.GERMANY).format(mDate.getTime());
         return String.format(contentURL, ddMM);
     }
 
@@ -172,14 +171,14 @@ public class StreamInfo {
     private String getDownloadDir() {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(mContext);
         String defaultPath = mContext.getExternalFilesDir(Environment.DIRECTORY_MUSIC).getAbsolutePath();
-        return sharedPreferences.getString(App.SP_DOWNLOAD_DIR, defaultPath);
+        return sharedPreferences.getString(Constants.SP_DOWNLOAD_DIR, defaultPath);
     }
 
     private String getFileName() {
         return mTitle
                + "_"
-               + new SimpleDateFormat("yyyy-MM-dd", App.GERMANY).format(mDate.getTime())
-               + App.FILE_EXTENSION_MP3;
+               + new SimpleDateFormat("yyyy-MM-dd", Constants.GERMANY).format(mDate.getTime())
+               + Constants.FILE_EXTENSION_MP3;
     }
 
     public Uri getFileUri() {

@@ -33,12 +33,9 @@ public class MainActivity extends FragmentActivity
     private ActionBar actionBar;
 
     private CacheFragment mCacheFragment;
-    private DownloadFragment mDownloadFragment;
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        App.mApp = getApplication();
 
         setContentView(R.layout.main_activity);
 
@@ -52,7 +49,7 @@ public class MainActivity extends FragmentActivity
             fm.beginTransaction().add(mCacheFragment, TAG_CACHE_FRAGMENT).commit();
         }
 
-        mDownloadFragment = new DownloadFragment();
+        DownloadFragment mDownloadFragment = new DownloadFragment();
         mFragments.add(new StreamsOverviewFragment());
         mFragments.add(mDownloadFragment);
         mFragments.add(new SettingsFragment());

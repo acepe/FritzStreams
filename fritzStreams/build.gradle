@@ -28,4 +28,6 @@ dependencies {
     compile 'org.jsoup:jsoup:1.8.3'
     compile 'com.android.support:support-v4:25.2.0'
 
+    // from: https://github.com/spacecowboy/NoNonsense-FilePicker
+    compile 'com.nononsenseapps:filepicker:4.0.0'
 }
