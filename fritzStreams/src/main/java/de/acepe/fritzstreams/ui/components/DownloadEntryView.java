@@ -1,6 +1,7 @@
 package de.acepe.fritzstreams.ui.components;
 
 import static de.acepe.fritzstreams.backend.DownloadInfo.State.downloading;
+import static de.acepe.fritzstreams.backend.DownloadInfo.State.finished;
 
 import java.io.File;
 
@@ -24,6 +25,7 @@ public class DownloadEntryView extends LinearLayout {
     private TextView mTitle;
     private TextView mSubTitle;
     private TextView mState;
+    private TextView mPlay;
     private Button mCancelButton;
     private ProgressBar mDownloadProgress;
     private DownloadInfo mDownload;
@@ -50,10 +52,11 @@ public class DownloadEntryView extends LinearLayout {
         mTitle = (TextView) findViewById(R.id.tvTitle);
         mSubTitle = (TextView) findViewById(R.id.tvSubtitle);
         mState = (TextView) findViewById(R.id.tvState);
+        mPlay = (TextView) findViewById(R.id.tvPlay);
+        mPlay.setTypeface(font);
         mCancelButton = (Button) findViewById(R.id.btnCancelDownload);
         mCancelButton.setTypeface(font);
         mDownloadProgress = (ProgressBar) findViewById(R.id.pbDownloadProgress);
-
         setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -102,6 +105,7 @@ public class DownloadEntryView extends LinearLayout {
         }
         mDownloadProgress.setVisibility(state == downloading ? View.VISIBLE : View.INVISIBLE);
         mState.setVisibility(state == downloading ? View.INVISIBLE : View.VISIBLE);
+        mPlay.setVisibility(state == finished ? View.VISIBLE : View.INVISIBLE);
     }
 
     public DownloadInfo getDownload() {

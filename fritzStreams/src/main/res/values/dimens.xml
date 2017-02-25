@@ -13,5 +13,6 @@
     <dimen name="toggle_margin">3dp</dimen>
     <dimen name="stream_padding">5dp</dimen>
     <dimen name="button_radius">3dp</dimen>
+    <dimen name="text_play_icon_overlay">42sp</dimen>
 
 </resources>

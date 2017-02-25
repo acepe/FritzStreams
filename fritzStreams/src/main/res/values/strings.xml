@@ -41,5 +41,6 @@
     <string name="icon_remove">&#xf00d;</string>
     <string name="icon_retry">&#xf021;</string>
     <string name="icon_accept">&#xf00c;</string>
+    <string name="icon_play">&#xf04b;</string>
     <string name="already_in_queue">Download is already in Queue</string>
 </resources>
