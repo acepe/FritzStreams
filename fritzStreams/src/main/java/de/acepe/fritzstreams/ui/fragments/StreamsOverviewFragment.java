@@ -132,7 +132,6 @@ public class StreamsOverviewFragment extends Fragment {
         public void initFinished(StreamInfo streamInfo) {
             setStreamView(view, streamInfo);
         }
-
     }
 
     private void setStreamView(StreamView view, StreamInfo streamInfo) {

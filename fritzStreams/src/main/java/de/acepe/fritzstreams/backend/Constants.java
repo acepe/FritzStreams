@@ -11,6 +11,7 @@ final class Constants {
     static final String RESPONSE_ACTION = "de.acepe.fritzstreams.RESPONSE_ACTION";
     static final String CURRENT_DOWNLOAD_PROGRESS_REPORT = "de.acepe.fritzstreams.RESPONSE_ACTION";
     static final String QUERY_DOWNLOADS = "de.acepe.fritzstreams.QUERY_DOWNLOADS";
+    static final String ALREADY_IN_QUEUE = "de.acepe.fritzstreams.ALREADY_IN_QUEUE";
 
     static final java.lang.String SERVICE_REQUEST = "serviceRequest";
     static final String DOWNLOAD_INFO = "downloadInfo";

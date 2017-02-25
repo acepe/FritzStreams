@@ -39,8 +39,8 @@ public class StreamView extends LinearLayout {
         View.inflate(context, R.layout.stream_view, this);
 
         progressOverlay = findViewById(R.id.progress_overlay);
-        category = (TextView) findViewById(R.id.tvStreamCategory);
-        genre = (TextView) findViewById(R.id.tvStreamGenre);
+        category = (TextView) findViewById(R.id.tvTitle);
+        genre = (TextView) findViewById(R.id.tvSubtitle);
         imageView = (ImageView) findViewById(R.id.ivDownload);
         downloadButton = (Button) findViewById(R.id.btndownload);
 

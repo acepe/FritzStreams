@@ -1,5 +1,7 @@
 package de.acepe.fritzstreams.ui.components;
 
+import static de.acepe.fritzstreams.backend.DownloadInfo.State.downloading;
+
 import java.io.File;
 
 import android.content.Context;
@@ -21,6 +23,7 @@ public class DownloadEntryView extends LinearLayout {
     public static final String TAG = "StreamDownloadView";
     private TextView mTitle;
     private TextView mSubTitle;
+    private TextView mState;
     private Button mCancelButton;
     private ProgressBar mDownloadProgress;
     private DownloadInfo mDownload;
@@ -44,8 +47,9 @@ public class DownloadEntryView extends LinearLayout {
         Typeface font = Typeface.createFromAsset(context.getAssets(), "fontawesome-webfont.ttf");
         View.inflate(context, R.layout.download_entry_view, this);
 
-        mTitle = (TextView) findViewById(R.id.tvStreamCategory);
-        mSubTitle = (TextView) findViewById(R.id.tvStreamGenre);
+        mTitle = (TextView) findViewById(R.id.tvTitle);
+        mSubTitle = (TextView) findViewById(R.id.tvSubtitle);
+        mState = (TextView) findViewById(R.id.tvState);
         mCancelButton = (Button) findViewById(R.id.btnCancelDownload);
         mCancelButton.setTypeface(font);
         mDownloadProgress = (ProgressBar) findViewById(R.id.pbDownloadProgress);
@@ -74,13 +78,30 @@ public class DownloadEntryView extends LinearLayout {
         mTitle.setText(download.getTitle());
         mSubTitle.setText(download.getSubtitle());
 
-        boolean isDownloading = download.getState() == DownloadInfo.State.downloading;
-        if (isDownloading) {
-            mDownloadProgress.setProgress(download.getProgressPercent());
-        } else if (download.getState() != DownloadInfo.State.waiting) {
-            mCancelButton.setText(R.string.icon_remove);
+        DownloadInfo.State state = download.getState();
+        switch (state) {
+            case waiting:
+                mCancelButton.setText(R.string.icon_remove);
+                mState.setText(R.string.waiting);
+                break;
+            case downloading:
+                mDownloadProgress.setProgress(download.getProgressPercent());
+                break;
+            case cancelled:
+                mState.setText(R.string.cancelled);
+                mCancelButton.setText(R.string.icon_retry);
+                break;
+            case failed:
+                mState.setText(R.string.failed);
+                mCancelButton.setText(R.string.icon_retry);
+                break;
+            case finished:
+                mState.setText(R.string.finished);
+                mCancelButton.setText(R.string.icon_accept);
+                break;
         }
-        mDownloadProgress.setVisibility(isDownloading ? View.VISIBLE : View.INVISIBLE);
+        mDownloadProgress.setVisibility(state == downloading ? View.VISIBLE : View.INVISIBLE);
+        mState.setVisibility(state == downloading ? View.INVISIBLE : View.VISIBLE);
     }
 
     public DownloadInfo getDownload() {

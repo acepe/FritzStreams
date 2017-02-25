@@ -13,7 +13,6 @@ import android.os.*;
 import android.os.Process;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
-import android.widget.Toast;
 
 public class DownloadService extends Service {
     private static final String TAG = "DownloadService";
@@ -30,8 +29,7 @@ public class DownloadService extends Service {
         public void reportProgress(DownloadInfo downloadInfo) {
             Intent localIntent = new Intent(Constants.RESPONSE_ACTION).putExtra(Constants.CURRENT_DOWNLOAD_PROGRESS_REPORT,
                                                                                 downloadInfo);
-            // Broadcasts the Intent to receivers in this app.
-            LocalBroadcastManager.getInstance(DownloadService.this).sendBroadcast(localIntent);
+            sendMessage(localIntent);
         }
     };
 
@@ -85,22 +83,28 @@ public class DownloadService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        Toast.makeText(this, "Connected to Service", Toast.LENGTH_SHORT).show();
+        Log.i(TAG, "Connected to Service");
 
         Bundle extras = intent.getExtras();
         if (extras != null) {
 
             String request = extras.getString(Constants.SERVICE_REQUEST);
             if (Constants.REQUEST_ADD_DOWNLOAD_ACTION.equals(request)) {
-                permissionToDie = false;
                 DownloadInfo info = (DownloadInfo) extras.get(Constants.DOWNLOAD_INFO);
-                mScheduledDownloads.add(info);
-                // For each start request, send a message to start a job and deliver the
-                // start ID so we know which request we're stopping when we finish the job
-                Message msg = mServiceHandler.obtainMessage();
-                msg.arg1 = startId;
-                mServiceHandler.sendMessage(msg);
-                reportQueue();
+                DownloadInfo existingDownload = findScheduledDownload(info);
+                if (existingDownload == null) {
+                    permissionToDie = false;
+                    mScheduledDownloads.add(info);
+                    // For each start request, send a message to start a job and deliver the
+                    // start ID so we know which request we're stopping when we finish the job
+                    Message msg = mServiceHandler.obtainMessage();
+                    msg.arg1 = startId;
+                    mServiceHandler.sendMessage(msg);
+                    reportQueue();
+                } else {
+                    sendMessage(new Intent(Constants.RESPONSE_ACTION).putExtra(Constants.ALREADY_IN_QUEUE,
+                                                                               existingDownload));
+                }
             }
             if (Constants.REQUEST_QUERY_DOWNLOADS_ACTION.equals(request)) {
                 reportQueue();
@@ -125,7 +129,7 @@ public class DownloadService extends Service {
             if (Constants.REQUEST_PERMISSION_TO_DIE_ACTION.equals(request)) {
                 permissionToDie = true;
             }
-            if (allCompletet() && permissionToDie) {
+            if (allComplete() && permissionToDie) {
                 stopSelf(startId);
             }
         }
@@ -133,7 +137,7 @@ public class DownloadService extends Service {
         return START_STICKY;
     }
 
-    private boolean allCompletet() {
+    private boolean allComplete() {
         for (DownloadInfo download : mScheduledDownloads) {
             DownloadInfo.State state = download.getState();
             if (state == DownloadInfo.State.waiting || state == DownloadInfo.State.downloading) {
@@ -151,7 +155,7 @@ public class DownloadService extends Service {
     private void reportQueue() {
         ArrayList<DownloadInfo> progressList = new ArrayList<>(mScheduledDownloads);
         Intent localIntent = new Intent(Constants.RESPONSE_ACTION).putExtra(Constants.QUERY_DOWNLOADS, progressList);
-        LocalBroadcastManager.getInstance(DownloadService.this).sendBroadcast(localIntent);
+        sendMessage(localIntent);
     }
 
     @Override
@@ -185,5 +189,10 @@ public class DownloadService extends Service {
 
         if (mWakeLock != null && mWakeLock.isHeld())
             mWakeLock.release();
+    }
+
+    private void sendMessage(Intent localIntent) {
+        // Broadcasts the Intent to receivers in this app.
+        LocalBroadcastManager.getInstance(DownloadService.this).sendBroadcast(localIntent);
     }
 }

@@ -39,7 +39,7 @@
                 android:padding="@dimen/streams_padding">
 
                 <TextView
-                    android:id="@+id/tvStreamCategory"
+                    android:id="@+id/tvTitle"
                     style="@android:style/TextAppearance.Medium"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -49,7 +49,7 @@
                     android:textStyle="bold" />
 
                 <TextView
-                    android:id="@+id/tvStreamGenre"
+                    android:id="@+id/tvSubtitle"
                     style="@android:style/TextAppearance.DeviceDefault.Small"
                     android:layout_width="match_parent"
                     android:layout_height="0dp"

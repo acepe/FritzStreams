@@ -113,14 +113,19 @@ public class DownloadFragment extends Fragment implements DownloadServiceAdapter
     private class CancelOrOpenAction implements DownloadEntryView.Action {
         @Override
         public void execute(DownloadInfo downloadInfo) {
+            DownloadServiceAdapter downloader = mDownloaderSupplier.getDownloader();
             switch (downloadInfo.getState()) {
                 case waiting:
+                case finished:
+                    downloader.removeDownload(downloadInfo);
+                case downloading:
+                    downloader.cancelDownload(downloadInfo);
+                    break;
                 case failed:
                 case cancelled:
-                case finished:
-                    mDownloaderSupplier.getDownloader().removeDownload(downloadInfo);
-                case downloading:
-                    mDownloaderSupplier.getDownloader().cancelDownload(downloadInfo);
+                    downloader.removeDownload(downloadInfo);
+                    downloadInfo.setState(DownloadInfo.State.waiting);
+                    downloader.addDownload(downloadInfo);
                     break;
             }
         }

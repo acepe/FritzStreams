@@ -11,6 +11,8 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
+import android.widget.Toast;
+import de.acepe.fritzstreams.R;
 
 public class DownloadServiceAdapter {
 
@@ -19,8 +21,6 @@ public class DownloadServiceAdapter {
 
         void updateProgress(DownloadInfo downloadInfo);
     }
-
-    private static final String TAG = "ServiceAdapter";
 
     private final DownloadStateReceiver mDownloadStateReceiver;
     private final IntentFilter statusIntentFilter;
@@ -100,6 +100,10 @@ public class DownloadServiceAdapter {
                 for (ResultReceiver resultReceiver : resultReceivers) {
                     resultReceiver.updateProgress(progress);
                 }
+            }
+            DownloadInfo alreadyInQueue = (DownloadInfo) extras.get(Constants.ALREADY_IN_QUEUE);
+            if (alreadyInQueue != null) {
+                Toast.makeText(mContext, R.string.already_in_queue, Toast.LENGTH_SHORT).show();
             }
             @SuppressWarnings("unchecked")
             ArrayList<DownloadInfo> downloadQueue = (ArrayList<DownloadInfo>) extras.get(Constants.QUERY_DOWNLOADS);
