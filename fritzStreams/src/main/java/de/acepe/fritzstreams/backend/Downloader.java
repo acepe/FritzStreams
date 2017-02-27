@@ -4,6 +4,7 @@ import java.io.*;
 import java.net.URL;
 import java.net.URLConnection;
 
+import android.media.MediaScannerConnection;
 import android.util.Log;
 import de.acepe.fritzstreams.backend.DownloadInfo.State;
 

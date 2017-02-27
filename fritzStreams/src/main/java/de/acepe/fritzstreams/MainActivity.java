@@ -1,10 +1,13 @@
 package de.acepe.fritzstreams;
 
+import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.LinkedList;
+import java.util.List;
 
 import android.app.ActionBar;
 import android.app.FragmentTransaction;
+import android.content.Intent;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -12,6 +15,9 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import de.acepe.fritzstreams.backend.DownloadInfo;
 import de.acepe.fritzstreams.backend.DownloadServiceAdapter;
 import de.acepe.fritzstreams.backend.StreamInfo;
@@ -28,14 +34,14 @@ public class MainActivity extends FragmentActivity
 
     private static final String TAG_CACHE_FRAGMENT = "CacheFragment";
 
-    private final LinkedList<Fragment> mFragments = new LinkedList<>();
     private ViewPager mViewPager;
     private ActionBar actionBar;
-
     private CacheFragment mCacheFragment;
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        actionBar = getActionBar();
 
         setContentView(R.layout.main_activity);
 
@@ -49,32 +55,58 @@ public class MainActivity extends FragmentActivity
             fm.beginTransaction().add(mCacheFragment, TAG_CACHE_FRAGMENT).commit();
         }
 
-        DownloadFragment mDownloadFragment = new DownloadFragment();
-        mFragments.add(new StreamsOverviewFragment());
-        mFragments.add(mDownloadFragment);
-        mFragments.add(new SettingsFragment());
-
-        AppSectionsPagerAdapter mAppSectionsPagerAdapter = new AppSectionsPagerAdapter(fm);
-
-        actionBar = getActionBar();
         actionBar.setHomeButtonEnabled(false);
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 
-        mViewPager = (ViewPager) findViewById(R.id.pager);
-        mViewPager.setAdapter(mAppSectionsPagerAdapter);
-        mViewPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
-            @Override
-            public void onPageSelected(int position) {
-                actionBar.setSelectedNavigationItem(position);
-            }
-        });
+        if (isTablet()) {
+            android.support.v4.app.FragmentTransaction ft = fm.beginTransaction();
+            ft.add(R.id.streams_frag_container, new StreamsOverviewFragment());
+            ft.commit();
 
-        for (int i = 0; i < mAppSectionsPagerAdapter.getCount(); i++) {
-            ActionBar.Tab tab = actionBar.newTab()
-                                         .setText(mAppSectionsPagerAdapter.getPageTitle(i))
-                                         .setTabListener(this);
-            actionBar.addTab(tab);
+            android.support.v4.app.FragmentTransaction ft2 = fm.beginTransaction();
+            ft2.add(R.id.downloads_frag_container, new DownloadFragment());
+            ft2.commit();
+        } else {
+            List<Fragment> fragments = new ArrayList<>(3);
+            fragments.add(new StreamsOverviewFragment());
+            fragments.add(new DownloadFragment());
+            fragments.add(new SettingsFragment());
+
+            AppSectionsPagerAdapter mAppSectionsPagerAdapter = new AppSectionsPagerAdapter(fm, fragments);
+            mViewPager = (ViewPager) findViewById(R.id.pager);
+            mViewPager.setAdapter(mAppSectionsPagerAdapter);
+            mViewPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
+                @Override
+                public void onPageSelected(int position) {
+                    actionBar.setSelectedNavigationItem(position);
+                }
+            });
+            for (int i = 0; i < mAppSectionsPagerAdapter.getCount(); i++) {
+                ActionBar.Tab tab = actionBar.newTab()
+                                             .setText(mAppSectionsPagerAdapter.getPageTitle(i))
+                                             .setTabListener(this);
+                actionBar.addTab(tab);
+            }
         }
+    }
+
+    private boolean isTablet() {
+        return (getResources().getConfiguration().screenLayout
+                & Configuration.SCREENLAYOUT_SIZE_MASK) >= Configuration.SCREENLAYOUT_SIZE_LARGE;
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.settings_action, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        Intent settingsIntent = new Intent(getApplicationContext(), SettingsActivity.class);
+        startActivity(settingsIntent);
+        return true;
     }
 
     @Override
@@ -112,8 +144,11 @@ public class MainActivity extends FragmentActivity
 
     private class AppSectionsPagerAdapter extends FragmentPagerAdapter {
 
-        AppSectionsPagerAdapter(FragmentManager fm) {
+        private final List<Fragment> mFragments;
+
+        AppSectionsPagerAdapter(FragmentManager fm, List<Fragment> fragments) {
             super(fm);
+            this.mFragments = fragments;
         }
 
         @Override
@@ -123,7 +158,7 @@ public class MainActivity extends FragmentActivity
 
         @Override
         public int getCount() {
-            return 3;
+            return mFragments.size();
         }
 
         @Override

@@ -8,6 +8,7 @@ import java.util.List;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.media.MediaScannerConnection;
 import android.net.wifi.WifiManager;
 import android.os.*;
 import android.os.Process;
@@ -45,6 +46,12 @@ public class DownloadService extends Service {
             while ((download = findNext()) != null) {
                 Log.i(TAG + "-Handler", "Starting Download " + download);
                 new Downloader(download, callback).download();
+                if (download.getState() == DownloadInfo.State.finished) {
+                    MediaScannerConnection.scanFile(getBaseContext(),
+                                                    new String[] { download.getFilename() },
+                                                    null,
+                                                    null);
+                }
                 reportQueue();
             }
 

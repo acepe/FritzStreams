@@ -15,4 +15,9 @@
     <dimen name="button_radius">3dp</dimen>
     <dimen name="text_play_icon_overlay">42sp</dimen>
 
+    <dimen name="fragment_title_padding">10dp</dimen>
+
+    <dimen name="header_height">60dp</dimen>
+    <dimen name="header_text_title">32sp</dimen>
+
 </resources>
