@@ -87,7 +87,7 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_margin="@dimen/stream_download_margin"
-            android:background="@color/red_fritz"
+            android:background="@drawable/button_selector"
             android:enabled="true"
             android:text="@string/icon_cancel"
             android:textColor="@color/white"
