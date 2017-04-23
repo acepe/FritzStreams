@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/yellow_fritz_bright"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/header_height"
+        android:background="@color/yellow_fritz"
+        android:gravity="center"
+        android:text="@string/downloads"
+        android:textColor="@color/red_fritz"
+        android:textSize="@dimen/header_text_title"
+        android:textStyle="bold" />
+
+    <LinearLayout
+        android:id="@+id/llDownloadsContainer"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="vertical" />
+
+    <TextView
+        android:id="@+id/downloads_freespace"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="end"
+        android:text="@string/download_freespace" />
+
+</LinearLayout>

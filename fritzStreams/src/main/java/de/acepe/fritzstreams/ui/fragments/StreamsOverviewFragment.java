@@ -111,14 +111,30 @@ public class StreamsOverviewFragment extends Fragment {
     private StreamInfo init(StreamInfo.Stream stream, Calendar day) {
         StreamView view = stream == NIGHTFLIGHT ? mStreamViewNightflight : mStreamViewSoundgarden;
         view.clearStream();
+
         StreamInfo streamInfo = mStreamsCache.getStream(stream, day);
         if (streamInfo == null) {
-            streamInfo = new StreamInfo(getActivity(), day, stream);
+            if (stream == SOUNDGARDEN && isTodayBeforeSoundgardenRelease(day)) {
+                Calendar dayInLastWeek = (Calendar) day.clone();
+                dayInLastWeek.add(Calendar.DAY_OF_YEAR, -7);
+                streamInfo = new StreamInfo(getActivity(), dayInLastWeek, stream);
+            } else {
+                streamInfo = new StreamInfo(getActivity(), day, stream);
+            }
             streamInfo.init(new InitStreamCallback(view));
         } else {
             setStreamView(view, streamInfo);
         }
         return streamInfo;
+    }
+
+    private boolean isTodayBeforeSoundgardenRelease(Calendar day) {
+        Calendar todayAt2200 = today();
+        todayAt2200.set(Calendar.HOUR_OF_DAY, 22);
+        todayAt2200.set(Calendar.HOUR, 22);
+
+        return today().get(Calendar.DAY_OF_YEAR) == day.get(Calendar.DAY_OF_YEAR)
+               && Calendar.getInstance().before(todayAt2200);
     }
 
     private class InitStreamCallback implements StreamInfo.Callback {

@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/stream_padding"
+            android:layout_weight="1"
+
+            android:background="@color/dark_overlay"
+            android:orientation="vertical"
+            android:padding="@dimen/streams_padding">
+
+
+            <TextView
+                android:id="@+id/tvTitle"
+                style="@android:style/TextAppearance.Medium"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Title of Stream"
+                android:textColor="@color/red_fritz"
+                android:textSize="@dimen/text_title"
+                android:textStyle="bold" />
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="0.9"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:id="@+id/ivDownload"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:adjustViewBounds="true"
+                    android:padding="@dimen/streams_padding"
+                    android:src="@drawable/sampleimage" />
+
+                <TextView
+                    android:id="@+id/tvSubtitle"
+                    style="@android:style/TextAppearance.DeviceDefault.Small"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_margin="@dimen/streams_padding"
+                    android:layout_weight="1"
+                    android:padding="@dimen/streams_padding"
+                    android:text="subtitle of Stream bla bla"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/text_subtitle" />
+
+            </LinearLayout>
+
+            <Button
+                android:id="@+id/btndownload"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/button_selector"
+                android:enabled="false"
+                android:text="@string/download"
+                android:textColor="@color/white"
+                android:textStyle="bold" />
+
+        </LinearLayout>
+
+        <!-- Progress bar overlay; shown while loading is in progress -->
+        <include layout="@layout/progress_overlay" />
+
+    </FrameLayout>
+</merge>

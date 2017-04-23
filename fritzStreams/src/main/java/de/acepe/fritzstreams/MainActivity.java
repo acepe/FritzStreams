@@ -60,12 +60,13 @@ public class MainActivity extends FragmentActivity
 
         if (isTablet()) {
             android.support.v4.app.FragmentTransaction ft = fm.beginTransaction();
-            ft.add(R.id.streams_frag_container, new StreamsOverviewFragment());
+            ft.replace(R.id.streams_frag_container, new StreamsOverviewFragment());
             ft.commit();
 
             android.support.v4.app.FragmentTransaction ft2 = fm.beginTransaction();
-            ft2.add(R.id.downloads_frag_container, new DownloadFragment());
+            ft2.replace(R.id.downloads_frag_container, new DownloadFragment());
             ft2.commit();
+
         } else {
             List<Fragment> fragments = new ArrayList<>(3);
             fragments.add(new StreamsOverviewFragment());
@@ -97,8 +98,10 @@ public class MainActivity extends FragmentActivity
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.settings_action, menu);
+        if (isTablet()) {
+            MenuInflater inflater = getMenuInflater();
+            inflater.inflate(R.menu.settings_action, menu);
+        }
         return true;
     }
 
