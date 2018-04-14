@@ -12,6 +12,8 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 
+import com.google.gson.Gson;
+
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
@@ -21,6 +23,8 @@ import android.os.AsyncTask;
 import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.util.Log;
+import de.acepe.fritzstreams.backend.json.OnDemandDownload;
+import de.acepe.fritzstreams.backend.json.OnDemandStreamDescriptor;
 
 public class StreamInfo {
 
@@ -32,18 +36,20 @@ public class StreamInfo {
         void initFinished(StreamInfo streamInfo);
     }
 
+    private static final String TAG = "StreamInfo";
     private static final String BASE_URL = "https://fritz.de%s";
     private static final String NIGHTFLIGHT_URL = "/livestream/liveplayer_nightflight.htm/day=%s.html";
     private static final String SOUNDGARDEN_URL = "/livestream/liveplayer_bestemusik.htm/day=%s.html";
     private static final String TITLE_SELECTOR = "#main > article > div.teaserboxgroup.intermediate.count2.even.layoutstandard.layouthalf_2_4 > section > article.manualteaser.first.count1.odd.layoutlaufende_sendung.doctypesendeplatz > h3 > a > span";
     private static final String SUBTITLE_SELECTOR = "#main > article > div.teaserboxgroup.intermediate.count2.even.layoutstandard.layouthalf_2_4 > section > article.manualteaser.first.count1.odd.layoutlaufende_sendung.doctypesendeplatz > div > p";
-    private static final String DOWNLOAD_SELECTOR = "#main > article > div.teaserboxgroup.first.count1.odd.layoutstandard.layouthalf_2_4 > section > article.manualteaser.last.count2.even.layoutmusikstream.layoutbeitrag_av_nur_av.doctypeteaser > div";
-    private static final String DOWNLOAD_DESCRIPTOR_ATTRIBUTE = "data-media-ref";
+    private static final String DOWNLOAD_SELECTOR = "#main > article > div.count1.first.layouthalf_2_4.layoutstandard.odd.teaserboxgroup > section > article.count2.doctypeteaser.even.last.layoutbeitrag_av_nur_av.layoutmusikstream.manualteaser > div";
+    private static final String DOWNLOAD_DESCRIPTOR_ATTRIBUTE = "data-jsb";
     private static final String IMAGE_SELECTOR = "#main > article > div.teaserboxgroup.intermediate.count2.even.layoutstandard.layouthalf_2_4 > section > article.manualteaser.last.count2.even.layoutstandard.doctypeteaser > aside > div > a > img";
 
     private final Context mContext;
     private final Calendar mDate;
     private final Stream mStream;
+    private final Gson mGson;
 
     private Document mDoc;
     private String mTitle;
@@ -57,32 +63,11 @@ public class StreamInfo {
         this.mContext = mContext;
         this.mDate = mDate;
         this.mStream = mStream;
+        this.mGson = new Gson();
     }
 
-    public void init(final Callback callback) {
-        AsyncTask<Void, Void, Void> initTask = new AsyncTask<Void, Void, Void>() {
-            private Exception error;
-
-            @Override
-            protected Void doInBackground(Void... params) {
-                try {
-                    init();
-                } catch (Exception e) {
-                    error = e;
-                }
-                return null;
-            }
-
-            protected void onPostExecute(Void result) {
-                if (error == null) {
-                    callback.initFinished(StreamInfo.this);
-                    failed = false;
-                } else {
-                    callback.initFinished(null);
-                    failed = true;
-                }
-            }
-        };
+    public void init(Callback callback) {
+        AsyncTask<Void, Void, Void> initTask = new InitTask(callback);
         initTask.executeOnExecutor(THREAD_POOL_EXECUTOR);
     }
 
@@ -132,22 +117,28 @@ public class StreamInfo {
             BufferedReader rd = new BufferedReader(new InputStreamReader(is, Charset.forName("UTF-8")));
             String jsonText = readAll(rd);
 
-            String streamToken = "_stream\":\"";
-            int beginIndex = jsonText.indexOf(streamToken) + streamToken.length();
-
-            String mp3Token = ".mp3";
-            int endIndex = jsonText.indexOf(mp3Token) + mp3Token.length();
-
-            return jsonText.substring(beginIndex, endIndex);
-        } catch (IOException e) {
-            e.printStackTrace();
+            OnDemandStreamDescriptor target = mGson.fromJson(jsonText, OnDemandStreamDescriptor.class);
+            String url = target.getMediaArray()
+                               .get(0)
+                               .getMediaStreamArray()
+                               .stream()
+                               .filter(m -> m.getQuality() != null)
+                               .findFirst()
+                               .orElseThrow(IOException::new)
+                               .getStream();
+            return url;
+        } catch (Throwable e) {
+            Log.e(TAG, "Couldn 't extract download-URL from stream website", e);
             return null;
         }
     }
 
     private String extractDownloadDescriptorUrl() {
         Elements info = mDoc.select(DOWNLOAD_SELECTOR);
-        return info.attr(DOWNLOAD_DESCRIPTOR_ATTRIBUTE);
+        String downloadJSON = info.attr(DOWNLOAD_DESCRIPTOR_ATTRIBUTE);
+        OnDemandDownload download = mGson.fromJson(downloadJSON, OnDemandDownload.class);
+
+        return download.getMedia();
     }
 
     private String extractImageUrl() {
@@ -228,5 +219,34 @@ public class StreamInfo {
 
     public boolean isInitFailed() {
         return failed;
+    }
+
+    private class InitTask extends AsyncTask<Void, Void, Void> {
+        private final Callback callback;
+        private Exception error;
+
+        InitTask(Callback callback) {
+            this.callback = callback;
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            try {
+                init();
+            } catch (Exception e) {
+                error = e;
+            }
+            return null;
+        }
+
+        protected void onPostExecute(Void result) {
+            if (error == null) {
+                callback.initFinished(StreamInfo.this);
+                failed = false;
+            } else {
+                callback.initFinished(null);
+                failed = true;
+            }
+        }
     }
 }

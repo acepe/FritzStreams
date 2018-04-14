@@ -2,7 +2,7 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 27
-    buildToolsVersion '26.0.2'
+    buildToolsVersion '27.0.3'
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
@@ -23,9 +23,10 @@ android {
 }
 
 dependencies {
-    compile project(':android-support-v4-preferencefragment')
-    compile 'org.jsoup:jsoup:1.8.3'
-    compile 'com.android.support:support-v4:27.0.2'
+    implementation project(':android-support-v4-preferencefragment')
+    implementation 'org.jsoup:jsoup:1.8.3'
+    implementation 'com.google.code.gson:gson:2.8.2'
+    implementation 'com.android.support:support-v4:27.1.1'
     // from: https://github.com/spacecowboy/NoNonsense-FilePicker
-    compile 'com.nononsenseapps:filepicker:4.0.0'
+    implementation 'com.nononsenseapps:filepicker:4.0.0'
 }
