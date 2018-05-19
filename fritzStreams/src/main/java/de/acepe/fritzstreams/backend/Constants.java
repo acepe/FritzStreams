@@ -5,8 +5,6 @@ import java.util.Locale;
 
 public final class Constants {
 
-    public static final String SP_WIFI_ONLY = "pref_dl_wifi_only";
-    public static final String SP_DOWNLOAD_DIR = "pref_dl_dir";
     public static final Locale GERMANY = Locale.GERMANY;
     public static final SimpleDateFormat DAY_FORMAT = new SimpleDateFormat("E", GERMANY);
     public static final String FILE_EXTENSION_MP3 = ".mp3";

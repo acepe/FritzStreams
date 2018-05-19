@@ -1,12 +1,7 @@
 package de.acepe.fritzstreams;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.List;
-
 import android.app.ActionBar;
 import android.app.FragmentTransaction;
-import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -15,22 +10,22 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import de.acepe.fritzstreams.backend.DownloadInfo;
 import de.acepe.fritzstreams.backend.DownloadServiceAdapter;
 import de.acepe.fritzstreams.backend.StreamInfo;
 import de.acepe.fritzstreams.ui.fragments.CacheFragment;
 import de.acepe.fritzstreams.ui.fragments.DownloadFragment;
-import de.acepe.fritzstreams.ui.fragments.SettingsFragment;
 import de.acepe.fritzstreams.ui.fragments.StreamsOverviewFragment;
+
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.List;
 
 public class MainActivity extends FragmentActivity
         implements
-            ActionBar.TabListener,
-            DownloadFragment.DownloadServiceAdapterSupplier,
-            StreamsOverviewFragment.StreamsCache {
+        ActionBar.TabListener,
+        DownloadFragment.DownloadServiceAdapterSupplier,
+        StreamsOverviewFragment.StreamsCache {
 
     private static final String TAG_CACHE_FRAGMENT = "CacheFragment";
 
@@ -71,7 +66,6 @@ public class MainActivity extends FragmentActivity
             List<Fragment> fragments = new ArrayList<>(3);
             fragments.add(new StreamsOverviewFragment());
             fragments.add(new DownloadFragment());
-            fragments.add(new SettingsFragment());
 
             AppSectionsPagerAdapter mAppSectionsPagerAdapter = new AppSectionsPagerAdapter(fm, fragments);
             mViewPager = (ViewPager) findViewById(R.id.pager);
@@ -84,8 +78,8 @@ public class MainActivity extends FragmentActivity
             });
             for (int i = 0; i < mAppSectionsPagerAdapter.getCount(); i++) {
                 ActionBar.Tab tab = actionBar.newTab()
-                                             .setText(mAppSectionsPagerAdapter.getPageTitle(i))
-                                             .setTabListener(this);
+                        .setText(mAppSectionsPagerAdapter.getPageTitle(i))
+                        .setTabListener(this);
                 actionBar.addTab(tab);
             }
         }
@@ -94,22 +88,6 @@ public class MainActivity extends FragmentActivity
     private boolean isTablet() {
         return (getResources().getConfiguration().screenLayout
                 & Configuration.SCREENLAYOUT_SIZE_MASK) >= Configuration.SCREENLAYOUT_SIZE_LARGE;
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        if (isTablet()) {
-            MenuInflater inflater = getMenuInflater();
-            inflater.inflate(R.menu.settings_action, menu);
-        }
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        Intent settingsIntent = new Intent(getApplicationContext(), SettingsActivity.class);
-        startActivity(settingsIntent);
-        return true;
     }
 
     @Override
@@ -138,6 +116,16 @@ public class MainActivity extends FragmentActivity
     @Override
     public void scheduleDownload(DownloadInfo streamDownload) {
         mCacheFragment.scheduleDownload(streamDownload);
+    }
+
+    @Override
+    public void setDay(Calendar day) {
+        mCacheFragment.setmDay(day);
+    }
+
+    @Override
+    public Calendar getDay() {
+        return mCacheFragment.getDay();
     }
 
     @Override

@@ -1,22 +1,12 @@
 package de.acepe.fritzstreams.ui.fragments;
 
-import static de.acepe.fritzstreams.backend.StreamInfo.Stream.NIGHTFLIGHT;
-import static de.acepe.fritzstreams.backend.StreamInfo.Stream.SOUNDGARDEN;
-import static de.acepe.fritzstreams.util.Utilities.today;
-
-import java.util.Calendar;
-import java.util.HashMap;
-
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.RadioGroup;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 import de.acepe.fritzstreams.R;
@@ -24,7 +14,14 @@ import de.acepe.fritzstreams.backend.Constants;
 import de.acepe.fritzstreams.backend.DownloadInfo;
 import de.acepe.fritzstreams.backend.StreamInfo;
 import de.acepe.fritzstreams.ui.components.StreamView;
-import de.acepe.fritzstreams.util.Utilities;
+
+import java.util.Calendar;
+import java.util.HashMap;
+import java.util.Map;
+
+import static de.acepe.fritzstreams.backend.StreamInfo.Stream.NIGHTFLIGHT;
+import static de.acepe.fritzstreams.backend.StreamInfo.Stream.SOUNDGARDEN;
+import static de.acepe.fritzstreams.util.Utilities.today;
 
 public class StreamsOverviewFragment extends Fragment {
 
@@ -34,17 +31,21 @@ public class StreamsOverviewFragment extends Fragment {
         StreamInfo getStream(StreamInfo.Stream stream, Calendar day);
 
         void scheduleDownload(DownloadInfo streamDownload);
+
+        void setDay(Calendar day);
+
+        Calendar getDay();
     }
 
     private static final String TAG = "StreamOverviewFragment";
 
-    private HashMap<View, Calendar> mDayButtons;
+    private HashMap<ToggleButton, Calendar> mDayButtons;
     private StreamsCache mStreamsCache;
     private StreamView mStreamViewSoundgarden;
     private StreamView mStreamViewNightflight;
     private StreamInfo mNightflightStreamInfo;
     private StreamInfo mSoundgardenStreamInfo;
-    private RadioGroup mDaysToggleGroup;
+    private ViewGroup mDaysToggleGroup;
 
     @Override
     public void onAttach(Context context) {
@@ -68,10 +69,8 @@ public class StreamsOverviewFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_streams_overview, container, false);
 
-        mDayButtons = new HashMap<>();
+        mDaysToggleGroup = ((ViewGroup) view.findViewById(R.id.daysToggleGroup));
 
-        mDaysToggleGroup = ((RadioGroup) view.findViewById(R.id.daysToggleGroup));
-        mDaysToggleGroup.setOnCheckedChangeListener(toggleListener);
         configureToggleButtons();
 
         mStreamViewNightflight = (StreamView) view.findViewById(R.id.ilbDownloadNightflight);
@@ -80,14 +79,26 @@ public class StreamsOverviewFragment extends Fragment {
         mStreamViewSoundgarden = (StreamView) view.findViewById(R.id.ilbDownloadSoundgarden);
         mStreamViewSoundgarden.setOnClickListener(new DownloadOnclickListener(SOUNDGARDEN));
 
-        ToggleButton todaysToggle = (ToggleButton) mDaysToggleGroup.getChildAt(mDayButtons.size() - 1);
-        todaysToggle.setChecked(true);
-        onSelectedDayChange(today());
+        Calendar dayFromCache = mStreamsCache.getDay();
+        Calendar day = dayFromCache != null ? dayFromCache : today();
+        onSelectedDayChange(day);
+
+        ToggleButton daysToggle = findToggle(day);
+        daysToggle.setChecked(true);
 
         return view;
     }
 
+    private ToggleButton findToggle(Calendar day) {
+        for (Map.Entry<ToggleButton, Calendar> entry : mDayButtons.entrySet()) {
+            if (entry.getValue().equals(day))
+                return entry.getKey();
+        }
+        return null;
+    }
+
     private void configureToggleButtons() {
+        mDayButtons = new HashMap<>();
         for (int i = 0; i < mDaysToggleGroup.getChildCount(); i++) {
             ToggleButton view = (ToggleButton) mDaysToggleGroup.getChildAt(6 - i);
             view.setOnClickListener(oclDaySelected);
@@ -104,6 +115,7 @@ public class StreamsOverviewFragment extends Fragment {
     }
 
     private void onSelectedDayChange(Calendar day) {
+        mStreamsCache.setDay(day);
         mSoundgardenStreamInfo = init(SOUNDGARDEN, day);
         mNightflightStreamInfo = init(NIGHTFLIGHT, day);
     }
@@ -134,7 +146,7 @@ public class StreamsOverviewFragment extends Fragment {
         todayAt2200.set(Calendar.HOUR, 22);
 
         return today().get(Calendar.DAY_OF_YEAR) == day.get(Calendar.DAY_OF_YEAR)
-               && Calendar.getInstance().before(todayAt2200);
+                && Calendar.getInstance().before(todayAt2200);
     }
 
     private class InitStreamCallback implements StreamInfo.Callback {
@@ -155,27 +167,25 @@ public class StreamsOverviewFragment extends Fragment {
             view.failed();
         } else {
             view.setStreamInfo(streamInfo);
-            mStreamsCache.addStream(streamInfo);
-        }
-    }
-
-    static final RadioGroup.OnCheckedChangeListener toggleListener = new RadioGroup.OnCheckedChangeListener() {
-        @Override
-        public void onCheckedChanged(RadioGroup radioGroup, int checkedId) {
-            for (int i = 0; i < radioGroup.getChildCount(); i++) {
-                ToggleButton view = (ToggleButton) radioGroup.getChildAt(i);
-                boolean checked = view.getId() == checkedId;
-                view.setChecked(checked);
+            if (mStreamsCache != null) {
+                mStreamsCache.addStream(streamInfo);
             }
         }
-    };
+    }
 
     private final View.OnClickListener oclDaySelected = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            ((RadioGroup) v.getParent()).clearCheck();
-            ((RadioGroup) v.getParent()).check(v.getId());
-            onSelectedDayChange(mDayButtons.get(v));
+            int childCount = mDaysToggleGroup.getChildCount();
+            for (int i = 0; i < childCount; i++) {
+                ToggleButton view = (ToggleButton) mDaysToggleGroup.getChildAt(i);
+                boolean checked = view.getId() == v.getId();
+                view.setChecked(checked);
+
+                if (checked) {
+                    onSelectedDayChange(mDayButtons.get(view));
+                }
+            }
         }
     };
 
@@ -202,12 +212,6 @@ public class StreamsOverviewFragment extends Fragment {
         if (!streamInfo.isInited()) {
             return;
         }
-
-        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getContext());
-        if (sharedPref.getBoolean(Constants.SP_WIFI_ONLY, false) && !Utilities.onWifi(getContext())) {
-            Toast.makeText(getContext(), R.string.download_only_wifi_notification_title, Toast.LENGTH_SHORT).show();
-            return;
-        }
         Toast.makeText(getContext(), R.string.download_started, Toast.LENGTH_SHORT).show();
 
         mStreamsCache.scheduleDownload(createDownloadInfo(streamInfo));
@@ -216,9 +220,9 @@ public class StreamsOverviewFragment extends Fragment {
     @NonNull
     private DownloadInfo createDownloadInfo(StreamInfo streamInfo) {
         return new DownloadInfo(streamInfo.getTitle(),
-                                streamInfo.getSubtitle(),
-                                streamInfo.getStreamURL(),
-                                streamInfo.getFilename());
+                streamInfo.getSubtitle(),
+                streamInfo.getStreamURL(),
+                streamInfo.getFilename());
     }
 
 }

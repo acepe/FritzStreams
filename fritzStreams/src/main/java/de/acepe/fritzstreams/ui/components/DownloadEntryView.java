@@ -1,10 +1,5 @@
 package de.acepe.fritzstreams.ui.components;
 
-import static de.acepe.fritzstreams.backend.DownloadInfo.State.downloading;
-import static de.acepe.fritzstreams.backend.DownloadInfo.State.finished;
-
-import java.io.File;
-
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Typeface;
@@ -14,6 +9,11 @@ import android.view.View;
 import android.widget.*;
 import de.acepe.fritzstreams.R;
 import de.acepe.fritzstreams.backend.DownloadInfo;
+
+import java.io.File;
+
+import static de.acepe.fritzstreams.backend.DownloadInfo.State.downloading;
+import static de.acepe.fritzstreams.backend.DownloadInfo.State.finished;
 
 public class DownloadEntryView extends LinearLayout {
 
@@ -57,23 +57,15 @@ public class DownloadEntryView extends LinearLayout {
         mCancelButton = (Button) findViewById(R.id.btnCancelDownload);
         mCancelButton.setTypeface(font);
         mDownloadProgress = (ProgressBar) findViewById(R.id.pbDownloadProgress);
-        setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (mDownload.getState() == DownloadInfo.State.finished) {
-                    openWithMusicApp();
-                }
+        setOnClickListener(v -> {
+            if (mDownload.getState() == DownloadInfo.State.finished) {
+                openWithMusicApp();
             }
         });
     }
 
-    public void setButtonAction(final Action action) {
-        mCancelButton.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                action.execute(mDownload);
-            }
-        });
+    public void setButtonAction(Action action) {
+        mCancelButton.setOnClickListener(v -> action.execute(mDownload));
     }
 
     public void setDownload(DownloadInfo download) {

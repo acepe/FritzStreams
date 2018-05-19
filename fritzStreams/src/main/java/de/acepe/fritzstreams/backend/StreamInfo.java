@@ -1,6 +1,17 @@
 package de.acepe.fritzstreams.backend;
 
-import static android.os.AsyncTask.THREAD_POOL_EXECUTOR;
+import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.os.AsyncTask;
+import android.os.Environment;
+import android.util.Log;
+import com.google.gson.Gson;
+import de.acepe.fritzstreams.backend.json.OnDemandDownload;
+import de.acepe.fritzstreams.backend.json.OnDemandStreamDescriptor;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.select.Elements;
 
 import java.io.*;
 import java.net.URL;
@@ -8,25 +19,10 @@ import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.select.Elements;
-
-import com.google.gson.Gson;
-
-import android.content.Context;
-import android.content.SharedPreferences;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.net.Uri;
-import android.os.AsyncTask;
-import android.os.Environment;
-import android.preference.PreferenceManager;
-import android.util.Log;
-import de.acepe.fritzstreams.backend.json.OnDemandDownload;
-import de.acepe.fritzstreams.backend.json.OnDemandStreamDescriptor;
+import static android.os.AsyncTask.THREAD_POOL_EXECUTOR;
 
 public class StreamInfo {
+
 
     public enum Stream {
         SOUNDGARDEN, NIGHTFLIGHT
@@ -45,6 +41,7 @@ public class StreamInfo {
     private static final String DOWNLOAD_SELECTOR = "#main > article > div.count1.first.layouthalf_2_4.layoutstandard.odd.teaserboxgroup > section > article.count2.doctypeteaser.even.last.layoutbeitrag_av_nur_av.layoutmusikstream.manualteaser > div";
     private static final String DOWNLOAD_DESCRIPTOR_ATTRIBUTE = "data-jsb";
     private static final String IMAGE_SELECTOR = "#main > article > div.teaserboxgroup.intermediate.count2.even.layoutstandard.layouthalf_2_4 > section > article.manualteaser.last.count2.even.layoutstandard.doctypeteaser > aside > div > a > img";
+    private static final String FILE_DATE_FORMAT = "yyyy-MM-dd";
 
     private final Context mContext;
     private final Calendar mDate;
@@ -119,13 +116,13 @@ public class StreamInfo {
 
             OnDemandStreamDescriptor target = mGson.fromJson(jsonText, OnDemandStreamDescriptor.class);
             String url = target.getMediaArray()
-                               .get(0)
-                               .getMediaStreamArray()
-                               .stream()
-                               .filter(m -> m.getQuality() != null)
-                               .findFirst()
-                               .orElseThrow(IOException::new)
-                               .getStream();
+                    .get(0)
+                    .getMediaStreamArray()
+                    .stream()
+                    .filter(m -> m.getQuality() != null)
+                    .findFirst()
+                    .orElseThrow(IOException::new)
+                    .getStream();
             return url;
         } catch (Throwable e) {
             Log.e(TAG, "Couldn 't extract download-URL from stream website", e);
@@ -160,24 +157,14 @@ public class StreamInfo {
     }
 
     private String getDownloadDir() {
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(mContext);
-        String defaultPath = mContext.getExternalFilesDir(Environment.DIRECTORY_MUSIC).getAbsolutePath();
-        return sharedPreferences.getString(Constants.SP_DOWNLOAD_DIR, defaultPath);
+        return mContext.getExternalFilesDir(Environment.DIRECTORY_MUSIC).getAbsolutePath();
     }
 
     private String getFileName() {
         return mTitle
-               + "_"
-               + new SimpleDateFormat("yyyy-MM-dd", Constants.GERMANY).format(mDate.getTime())
-               + Constants.FILE_EXTENSION_MP3;
-    }
-
-    public Uri getFileUri() {
-        return Uri.fromFile(new File(getFilename()));
-    }
-
-    public String getPath() {
-        return new File(getFilename()).getAbsolutePath();
+                + "_"
+                + new SimpleDateFormat(FILE_DATE_FORMAT, Constants.GERMANY).format(mDate.getTime())
+                + Constants.FILE_EXTENSION_MP3;
     }
 
     public String getStreamURL() {
@@ -212,14 +199,15 @@ public class StreamInfo {
         return mDate;
     }
 
+    public boolean isInitFailed() {
+        return failed;
+    }
+
     @Override
     public String toString() {
         return "StreamInfo{" + "mDate=" + mDate + ", mStream=" + mStream + ", mTitle='" + mTitle + '\'' + '}';
     }
 
-    public boolean isInitFailed() {
-        return failed;
-    }
 
     private class InitTask extends AsyncTask<Void, Void, Void> {
         private final Callback callback;

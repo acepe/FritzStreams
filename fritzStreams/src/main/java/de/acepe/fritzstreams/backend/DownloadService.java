@@ -1,10 +1,5 @@
 package de.acepe.fritzstreams.backend;
 
-import static android.net.wifi.WifiManager.WIFI_MODE_FULL_HIGH_PERF;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
@@ -15,8 +10,14 @@ import android.os.Process;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import static android.net.wifi.WifiManager.WIFI_MODE_FULL_HIGH_PERF;
+
 public class DownloadService extends Service {
     private static final String TAG = "DownloadService";
+    public static final int MINUTE_IN_MILLIS = 60 * 1000;
 
     private final List<DownloadInfo> mScheduledDownloads = new ArrayList<>();
 
@@ -25,13 +26,10 @@ public class DownloadService extends Service {
     private PowerManager.WakeLock mWakeLock;
     private boolean permissionToDie = false;
 
-    private final Downloader.DownloadCallback callback = new Downloader.DownloadCallback() {
-        @Override
-        public void reportProgress(DownloadInfo downloadInfo) {
-            Intent localIntent = new Intent(Constants.RESPONSE_ACTION).putExtra(Constants.CURRENT_DOWNLOAD_PROGRESS_REPORT,
-                                                                                downloadInfo);
-            sendMessage(localIntent);
-        }
+    private final Downloader.DownloadCallback callback = downloadInfo -> {
+        Intent localIntent = new Intent(Constants.RESPONSE_ACTION).putExtra(Constants.CURRENT_DOWNLOAD_PROGRESS_REPORT,
+                downloadInfo);
+        sendMessage(localIntent);
     };
 
     // Handler that receives messages from the thread
@@ -48,9 +46,9 @@ public class DownloadService extends Service {
                 new Downloader(download, callback).download();
                 if (download.getState() == DownloadInfo.State.finished) {
                     MediaScannerConnection.scanFile(getBaseContext(),
-                                                    new String[] { download.getFilename() },
-                                                    null,
-                                                    null);
+                            new String[]{download.getFilename()},
+                            null,
+                            null);
                 }
                 reportQueue();
             }
@@ -110,7 +108,7 @@ public class DownloadService extends Service {
                     reportQueue();
                 } else {
                     sendMessage(new Intent(Constants.RESPONSE_ACTION).putExtra(Constants.ALREADY_IN_QUEUE,
-                                                                               existingDownload));
+                            existingDownload));
                 }
             }
             if (Constants.REQUEST_QUERY_DOWNLOADS_ACTION.equals(request)) {
@@ -180,7 +178,7 @@ public class DownloadService extends Service {
         PowerManager powerManager = (PowerManager) getSystemService(Context.POWER_SERVICE);
         if (powerManager != null) {
             mWakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, TAG);
-            mWakeLock.acquire();
+            mWakeLock.acquire(30 * MINUTE_IN_MILLIS);
         }
 
         WifiManager wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);

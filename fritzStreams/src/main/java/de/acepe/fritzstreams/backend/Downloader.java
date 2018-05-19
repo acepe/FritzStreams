@@ -1,12 +1,11 @@
 package de.acepe.fritzstreams.backend;
 
+import android.util.Log;
+import de.acepe.fritzstreams.backend.DownloadInfo.State;
+
 import java.io.*;
 import java.net.URL;
 import java.net.URLConnection;
-
-import android.media.MediaScannerConnection;
-import android.util.Log;
-import de.acepe.fritzstreams.backend.DownloadInfo.State;
 
 class Downloader {
 
@@ -38,7 +37,7 @@ class Downloader {
             return;
         }
         try (InputStream is = connection.getInputStream();
-                OutputStream outstream = new BufferedOutputStream(new FileOutputStream(file))) {
+             OutputStream outstream = new BufferedOutputStream(new FileOutputStream(file))) {
             int size = connection.getContentLength();
 
             Log.d(TAG, "Size is: " + size);

@@ -1,11 +1,5 @@
 package de.acepe.fritzstreams.ui.fragments;
 
-import static de.acepe.fritzstreams.backend.StreamInfo.Stream.NIGHTFLIGHT;
-import static de.acepe.fritzstreams.backend.StreamInfo.Stream.SOUNDGARDEN;
-
-import java.util.Calendar;
-import java.util.HashMap;
-
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -13,6 +7,12 @@ import android.util.Log;
 import de.acepe.fritzstreams.backend.DownloadInfo;
 import de.acepe.fritzstreams.backend.DownloadServiceAdapter;
 import de.acepe.fritzstreams.backend.StreamInfo;
+
+import java.util.Calendar;
+import java.util.HashMap;
+
+import static de.acepe.fritzstreams.backend.StreamInfo.Stream.NIGHTFLIGHT;
+import static de.acepe.fritzstreams.backend.StreamInfo.Stream.SOUNDGARDEN;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -25,6 +25,7 @@ public class CacheFragment extends Fragment {
     private HashMap<Calendar, StreamInfo> mNightflightStreamsForDay;
     private Context mContext;
     private DownloadServiceAdapter downloadServiceAdapter;
+    private Calendar mDay;
 
     /**
      * This method will only be called once when the retained Fragment is first created.
@@ -73,6 +74,14 @@ public class CacheFragment extends Fragment {
         downloadServiceAdapter.detachFromService();
     }
 
+    public void setmDay(Calendar day) {
+        this.mDay = day;
+    }
+
+    public Calendar getDay() {
+        return mDay;
+    }
+
     public void addStream(StreamInfo streamInfo) {
         if (streamInfo.getStream() == SOUNDGARDEN) {
             mSoundgardenStreamsForDay.put(streamInfo.getDay(), streamInfo);
@@ -98,4 +107,5 @@ public class CacheFragment extends Fragment {
     public DownloadServiceAdapter getDownloadServiceAdapter() {
         return downloadServiceAdapter;
     }
+
 }

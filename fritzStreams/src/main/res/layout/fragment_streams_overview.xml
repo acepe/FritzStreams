@@ -39,7 +39,7 @@
         android:layout_weight="1"
         tools:ignore="UselessLeaf" />
 
-    <RadioGroup
+    <LinearLayout
         android:id="@+id/daysToggleGroup"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
@@ -137,5 +137,5 @@
             android:textOff="@string/sundayButton"
             android:textOn="@string/sundayButton"
             android:textStyle="bold" />
-    </RadioGroup>
+    </LinearLayout>
 </LinearLayout>
