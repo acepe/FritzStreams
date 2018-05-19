@@ -4,9 +4,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.net.Uri;
+import android.support.v4.content.FileProvider;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.*;
+import de.acepe.fritzstreams.BuildConfig;
 import de.acepe.fritzstreams.R;
 import de.acepe.fritzstreams.backend.DownloadInfo;
 
@@ -105,12 +107,12 @@ public class DownloadEntryView extends LinearLayout {
     }
 
     private void openWithMusicApp() {
-        Uri outFile = Uri.fromFile(new File(mDownload.getFilename()));
+        Uri outFile = FileProvider.getUriForFile(getContext(), BuildConfig.APPLICATION_ID + ".provider", new File(mDownload.getFilename()));
 
         Intent mediaIntent = new Intent();
         mediaIntent.setAction(Intent.ACTION_VIEW);
         mediaIntent.setDataAndType(outFile, "audio/*");
-        mediaIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        mediaIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_GRANT_READ_URI_PERMISSION);
 
         if (mediaIntent.resolveActivity(getContext().getPackageManager()) != null) {
             getContext().startActivity(mediaIntent);
