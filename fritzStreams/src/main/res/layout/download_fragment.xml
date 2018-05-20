@@ -5,7 +5,7 @@
     android:orientation="vertical">
 
     <TextView
-        android:id="@+id/downloads_freespace"
+        android:id="@+id/downloadsFreespace"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/yellow_fritz_bright"
@@ -13,7 +13,7 @@
         android:text="@string/download_freespace" />
 
     <LinearLayout
-        android:id="@+id/llDownloadsContainer"
+        android:id="@+id/downloadsContainer"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/yellow_fritz"

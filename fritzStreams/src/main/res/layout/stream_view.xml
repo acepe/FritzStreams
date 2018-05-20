@@ -17,7 +17,7 @@
 
 
             <TextView
-                android:id="@+id/tvTitle"
+                android:id="@+id/title"
                 style="@android:style/TextAppearance.Medium"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -43,7 +43,7 @@
                     android:src="@drawable/sampleimage" />
 
                 <TextView
-                    android:id="@+id/tvSubtitle"
+                    android:id="@+id/subtitle"
                     style="@android:style/TextAppearance.DeviceDefault.Small"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"

@@ -25,7 +25,7 @@
                 android:padding="@dimen/streams_padding">
 
                 <TextView
-                    android:id="@+id/tvTitle"
+                    android:id="@+id/title"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="Title of Stream"
@@ -34,7 +34,7 @@
                     tools:ignore="HardcodedText" />
 
                 <TextView
-                    android:id="@+id/tvSubtitle"
+                    android:id="@+id/subtitle"
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
                     android:layout_weight="1"
@@ -49,7 +49,7 @@
                     android:layout_height="wrap_content">
 
                     <ProgressBar
-                        android:id="@+id/pbDownloadProgress"
+                        android:id="@+id/downloadProgress"
                         style="?android:attr/progressBarStyleHorizontal"
                         android:layout_width="match_parent"
                         android:layout_height="5dp"
@@ -60,7 +60,7 @@
                         android:progressDrawable="@drawable/progress" />
 
                     <TextView
-                        android:id="@+id/tvState"
+                        android:id="@+id/stateDisplay"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:text="@string/finished"
@@ -71,7 +71,7 @@
             </LinearLayout>
 
             <TextView
-                android:id="@+id/tvPlay"
+                android:id="@+id/playIcon"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:background="@color/dark_overlay"
@@ -83,7 +83,7 @@
         </FrameLayout>
 
         <Button
-            android:id="@+id/btnCancelDownload"
+            android:id="@+id/cancelDownload"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_margin="@dimen/stream_download_margin"
