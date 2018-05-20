@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Environment;
+import android.support.annotation.NonNull;
 import android.util.Log;
 import com.google.gson.Gson;
 import de.acepe.fritzstreams.backend.json.MediaStreamArray;
@@ -58,7 +59,7 @@ public class StreamInfo {
     private Bitmap mImage;
     private boolean failed;
 
-    public StreamInfo(Context mContext, Calendar mDate, Stream mStream) {
+    public StreamInfo(Context mContext, Calendar mDate, @NonNull Stream mStream) {
         this.mContext = mContext;
         this.mDate = mDate;
         this.mStream = mStream;

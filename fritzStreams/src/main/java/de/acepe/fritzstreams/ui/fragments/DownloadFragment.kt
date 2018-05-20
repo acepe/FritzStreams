@@ -22,8 +22,8 @@ class DownloadFragment : Fragment(), DownloadServiceAdapter.ResultReceiver {
 
     private val downloadViews = HashMap<DownloadInfo, DownloadEntryView>()
 
-    private lateinit var mDownloaderSupplier: DownloadServiceAdapterSupplier
     private var lastUpdateFreeSpace: Long = 0
+    private lateinit var mDownloaderSupplier: DownloadServiceAdapterSupplier
 
     interface DownloadServiceAdapterSupplier {
         val downloader: DownloadServiceAdapter
@@ -77,6 +77,7 @@ class DownloadFragment : Fragment(), DownloadServiceAdapter.ResultReceiver {
 
     private fun addDownload(download: DownloadInfo) {
         val context = context ?: return
+
         val downloadView = DownloadEntryView(context)
         downloadView.setDownload(download)
         downloadsContainer.addView(downloadView)
@@ -91,11 +92,11 @@ class DownloadFragment : Fragment(), DownloadServiceAdapter.ResultReceiver {
         val downloader = mDownloaderSupplier.downloader
         with(downloader) {
             when (downloadInfo.state) {
+                DOWNLOADING -> cancelDownload(downloadInfo)
                 WAITING, FINISHED -> {
                     removeDownload(downloadInfo)
                     cancelDownload(downloadInfo)
                 }
-                DOWNLOADING -> cancelDownload(downloadInfo)
                 FAILED, CANCELLED -> {
                     removeDownload(downloadInfo)
                     downloadInfo.state = WAITING

@@ -4,6 +4,7 @@ import android.app.ActionBar;
 import android.app.FragmentTransaction;
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
@@ -122,7 +123,7 @@ public class MainActivity extends FragmentActivity
 
     @Override
     public void setDay(Calendar day) {
-        mCacheFragment.setmDay(day);
+        mCacheFragment.setDay(day);
     }
 
     @Override
@@ -130,6 +131,7 @@ public class MainActivity extends FragmentActivity
         return mCacheFragment.getDay();
     }
 
+    @NonNull
     @Override
     public DownloadServiceAdapter getDownloader() {
         return mCacheFragment.getDownloadServiceAdapter();
