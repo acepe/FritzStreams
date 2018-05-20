@@ -10,6 +10,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
+import android.view.WindowManager;
 import de.acepe.fritzstreams.backend.DownloadInfo;
 import de.acepe.fritzstreams.backend.DownloadServiceAdapter;
 import de.acepe.fritzstreams.backend.StreamInfo;
@@ -35,6 +36,7 @@ public class MainActivity extends FragmentActivity
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
 
         actionBar = getActionBar();
 

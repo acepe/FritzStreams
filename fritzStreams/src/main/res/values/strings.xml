@@ -7,7 +7,6 @@
     <string-array name="navigation_array">
         <item>@string/streams</item>
         <item>@string/downloads</item>
-        <item>@string/settings</item>
     </string-array>
 
     <string name="app_name">Fritz Musikstreams</string>
@@ -15,9 +14,6 @@
     <string name="download">Download</string>
     <string name="try_again">Reload</string>
 
-    <string name="pref_dl_wifi_only">Wifi only</string>
-    <string name="pref_dl_wifi_only_summary">Download stream only if connected to wifi network</string>
-    <string name="pref_dl_dir">Set download folder</string>
     <string name="file_dialog_set_dir">Select directory</string>
     <string name="download_noti_not_mounted">No storage device found!</string>
 
@@ -26,8 +22,6 @@
     <string name="finished">Download finished</string>
     <string name="failed">Download failed\u2026</string>
     <string name="cancelled">Download cancelled\u2026</string>
-    <string name="onlyWifi">Not connected to WiFi-Network</string>
-    <string name="download_only_wifi_notification_title">Download cancelled: not connected to WiFi.</string>
     <string name="app_not_available">No audio player found…</string>
 
     <string name="mondayButton">Mo</string>

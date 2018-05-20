@@ -12,6 +12,7 @@ import android.widget.TextView;
 import de.acepe.fritzstreams.R;
 import de.acepe.fritzstreams.backend.DownloadInfo;
 import de.acepe.fritzstreams.backend.DownloadServiceAdapter;
+import de.acepe.fritzstreams.backend.DownloadState;
 import de.acepe.fritzstreams.ui.components.DownloadEntryView;
 import de.acepe.fritzstreams.util.Utilities;
 
@@ -114,16 +115,16 @@ public class DownloadFragment extends Fragment implements DownloadServiceAdapter
         public void execute(DownloadInfo downloadInfo) {
             DownloadServiceAdapter downloader = mDownloaderSupplier.getDownloader();
             switch (downloadInfo.getState()) {
-                case waiting:
-                case finished:
+                case WAITING:
+                case FINISHED:
                     downloader.removeDownload(downloadInfo);
-                case downloading:
+                case DOWNLOADING:
                     downloader.cancelDownload(downloadInfo);
                     break;
-                case failed:
-                case cancelled:
+                case FAILED:
+                case CANCELLED:
                     downloader.removeDownload(downloadInfo);
-                    downloadInfo.setState(DownloadInfo.State.waiting);
+                    downloadInfo.setState(DownloadState.WAITING);
                     downloader.addDownload(downloadInfo);
                     break;
             }

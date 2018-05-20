@@ -11,11 +11,12 @@ import android.widget.*;
 import de.acepe.fritzstreams.BuildConfig;
 import de.acepe.fritzstreams.R;
 import de.acepe.fritzstreams.backend.DownloadInfo;
+import de.acepe.fritzstreams.backend.DownloadState;
 
 import java.io.File;
 
-import static de.acepe.fritzstreams.backend.DownloadInfo.State.downloading;
-import static de.acepe.fritzstreams.backend.DownloadInfo.State.finished;
+import static de.acepe.fritzstreams.backend.DownloadState.DOWNLOADING;
+import static de.acepe.fritzstreams.backend.DownloadState.FINISHED;
 
 public class DownloadEntryView extends LinearLayout {
 
@@ -34,35 +35,35 @@ public class DownloadEntryView extends LinearLayout {
 
     public DownloadEntryView(Context context) {
         super(context);
-        init(context, null);
+        init(context);
     }
 
     public DownloadEntryView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        init(context, attrs);
+        init(context);
     }
 
     public DownloadEntryView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
-        init(context, attrs);
+        init(context);
     }
 
-    private void init(Context context, AttributeSet attrs) {
+    private void init(Context context) {
         Typeface font = Typeface.createFromAsset(context.getAssets(), "fontawesome-webfont.ttf");
         View.inflate(context, R.layout.download_entry_view, this);
 
-        mTitle = (TextView) findViewById(R.id.tvTitle);
-        mSubTitle = (TextView) findViewById(R.id.tvSubtitle);
-        mState = (TextView) findViewById(R.id.tvState);
-        mPlay = (TextView) findViewById(R.id.tvPlay);
+        mTitle = findViewById(R.id.tvTitle);
+        mSubTitle = findViewById(R.id.tvSubtitle);
+        mState = findViewById(R.id.tvState);
+        mPlay = findViewById(R.id.tvPlay);
         mPlay.setTypeface(font);
-        mCancelButton = (Button) findViewById(R.id.btnCancelDownload);
+        mCancelButton = findViewById(R.id.btnCancelDownload);
         mCancelButton.setTypeface(font);
-        mDownloadProgress = (ProgressBar) findViewById(R.id.pbDownloadProgress);
+        mDownloadProgress = findViewById(R.id.pbDownloadProgress);
         setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (mDownload.getState() == DownloadInfo.State.finished) {
+                if (mDownload.getState() == DownloadState.FINISHED) {
                     DownloadEntryView.this.openWithMusicApp();
                 }
             }
@@ -83,31 +84,31 @@ public class DownloadEntryView extends LinearLayout {
         mTitle.setText(download.getTitle());
         mSubTitle.setText(download.getSubtitle());
 
-        DownloadInfo.State state = download.getState();
+        DownloadState state = download.getState();
         switch (state) {
-            case waiting:
+            case WAITING:
                 mCancelButton.setText(R.string.icon_remove);
                 mState.setText(R.string.waiting);
                 break;
-            case downloading:
+            case DOWNLOADING:
                 mDownloadProgress.setProgress(download.getProgressPercent());
                 break;
-            case cancelled:
+            case CANCELLED:
                 mState.setText(R.string.cancelled);
                 mCancelButton.setText(R.string.icon_retry);
                 break;
-            case failed:
+            case FAILED:
                 mState.setText(R.string.failed);
                 mCancelButton.setText(R.string.icon_retry);
                 break;
-            case finished:
+            case FINISHED:
                 mState.setText(R.string.finished);
                 mCancelButton.setText(R.string.icon_accept);
                 break;
         }
-        mDownloadProgress.setVisibility(state == downloading ? View.VISIBLE : View.INVISIBLE);
-        mState.setVisibility(state == downloading ? View.INVISIBLE : View.VISIBLE);
-        mPlay.setVisibility(state == finished ? View.VISIBLE : View.INVISIBLE);
+        mDownloadProgress.setVisibility(state == DOWNLOADING ? View.VISIBLE : View.INVISIBLE);
+        mState.setVisibility(state == DOWNLOADING ? View.INVISIBLE : View.VISIBLE);
+        mPlay.setVisibility(state == FINISHED ? View.VISIBLE : View.INVISIBLE);
     }
 
     public DownloadInfo getDownload() {

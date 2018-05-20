@@ -1,7 +1,6 @@
 package de.acepe.fritzstreams.backend;
 
 import android.util.Log;
-import de.acepe.fritzstreams.backend.DownloadInfo.State;
 
 import java.io.*;
 import java.net.URL;
@@ -24,7 +23,7 @@ class Downloader {
     }
 
     public void download() {
-        mDownloadInfo.setState(State.downloading);
+        mDownloadInfo.setState(DownloadState.DOWNLOADING);
         String pathname = mDownloadInfo.getFilename();
         File file = new File(pathname);
 
@@ -33,7 +32,7 @@ class Downloader {
             connection = new URL(mDownloadInfo.getStreamURL()).openConnection();
         } catch (IOException e) {
             Log.e(TAG, "couldn't open connection to: " + mDownloadInfo.getStreamURL(), e);
-            mDownloadInfo.setState(State.failed);
+            mDownloadInfo.setState(DownloadState.FAILED);
             return;
         }
         try (InputStream is = connection.getInputStream();
@@ -48,7 +47,7 @@ class Downloader {
             int downloadedSum = 0;
             int len;
             while ((len = is.read(buffer)) > 0) {
-                if (mDownloadInfo.getState().equals(State.cancelled)) {
+                if (mDownloadInfo.getState().equals(DownloadState.CANCELLED)) {
                     Log.i(TAG, "Download was cancelled: " + mDownloadInfo.getStreamURL());
                     file.delete();
                     return;
@@ -64,11 +63,11 @@ class Downloader {
             }
         } catch (IOException e) {
             Log.e(TAG, "Download failed: " + mDownloadInfo.getStreamURL(), e);
-            mDownloadInfo.setState(State.failed);
+            mDownloadInfo.setState(DownloadState.FAILED);
             renameToFailed(file);
             return;
         }
-        mDownloadInfo.setState(State.finished);
+        mDownloadInfo.setState(DownloadState.FINISHED);
         Log.i(TAG, "Download successful: " + mDownloadInfo.getStreamURL());
     }
 

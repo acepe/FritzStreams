@@ -25,9 +25,9 @@
         <item name="android:actionDropDownStyle">@style/DropDownNav.Example</item>
         <item name="android:actionBarStyle">@style/ActionBar.Solid.Example</item>
         <item name="android:actionModeBackground">@drawable/cab_background_top_example</item>
-        <item name="android:actionModeSplitBackground">@drawable/cab_background_bottom_example
-        </item>
+        <item name="android:actionModeSplitBackground">@drawable/cab_background_bottom_example</item>
         <item name="android:actionModeCloseButtonStyle">@style/ActionButton.CloseMode.Example</item>
+        <item name="android:navigationBarColor">@color/yellow_fritz</item>
     </style>
 
     <style name="ActionBar.Solid.Example" parent="@android:style/Widget.Holo.Light.ActionBar.Solid">
@@ -73,5 +73,6 @@
         <item name="android:popupMenuStyle">@style/PopupMenu.Example</item>
         <item name="android:dropDownListViewStyle">@style/DropDownListView.Example</item>
     </style>
+
 
 </resources>

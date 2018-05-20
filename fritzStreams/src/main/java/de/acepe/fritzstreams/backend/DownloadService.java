@@ -77,7 +77,7 @@ public class DownloadService extends Service {
             DownloadInfo info = (DownloadInfo) extras.get(DOWNLOAD_INFO);
             DownloadInfo download = findScheduledDownload(info);
             if (download != null) {
-                download.setState(DownloadInfo.State.cancelled);
+                download.setState(DownloadState.CANCELLED);
             }
             reportQueue();
         }
@@ -85,7 +85,7 @@ public class DownloadService extends Service {
             DownloadInfo info = (DownloadInfo) extras.get(DOWNLOAD_INFO);
             DownloadInfo download = findScheduledDownload(info);
             if (download != null) {
-                download.setState(DownloadInfo.State.cancelled);
+                download.setState(DownloadState.CANCELLED);
                 mScheduledDownloads.remove(info);
             }
             reportQueue();
@@ -102,8 +102,8 @@ public class DownloadService extends Service {
 
     private boolean allComplete() {
         for (DownloadInfo download : mScheduledDownloads) {
-            DownloadInfo.State state = download.getState();
-            if (state == DownloadInfo.State.waiting || state == DownloadInfo.State.downloading) {
+            DownloadState state = download.getState();
+            if (state == DownloadState.WAITING || state == DownloadState.DOWNLOADING) {
                 return false;
             }
         }
@@ -181,7 +181,7 @@ public class DownloadService extends Service {
 
                 new Downloader(download, downloadCallback).download();
 
-                if (download.getState() == DownloadInfo.State.finished) {
+                if (download.getState() == DownloadState.FINISHED) {
                     MediaScannerConnection.scanFile(getBaseContext(),
                             new String[]{download.getFilename()},
                             null,
@@ -200,7 +200,7 @@ public class DownloadService extends Service {
 
         private DownloadInfo findNext() {
             for (DownloadInfo download : mScheduledDownloads) {
-                if (download.getState() == DownloadInfo.State.waiting) {
+                if (download.getState() == DownloadState.WAITING) {
                     return download;
                 }
             }

@@ -7,7 +7,6 @@
     <string-array name="navigation_array">
         <item>@string/streams</item>
         <item>@string/downloads</item>
-        <item>@string/settings</item>
     </string-array>
 
     <string name="app_name">Fritz Musikstreams</string>
@@ -17,7 +16,6 @@
     <string name="download">Download</string>
     <string name="download_freespace">Freier Speicher: %1$s</string>
     <string name="download_noti_not_mounted">Kein Speicher gefunden</string>
-    <string name="download_only_wifi_notification_title">Download abgebrochen: nicht mit WLAN verbunden</string>
     <string name="download_started">Download gestartet</string>
     <string name="error">Keine Verbindung…</string>
     <string name="failed">Download fehlgeschlagen…</string>
@@ -25,10 +23,6 @@
     <string name="finished">Download abgeschlossen</string>
     <string name="fridayButton">Fr</string>
     <string name="mondayButton">Mo</string>
-    <string name="onlyWifi">Nicht mit WLAN verbunden</string>
-    <string name="pref_dl_dir">Download-Ordner auswählen</string>
-    <string name="pref_dl_wifi_only">Nur im WLAN</string>
-    <string name="pref_dl_wifi_only_summary">Download nur wenn mit WLAN verbunden</string>
     <string name="saturdayButton">Sa</string>
     <string name="sundayButton">So</string>
     <string name="thursdayButton">Do</string>
