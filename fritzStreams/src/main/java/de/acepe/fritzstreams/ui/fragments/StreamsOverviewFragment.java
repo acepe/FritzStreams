@@ -66,17 +66,17 @@ public class StreamsOverviewFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_streams_overview, container, false);
 
-        mDaysToggleGroup = ((ViewGroup) view.findViewById(R.id.daysToggleGroup));
+        mDaysToggleGroup = view.findViewById(R.id.daysToggleGroup);
 
         configureToggleButtons();
 
-        mStreamViewNightflight = (StreamView) view.findViewById(R.id.ilbDownloadNightflight);
+        mStreamViewNightflight = view.findViewById(R.id.ilbDownloadNightflight);
         mStreamViewNightflight.setOnClickListener(new DownloadOnclickListener(NIGHTFLIGHT));
 
-        mStreamViewSoundgarden = (StreamView) view.findViewById(R.id.ilbDownloadSoundgarden);
+        mStreamViewSoundgarden = view.findViewById(R.id.ilbDownloadSoundgarden);
         mStreamViewSoundgarden.setOnClickListener(new DownloadOnclickListener(SOUNDGARDEN));
 
         Calendar dayFromCache = mStreamsCache.getDay();
@@ -84,7 +84,9 @@ public class StreamsOverviewFragment extends Fragment {
         onSelectedDayChange(day);
 
         ToggleButton daysToggle = findToggle(day);
-        daysToggle.setChecked(true);
+        if (daysToggle != null) {
+            daysToggle.setChecked(true);
+        }
 
         return view;
     }

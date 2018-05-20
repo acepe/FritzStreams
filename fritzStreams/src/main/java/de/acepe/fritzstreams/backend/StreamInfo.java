@@ -7,6 +7,7 @@ import android.os.AsyncTask;
 import android.os.Environment;
 import android.util.Log;
 import com.google.gson.Gson;
+import de.acepe.fritzstreams.backend.json.MediaStreamArray;
 import de.acepe.fritzstreams.backend.json.OnDemandDownload;
 import de.acepe.fritzstreams.backend.json.OnDemandStreamDescriptor;
 import org.jsoup.Jsoup;
@@ -20,6 +21,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
 import static android.os.AsyncTask.THREAD_POOL_EXECUTOR;
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 public class StreamInfo {
 
@@ -111,19 +113,17 @@ public class StreamInfo {
         }
 
         try (InputStream is = new URL(url(downloadDescriptorURL)).openStream()) {
-            BufferedReader rd = new BufferedReader(new InputStreamReader(is, Charset.forName("UTF-8")));
+            BufferedReader rd = new BufferedReader(new InputStreamReader(is, Charset.forName(UTF_8.name())));
             String jsonText = readAll(rd);
 
             OnDemandStreamDescriptor target = mGson.fromJson(jsonText, OnDemandStreamDescriptor.class);
-            String url = target.getMediaArray()
-                    .get(0)
-                    .getMediaStreamArray()
-                    .stream()
-                    .filter(m -> m.getQuality() != null)
-                    .findFirst()
-                    .orElseThrow(IOException::new)
-                    .getStream();
-            return url;
+
+            for (MediaStreamArray mediaStreamArray : target.getMediaArray().get(0).getMediaStreamArray()) {
+                if (mediaStreamArray.getQuality() != null) {
+                    return mediaStreamArray.getStream();
+                }
+            }
+            return null;
         } catch (Throwable e) {
             Log.e(TAG, "Couldn 't extract download-URL from stream website", e);
             return null;

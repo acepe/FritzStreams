@@ -59,15 +59,23 @@ public class DownloadEntryView extends LinearLayout {
         mCancelButton = (Button) findViewById(R.id.btnCancelDownload);
         mCancelButton.setTypeface(font);
         mDownloadProgress = (ProgressBar) findViewById(R.id.pbDownloadProgress);
-        setOnClickListener(v -> {
-            if (mDownload.getState() == DownloadInfo.State.finished) {
-                openWithMusicApp();
+        setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mDownload.getState() == DownloadInfo.State.finished) {
+                    DownloadEntryView.this.openWithMusicApp();
+                }
             }
         });
     }
 
-    public void setButtonAction(Action action) {
-        mCancelButton.setOnClickListener(v -> action.execute(mDownload));
+    public void setButtonAction(final Action action) {
+        mCancelButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                action.execute(mDownload);
+            }
+        });
     }
 
     public void setDownload(DownloadInfo download) {

@@ -68,9 +68,9 @@ public class MainActivity extends FragmentActivity
             fragments.add(new DownloadFragment());
 
             AppSectionsPagerAdapter mAppSectionsPagerAdapter = new AppSectionsPagerAdapter(fm, fragments);
-            mViewPager = (ViewPager) findViewById(R.id.pager);
+            mViewPager = findViewById(R.id.pager);
             mViewPager.setAdapter(mAppSectionsPagerAdapter);
-            mViewPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
+            mViewPager.addOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
                 @Override
                 public void onPageSelected(int position) {
                     actionBar.setSelectedNavigationItem(position);

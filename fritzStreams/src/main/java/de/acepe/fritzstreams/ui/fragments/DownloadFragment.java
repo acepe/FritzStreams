@@ -1,11 +1,8 @@
 package de.acepe.fritzstreams.ui.fragments;
 
-import java.util.Calendar;
-import java.util.HashMap;
-import java.util.List;
-
 import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,6 +14,10 @@ import de.acepe.fritzstreams.backend.DownloadInfo;
 import de.acepe.fritzstreams.backend.DownloadServiceAdapter;
 import de.acepe.fritzstreams.ui.components.DownloadEntryView;
 import de.acepe.fritzstreams.util.Utilities;
+
+import java.util.Calendar;
+import java.util.HashMap;
+import java.util.List;
 
 public class DownloadFragment extends Fragment implements DownloadServiceAdapter.ResultReceiver {
 
@@ -41,13 +42,11 @@ public class DownloadFragment extends Fragment implements DownloadServiceAdapter
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.download_fragment, container, false);
 
-        mDownloadsContainer = (LinearLayout) view.findViewById(R.id.llDownloadsContainer);
-        mFreeSpace = (TextView) view.findViewById(R.id.downloads_freespace);
-
-        setHasOptionsMenu(true);
+        mDownloadsContainer = view.findViewById(R.id.llDownloadsContainer);
+        mFreeSpace = view.findViewById(R.id.downloads_freespace);
 
         return view;
     }
