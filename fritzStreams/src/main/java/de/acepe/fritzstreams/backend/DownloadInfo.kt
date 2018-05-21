@@ -8,4 +8,9 @@ data class DownloadInfo(val title: String, val subtitle: String, val streamURL: 
     var downloadedSize: Int = 0
     var totalSize: Int = 0
 
+    constructor(onDemandStream: OnDemandStream) :
+            this(onDemandStream.title,
+                    onDemandStream.subtitle,
+                    onDemandStream.streamURL,
+                    onDemandStream.filename)
 }
