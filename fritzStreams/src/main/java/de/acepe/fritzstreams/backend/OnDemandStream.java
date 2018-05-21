@@ -1,10 +1,8 @@
 package de.acepe.fritzstreams.backend;
 
-import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
-import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.util.Log;
 import com.google.gson.Gson;
@@ -24,15 +22,11 @@ import java.util.Calendar;
 import static android.os.AsyncTask.THREAD_POOL_EXECUTOR;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
-public class StreamInfo {
+public class OnDemandStream {
 
-
-    public enum Stream {
-        SOUNDGARDEN, NIGHTFLIGHT
-    }
 
     public interface Callback {
-        void initFinished(StreamInfo streamInfo);
+        void initFinished(OnDemandStream onDemandStream);
     }
 
     private static final String TAG = "StreamInfo";
@@ -46,7 +40,7 @@ public class StreamInfo {
     private static final String IMAGE_SELECTOR = "#main > article > div.teaserboxgroup.intermediate.count2.even.layoutstandard.layouthalf_2_4 > section > article.manualteaser.last.count2.even.layoutstandard.doctypeteaser > aside > div > a > img";
     private static final String FILE_DATE_FORMAT = "yyyy-MM-dd";
 
-    private final Context mContext;
+    private final String downloadPath;
     private final Calendar mDate;
     private final Stream mStream;
     private final Gson mGson;
@@ -59,14 +53,18 @@ public class StreamInfo {
     private Bitmap mImage;
     private boolean failed;
 
-    public StreamInfo(Context mContext, Calendar mDate, @NonNull Stream mStream) {
-        this.mContext = mContext;
+    public OnDemandStream(String downloadPath, Calendar mDate, @NonNull Stream mStream) {
+        this.downloadPath = downloadPath;
         this.mDate = mDate;
         this.mStream = mStream;
         this.mGson = new Gson();
     }
 
     public void init(Callback callback) {
+        if (isInited()) {
+            callback.initFinished(this);
+            return;
+        }
         AsyncTask<Void, Void, Void> initTask = new InitTask(callback);
         initTask.executeOnExecutor(THREAD_POOL_EXECUTOR);
     }
@@ -158,7 +156,7 @@ public class StreamInfo {
     }
 
     private String getDownloadDir() {
-        return mContext.getExternalFilesDir(Environment.DIRECTORY_MUSIC).getAbsolutePath();
+        return downloadPath;
     }
 
     private String getFileName() {
@@ -230,10 +228,10 @@ public class StreamInfo {
 
         protected void onPostExecute(Void result) {
             if (error == null) {
-                callback.initFinished(StreamInfo.this);
+                callback.initFinished(OnDemandStream.this);
                 failed = false;
             } else {
-                callback.initFinished(null);
+                callback.initFinished(OnDemandStream.this);
                 failed = true;
             }
         }

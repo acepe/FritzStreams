@@ -14,7 +14,8 @@ import android.util.Log;
 import android.view.WindowManager;
 import de.acepe.fritzstreams.backend.DownloadInfo;
 import de.acepe.fritzstreams.backend.DownloadServiceAdapter;
-import de.acepe.fritzstreams.backend.StreamInfo;
+import de.acepe.fritzstreams.backend.Stream;
+import de.acepe.fritzstreams.backend.OnDemandStream;
 import de.acepe.fritzstreams.ui.fragments.CacheFragment;
 import de.acepe.fritzstreams.ui.fragments.DownloadFragment;
 import de.acepe.fritzstreams.ui.fragments.StreamsOverviewFragment;
@@ -107,12 +108,7 @@ public class MainActivity extends FragmentActivity
     }
 
     @Override
-    public void addStream(StreamInfo streamInfo) {
-        mCacheFragment.addStream(streamInfo);
-    }
-
-    @Override
-    public StreamInfo getStream(StreamInfo.Stream stream, Calendar day) {
+    public OnDemandStream getStream(Stream stream, Calendar day) {
         return mCacheFragment.getStream(stream, day);
     }
 

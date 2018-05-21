@@ -1,7 +1,5 @@
 package de.acepe.fritzstreams.util;
 
-import java.util.Calendar;
-
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.content.Context;
@@ -11,6 +9,8 @@ import android.os.Environment;
 import android.os.StatFs;
 import android.support.annotation.NonNull;
 import android.view.View;
+
+import java.util.Calendar;
 
 public final class Utilities {
 
@@ -50,13 +50,19 @@ public final class Utilities {
         return date;
     }
 
+    public static boolean isTodayBeforeSoundgardenRelease(Calendar day) {
+        Calendar todayAt2200 = today();
+        todayAt2200.set(Calendar.HOUR_OF_DAY, 22);
+        todayAt2200.set(Calendar.HOUR, 22);
+
+        return today().get(Calendar.DAY_OF_YEAR) == day.get(Calendar.DAY_OF_YEAR) && Calendar.getInstance().before(todayAt2200);
+    }
+
     /**
      * Convert bytes in a human readable format.
      *
-     * @param bytes
-     *            The byte count
-     * @param iec
-     *            false for KB, false for KiB
+     * @param bytes The byte count
+     * @param iec   false for KB, false for KiB
      * @return The human readable file size
      */
     public static String humanReadableBytes(long bytes, boolean iec) {
@@ -82,14 +88,10 @@ public final class Utilities {
     }
 
     /**
-     * @param view
-     *            View to animate
-     * @param toVisibility
-     *            Visibility at the end of animation
-     * @param toAlpha
-     *            Alpha at the end of animation
-     * @param duration
-     *            Animation duration in ms
+     * @param view         View to animate
+     * @param toVisibility Visibility at the end of animation
+     * @param toAlpha      Alpha at the end of animation
+     * @param duration     Animation duration in ms
      */
     public static void animateView(final View view, final int toVisibility, float toAlpha, int duration) {
         boolean show = toVisibility == View.VISIBLE;

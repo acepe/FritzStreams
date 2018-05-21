@@ -2,13 +2,10 @@ package de.acepe.fritzstreams.ui.fragments
 
 import android.content.Context
 import android.os.Bundle
+import android.os.Environment
 import android.support.v4.app.Fragment
 import android.util.Log
-import de.acepe.fritzstreams.backend.DownloadInfo
-import de.acepe.fritzstreams.backend.DownloadServiceAdapter
-import de.acepe.fritzstreams.backend.StreamInfo
-import de.acepe.fritzstreams.backend.StreamInfo.Stream.NIGHTFLIGHT
-import de.acepe.fritzstreams.backend.StreamInfo.Stream.SOUNDGARDEN
+import de.acepe.fritzstreams.backend.*
 import java.util.*
 
 private const val TAG = "CacheFragment"
@@ -16,12 +13,13 @@ private const val TAG = "CacheFragment"
 class CacheFragment : Fragment() {
     var day: Calendar? = null
 
+    private val streamManager: StreamManager by lazy {
+        StreamManager(context!!.getExternalFilesDir(Environment.DIRECTORY_MUSIC).getAbsolutePath())
+    }
     val downloadServiceAdapter: DownloadServiceAdapter by lazy {
         DownloadServiceAdapter()
     }
 
-    private val mSoundgardenStreamsForDay = HashMap<Calendar, StreamInfo>()
-    private val mNightflightStreamsForDay = HashMap<Calendar, StreamInfo>()
 
     /*
      * This     method will only be called once (but after onAttach) when the retained Fragment is first created.
@@ -56,17 +54,8 @@ class CacheFragment : Fragment() {
         downloadServiceAdapter.detachFromService()
     }
 
-    fun addStream(streamInfo: StreamInfo) {
-        when (streamInfo.stream) {
-            SOUNDGARDEN -> mSoundgardenStreamsForDay[streamInfo.day] = streamInfo
-            NIGHTFLIGHT -> mNightflightStreamsForDay[streamInfo.day] = streamInfo
-        }
-        Log.i(TAG, "Added $streamInfo")
-    }
-
-    fun getStream(stream: StreamInfo.Stream, day: Calendar): StreamInfo? {
-        val streamsForDay = if (stream == NIGHTFLIGHT) mNightflightStreamsForDay else mSoundgardenStreamsForDay
-        return streamsForDay[day]
+    fun getStream(stream: Stream, day: Calendar): OnDemandStream? {
+        return streamManager.getOrCreateStream(stream, day)
     }
 
     fun scheduleDownload(downloadInfo: DownloadInfo) {

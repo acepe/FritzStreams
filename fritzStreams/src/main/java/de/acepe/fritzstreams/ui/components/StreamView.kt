@@ -6,7 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.widget.LinearLayout
 import de.acepe.fritzstreams.R
-import de.acepe.fritzstreams.backend.StreamInfo
+import de.acepe.fritzstreams.backend.OnDemandStream
 import de.acepe.fritzstreams.util.Utilities
 import kotlinx.android.synthetic.main.progress_overlay.view.*
 import kotlinx.android.synthetic.main.stream_view.view.*
@@ -22,10 +22,10 @@ class StreamView(context: Context, attrs: AttributeSet) : LinearLayout(context, 
         downloadButton.setOnClickListener(listener)
     }
 
-    fun setStreamInfo(streamInfo: StreamInfo) {
-        title.text = streamInfo.title
-        subtitle.text = streamInfo.subtitle
-        image.setImageBitmap(streamInfo.image)
+    fun setStreamInfo(onDemandStream: OnDemandStream) {
+        title.text = onDemandStream.title
+        subtitle.text = onDemandStream.subtitle
+        image.setImageBitmap(onDemandStream.image)
         downloadButton.isEnabled = true
         downloadButton.setText(R.string.download)
 

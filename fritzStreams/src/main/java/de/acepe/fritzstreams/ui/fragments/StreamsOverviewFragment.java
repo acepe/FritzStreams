@@ -12,23 +12,21 @@ import android.widget.ToggleButton;
 import de.acepe.fritzstreams.R;
 import de.acepe.fritzstreams.backend.Constants;
 import de.acepe.fritzstreams.backend.DownloadInfo;
-import de.acepe.fritzstreams.backend.StreamInfo;
+import de.acepe.fritzstreams.backend.OnDemandStream;
+import de.acepe.fritzstreams.backend.Stream;
 import de.acepe.fritzstreams.ui.components.StreamView;
 
 import java.util.Calendar;
-import java.util.HashMap;
-import java.util.Map;
 
-import static de.acepe.fritzstreams.backend.StreamInfo.Stream.NIGHTFLIGHT;
-import static de.acepe.fritzstreams.backend.StreamInfo.Stream.SOUNDGARDEN;
+import static de.acepe.fritzstreams.backend.Stream.NIGHTFLIGHT;
+import static de.acepe.fritzstreams.backend.Stream.SOUNDGARDEN;
 import static de.acepe.fritzstreams.util.Utilities.today;
 
 public class StreamsOverviewFragment extends Fragment {
 
     public interface StreamsCache {
-        void addStream(StreamInfo streamInfo);
 
-        StreamInfo getStream(StreamInfo.Stream stream, Calendar day);
+        OnDemandStream getStream(Stream stream, Calendar day);
 
         void scheduleDownload(DownloadInfo streamDownload);
 
@@ -37,15 +35,11 @@ public class StreamsOverviewFragment extends Fragment {
         Calendar getDay();
     }
 
-    private static final String TAG = "StreamOverviewFragment";
-
-    private HashMap<ToggleButton, Calendar> mDayButtons;
     private StreamsCache mStreamsCache;
+
+    private ViewGroup mDaysToggleGroup;
     private StreamView mStreamViewSoundgarden;
     private StreamView mStreamViewNightflight;
-    private StreamInfo mNightflightStreamInfo;
-    private StreamInfo mSoundgardenStreamInfo;
-    private ViewGroup mDaysToggleGroup;
 
     @Override
     public void onAttach(Context context) {
@@ -81,71 +75,49 @@ public class StreamsOverviewFragment extends Fragment {
         if (daysToggle != null) {
             daysToggle.setChecked(true);
         }
-
         return view;
     }
 
     private ToggleButton findToggle(Calendar day) {
-        for (Map.Entry<ToggleButton, Calendar> entry : mDayButtons.entrySet()) {
-            if (entry.getValue().equals(day))
-                return entry.getKey();
+        for (int i = 0; i < mDaysToggleGroup.getChildCount(); i++) {
+            ToggleButton view = (ToggleButton) mDaysToggleGroup.getChildAt(i);
+            if (view.getTag().equals(day))
+                return view;
         }
         return null;
     }
 
     private void configureToggleButtons() {
-        mDayButtons = new HashMap<>();
         for (int i = 0; i < mDaysToggleGroup.getChildCount(); i++) {
             ToggleButton view = (ToggleButton) mDaysToggleGroup.getChildAt(6 - i);
-            view.setOnClickListener(oclDaySelected);
 
-            Calendar date = today();
-            date.add(Calendar.DAY_OF_YEAR, -i);
+            Calendar day = today();
+            day.add(Calendar.DAY_OF_YEAR, -i);
 
-            String text = Constants.DAY_FORMAT.format(date.getTime());
+            String text = Constants.DAY_FORMAT.format(day.getTime());
             view.setTextOff(text);
             view.setTextOn(text);
             view.setText(text);
-            mDayButtons.put(view, date);
+            view.setOnClickListener(new MyOnClickListener(day));
+            view.setTag(day);
         }
     }
 
     private void onSelectedDayChange(Calendar day) {
         mStreamsCache.setDay(day);
-        mSoundgardenStreamInfo = init(SOUNDGARDEN, day);
-        mNightflightStreamInfo = init(NIGHTFLIGHT, day);
+        init(SOUNDGARDEN, day);
+        init(NIGHTFLIGHT, day);
     }
 
-    private StreamInfo init(StreamInfo.Stream stream, Calendar day) {
+    private void init(Stream stream, Calendar day) {
         StreamView view = stream == NIGHTFLIGHT ? mStreamViewNightflight : mStreamViewSoundgarden;
         view.clearStream();
 
-        StreamInfo streamInfo = mStreamsCache.getStream(stream, day);
-        if (streamInfo == null) {
-            if (stream == SOUNDGARDEN && isTodayBeforeSoundgardenRelease(day)) {
-                Calendar dayInLastWeek = (Calendar) day.clone();
-                dayInLastWeek.add(Calendar.DAY_OF_YEAR, -7);
-                streamInfo = new StreamInfo(getActivity(), dayInLastWeek, stream);
-            } else {
-                streamInfo = new StreamInfo(getActivity(), day, stream);
-            }
-            streamInfo.init(new InitStreamCallback(view));
-        } else {
-            setStreamView(view, streamInfo);
-        }
-        return streamInfo;
+        OnDemandStream onDemandStream = mStreamsCache.getStream(stream, day);
+        onDemandStream.init(new InitStreamCallback(view));
     }
 
-    private boolean isTodayBeforeSoundgardenRelease(Calendar day) {
-        Calendar todayAt2200 = today();
-        todayAt2200.set(Calendar.HOUR_OF_DAY, 22);
-        todayAt2200.set(Calendar.HOUR, 22);
-
-        return today().get(Calendar.DAY_OF_YEAR) == day.get(Calendar.DAY_OF_YEAR)
-                && Calendar.getInstance().before(todayAt2200);
-    }
-
-    private class InitStreamCallback implements StreamInfo.Callback {
+    private class InitStreamCallback implements OnDemandStream.Callback {
         private final StreamView view;
 
         InitStreamCallback(StreamView view) {
@@ -153,72 +125,75 @@ public class StreamsOverviewFragment extends Fragment {
         }
 
         @Override
-        public void initFinished(StreamInfo streamInfo) {
-            setStreamView(view, streamInfo);
+        public void initFinished(OnDemandStream onDemandStream) {
+            setStreamView(view, onDemandStream);
         }
     }
 
-    private void setStreamView(StreamView view, StreamInfo streamInfo) {
-        if (streamInfo == null) {
+    private void setStreamView(StreamView view, OnDemandStream onDemandStream) {
+        if (onDemandStream.isInitFailed()) {
             view.failed();
-        } else {
-            view.setStreamInfo(streamInfo);
-            if (mStreamsCache != null) {
-                mStreamsCache.addStream(streamInfo);
-            }
+            return;
         }
+        view.setStreamInfo(onDemandStream);
     }
 
-    private final View.OnClickListener oclDaySelected = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            int childCount = mDaysToggleGroup.getChildCount();
-            for (int i = 0; i < childCount; i++) {
-                ToggleButton view = (ToggleButton) mDaysToggleGroup.getChildAt(i);
-                boolean checked = view.getId() == v.getId();
-                view.setChecked(checked);
-
-                if (checked) {
-                    onSelectedDayChange(mDayButtons.get(view));
-                }
-            }
-        }
-    };
 
     private class DownloadOnclickListener implements View.OnClickListener {
-        private final StreamInfo.Stream stream;
+        private final Stream stream;
 
-        DownloadOnclickListener(StreamInfo.Stream stream) {
+        DownloadOnclickListener(Stream stream) {
             this.stream = stream;
         }
 
         @Override
         public void onClick(View v) {
-            StreamInfo streamInfo = stream == NIGHTFLIGHT ? mNightflightStreamInfo : mSoundgardenStreamInfo;
+            OnDemandStream onDemandStream = mStreamsCache.getStream(stream, mStreamsCache.getDay());
 
-            if (streamInfo.isInitFailed()) {
-                init(stream, streamInfo.getDay());
+            if (onDemandStream.isInitFailed()) {
+                init(stream, onDemandStream.getDay());
             } else {
-                download(streamInfo);
+                download(onDemandStream);
             }
         }
     }
 
-    private void download(StreamInfo streamInfo) {
-        if (!streamInfo.isInited()) {
+    private void download(OnDemandStream onDemandStream) {
+        if (!onDemandStream.isInited()) {
             return;
         }
         Toast.makeText(getContext(), R.string.download_started, Toast.LENGTH_SHORT).show();
 
-        mStreamsCache.scheduleDownload(createDownloadInfo(streamInfo));
+        mStreamsCache.scheduleDownload(createDownloadInfo(onDemandStream));
     }
 
     @NonNull
-    private DownloadInfo createDownloadInfo(StreamInfo streamInfo) {
-        return new DownloadInfo(streamInfo.getTitle(),
-                streamInfo.getSubtitle(),
-                streamInfo.getStreamURL(),
-                streamInfo.getFilename());
+    private DownloadInfo createDownloadInfo(OnDemandStream onDemandStream) {
+        return new DownloadInfo(onDemandStream.getTitle(),
+                onDemandStream.getSubtitle(),
+                onDemandStream.getStreamURL(),
+                onDemandStream.getFilename());
     }
 
+    private final class MyOnClickListener implements View.OnClickListener {
+        private final Calendar day;
+
+        private MyOnClickListener(Calendar day) {
+            this.day = day;
+        }
+
+        @Override
+        public void onClick(View v) {
+            int childCount = mDaysToggleGroup.getChildCount();
+            for (int i = 0; i < childCount; i++) {
+                ToggleButton toggle = (ToggleButton) mDaysToggleGroup.getChildAt(i);
+                boolean checked = toggle.getId() == v.getId();
+                toggle.setChecked(checked);
+
+                if (checked) {
+                    onSelectedDayChange(day);
+                }
+            }
+        }
+    }
 }
