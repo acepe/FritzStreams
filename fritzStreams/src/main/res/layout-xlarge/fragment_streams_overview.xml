@@ -114,14 +114,14 @@
         android:orientation="vertical">
 
         <de.acepe.fritzstreams.ui.components.StreamView
-            android:id="@+id/ilbDownloadSoundgarden"
+            android:id="@+id/streamViewSoundgarden"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="5dp"
             android:layout_weight="1" />
 
         <de.acepe.fritzstreams.ui.components.StreamView
-            android:id="@+id/ilbDownloadNightflight"
+            android:id="@+id/streamViewNightflight"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="5dp"

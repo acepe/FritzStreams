@@ -50,9 +50,9 @@ class DownloadFragment : Fragment(), DownloadServiceAdapter.ResultReceiver {
         updateFreeSpace()
     }
 
-    override fun downloadsInQueue(downloads: List<DownloadInfo>) {
+    override fun downloadsInQueue(downloadInfoList: List<DownloadInfo>) {
         downloadsContainer.removeAllViews()
-        for (download in downloads) {
+        for (download in downloadInfoList) {
             addDownload(download)
         }
     }

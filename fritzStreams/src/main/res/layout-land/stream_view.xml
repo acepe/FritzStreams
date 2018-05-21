@@ -21,7 +21,7 @@
                 android:background="@color/dark_overlay">
 
                 <ImageView
-                    android:id="@+id/ivDownload"
+                    android:id="@+id/image"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:adjustViewBounds="true"
@@ -59,7 +59,7 @@
                     android:textSize="@dimen/text_subtitle" />
 
                 <Button
-                    android:id="@+id/btndownload"
+                    android:id="@+id/downloadButton"
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
                     android:layout_weight="0.5"

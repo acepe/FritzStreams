@@ -58,15 +58,10 @@ class CacheFragment : Fragment() {
 
     fun addStream(streamInfo: StreamInfo) {
         when (streamInfo.stream) {
-            SOUNDGARDEN -> {
-                mSoundgardenStreamsForDay[streamInfo.day] = streamInfo
-                Log.i(TAG, "Added $streamInfo")
-            }
-            NIGHTFLIGHT -> {
-                mNightflightStreamsForDay[streamInfo.day] = streamInfo
-                Log.i(TAG, "Added $streamInfo")
-            }
+            SOUNDGARDEN -> mSoundgardenStreamsForDay[streamInfo.day] = streamInfo
+            NIGHTFLIGHT -> mNightflightStreamsForDay[streamInfo.day] = streamInfo
         }
+        Log.i(TAG, "Added $streamInfo")
     }
 
     fun getStream(stream: StreamInfo.Stream, day: Calendar): StreamInfo? {

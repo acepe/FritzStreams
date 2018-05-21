@@ -50,13 +50,7 @@ public class StreamsOverviewFragment extends Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        // This makes sure that the container activity has implemented
-        // the callback interface. If not, it throws an exception
-        try {
-            mStreamsCache = (StreamsCache) context;
-        } catch (ClassCastException e) {
-            throw new ClassCastException(context.toString() + " must implement StreamsCache");
-        }
+        mStreamsCache = (StreamsCache) context;
     }
 
     @Override
@@ -73,10 +67,10 @@ public class StreamsOverviewFragment extends Fragment {
 
         configureToggleButtons();
 
-        mStreamViewNightflight = view.findViewById(R.id.ilbDownloadNightflight);
+        mStreamViewNightflight = view.findViewById(R.id.streamViewNightflight);
         mStreamViewNightflight.setOnClickListener(new DownloadOnclickListener(NIGHTFLIGHT));
 
-        mStreamViewSoundgarden = view.findViewById(R.id.ilbDownloadSoundgarden);
+        mStreamViewSoundgarden = view.findViewById(R.id.streamViewSoundgarden);
         mStreamViewSoundgarden.setOnClickListener(new DownloadOnclickListener(SOUNDGARDEN));
 
         Calendar dayFromCache = mStreamsCache.getDay();

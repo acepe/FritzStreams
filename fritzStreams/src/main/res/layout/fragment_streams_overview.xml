@@ -17,7 +17,7 @@
         android:padding="@dimen/streams_padding">
 
         <de.acepe.fritzstreams.ui.components.StreamView
-            android:id="@+id/ilbDownloadSoundgarden"
+            android:id="@+id/streamViewSoundgarden"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -25,7 +25,7 @@
             myapp:genreText="mit Someone and someother" />
 
         <de.acepe.fritzstreams.ui.components.StreamView
-            android:id="@+id/ilbDownloadNightflight"
+            android:id="@+id/streamViewNightflight"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -39,7 +39,7 @@
         android:layout_weight="1"
         tools:ignore="UselessLeaf" />
 
-    <LinearLayout
+    <RadioGroup
         android:id="@+id/daysToggleGroup"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
@@ -137,5 +137,5 @@
             android:textOff="@string/sundayButton"
             android:textOn="@string/sundayButton"
             android:textStyle="bold" />
-    </LinearLayout>
+    </RadioGroup>
 </LinearLayout>
