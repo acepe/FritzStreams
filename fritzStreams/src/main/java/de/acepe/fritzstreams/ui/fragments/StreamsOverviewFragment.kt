@@ -9,10 +9,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import android.widget.ToggleButton
 import de.acepe.fritzstreams.R
-import de.acepe.fritzstreams.backend.Constants
-import de.acepe.fritzstreams.backend.DownloadInfo
-import de.acepe.fritzstreams.backend.OnDemandStream
-import de.acepe.fritzstreams.backend.Stream
+import de.acepe.fritzstreams.backend.*
 import de.acepe.fritzstreams.backend.Stream.NIGHTFLIGHT
 import de.acepe.fritzstreams.backend.Stream.SOUNDGARDEN
 import de.acepe.fritzstreams.ui.components.StreamView
@@ -22,20 +19,15 @@ import java.util.*
 
 class StreamsOverviewFragment : Fragment() {
 
-    interface StreamsCache {
+    private lateinit var streamCacheProvider: StreamCacheProvider
 
-        var day: Calendar?
-
-        fun getStream(stream: Stream, day: Calendar?): OnDemandStream
-
-        fun scheduleDownload(streamDownload: DownloadInfo)
+    interface StreamCacheProvider {
+        fun get(): StreamCache
     }
-
-    private lateinit var mStreamsCache: StreamsCache
 
     override fun onAttach(context: Context?) {
         super.onAttach(context)
-        mStreamsCache = context as StreamsCache
+        streamCacheProvider = context as StreamCacheProvider
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -52,7 +44,7 @@ class StreamsOverviewFragment : Fragment() {
     }
 
     private fun onDownloadClicked(stream: Stream) {
-        val onDemandStream = mStreamsCache.getStream(stream, mStreamsCache.day)
+        val onDemandStream = streamCacheProvider.get().getStream(stream, streamCacheProvider.get().day!!)
 
         if (onDemandStream.isInitFailed) {
             init(stream, onDemandStream.day)
@@ -91,14 +83,14 @@ class StreamsOverviewFragment : Fragment() {
     }
 
     private fun onSelectedDayChange(day: Calendar) {
-        mStreamsCache.day = day
+        streamCacheProvider.get().day = day
         init(SOUNDGARDEN, day)
         init(NIGHTFLIGHT, day)
     }
 
     private fun init(stream: Stream, day: Calendar) {
         val view = if (stream === NIGHTFLIGHT) streamViewNightflight else streamViewSoundgarden
-        val onDemandStream = mStreamsCache!!.getStream(stream, day)
+        val onDemandStream = streamCacheProvider.get().getStream(stream, day)
 
         view.clearStream()
         onDemandStream.init({ setStreamView(view, onDemandStream) })
@@ -113,7 +105,7 @@ class StreamsOverviewFragment : Fragment() {
     }
 
     private fun restoreState() {
-        val dayFromCache = mStreamsCache.day
+        val dayFromCache = streamCacheProvider.get().day
         val day = dayFromCache ?: today()
         onSelectedDayChange(day)
 
@@ -139,7 +131,7 @@ class StreamsOverviewFragment : Fragment() {
         }
         Toast.makeText(context, R.string.download_started, Toast.LENGTH_SHORT).show()
 
-        mStreamsCache.scheduleDownload(DownloadInfo(onDemandStream))
+        streamCacheProvider.get().scheduleDownload(DownloadInfo(onDemandStream))
     }
 
 }

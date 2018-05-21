@@ -12,23 +12,21 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.WindowManager;
-import de.acepe.fritzstreams.backend.DownloadInfo;
 import de.acepe.fritzstreams.backend.DownloadServiceAdapter;
-import de.acepe.fritzstreams.backend.Stream;
-import de.acepe.fritzstreams.backend.OnDemandStream;
+import de.acepe.fritzstreams.backend.StreamCache;
 import de.acepe.fritzstreams.ui.fragments.CacheFragment;
 import de.acepe.fritzstreams.ui.fragments.DownloadFragment;
 import de.acepe.fritzstreams.ui.fragments.StreamsOverviewFragment;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 
 public class MainActivity extends FragmentActivity
         implements
         ActionBar.TabListener,
         DownloadFragment.DownloadServiceAdapterSupplier,
-        StreamsOverviewFragment.StreamsCache {
+        StreamsOverviewFragment.StreamCacheProvider {
 
     private static final String TAG_CACHE_FRAGMENT = "CacheFragment";
 
@@ -107,30 +105,16 @@ public class MainActivity extends FragmentActivity
     public void onTabReselected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
     }
 
-    @Override
-    public OnDemandStream getStream(Stream stream, Calendar day) {
-        return mCacheFragment.getStream(stream, day);
-    }
-
-    @Override
-    public void scheduleDownload(DownloadInfo streamDownload) {
-        mCacheFragment.scheduleDownload(streamDownload);
-    }
-
-    @Override
-    public void setDay(Calendar day) {
-        mCacheFragment.setDay(day);
-    }
-
-    @Override
-    public Calendar getDay() {
-        return mCacheFragment.getDay();
-    }
-
     @NonNull
     @Override
     public DownloadServiceAdapter getDownloader() {
         return mCacheFragment.getDownloadServiceAdapter();
+    }
+
+    @NotNull
+    @Override
+    public StreamCache get() {
+        return mCacheFragment;
     }
 
     private class AppSectionsPagerAdapter extends FragmentPagerAdapter {

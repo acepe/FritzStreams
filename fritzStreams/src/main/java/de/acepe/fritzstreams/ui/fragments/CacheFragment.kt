@@ -10,8 +10,9 @@ import java.util.*
 
 private const val TAG = "CacheFragment"
 
-class CacheFragment : Fragment() {
-    var day: Calendar? = null
+class CacheFragment : Fragment(), StreamCache {
+
+    override var day: Calendar? = null
 
     private val streamManager: StreamManager by lazy {
         StreamManager(context!!.getExternalFilesDir(Environment.DIRECTORY_MUSIC).getAbsolutePath())
@@ -22,7 +23,7 @@ class CacheFragment : Fragment() {
 
 
     /*
-     * This     method will only be called once (but after onAttach) when the retained Fragment is first created.
+     * This method will only be called once (but after onAttach) when the retained Fragment is first created.
      */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -54,11 +55,11 @@ class CacheFragment : Fragment() {
         downloadServiceAdapter.detachFromService()
     }
 
-    fun getStream(stream: Stream, day: Calendar): OnDemandStream? {
+    override fun getStream(stream: Stream, day: Calendar): OnDemandStream {
         return streamManager.getOrCreateStream(stream, day)
     }
 
-    fun scheduleDownload(downloadInfo: DownloadInfo) {
+    override fun scheduleDownload(downloadInfo: DownloadInfo) {
         downloadServiceAdapter.addDownload(downloadInfo)
     }
 
