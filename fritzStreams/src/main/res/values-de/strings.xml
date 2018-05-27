@@ -30,4 +30,8 @@
     <string name="tuesdayButton">Di</string>
     <string name="waiting">Download ausstehend</string>
     <string name="wednesdayButton">Mi</string>
+
+    <string name="notification_text_title">Fritz Streams</string>
+    <string name="notification_text_downloading">Downloade Streams</string>
+    <string name="notification_text_done">Downloads abgeschlossen</string>
 </resources>
