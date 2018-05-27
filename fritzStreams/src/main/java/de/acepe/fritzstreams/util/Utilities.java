@@ -2,6 +2,7 @@ package de.acepe.fritzstreams.util;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -65,6 +66,7 @@ public final class Utilities {
      * @param iec   false for KB, false for KiB
      * @return The human readable file size
      */
+    @SuppressLint("DefaultLocale")
     public static String humanReadableBytes(long bytes, boolean iec) {
         // Are we using xB or xiB?
         int byteUnit = iec ? 1024 : 1000;
