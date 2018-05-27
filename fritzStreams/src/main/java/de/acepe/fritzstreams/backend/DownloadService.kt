@@ -42,48 +42,50 @@ class DownloadService : Service() {
 
         val extras = intent.extras ?: return Service.START_STICKY
 
-        val request = extras.getString(SERVICE_REQUEST)
-        if (REQUEST_ADD_DOWNLOAD_ACTION == request) {
-            val info = extras.get(DOWNLOAD_INFO) as DownloadInfo
-            val existingDownload = findScheduledDownload(info)
-            if (existingDownload == null) {
-                permissionToDie = false
-                mScheduledDownloads.add(info)
+        var downloadInfo = extras.get(DOWNLOAD_INFO) as DownloadInfo?
+        when (extras.getString(SERVICE_REQUEST)) {
+            REQUEST_ADD_DOWNLOAD_ACTION -> addDownload(downloadInfo!!)
+            REQUEST_QUERY_DOWNLOADS_ACTION -> reportQueue()
+            REQUEST_CANCEL_DOWNLOAD_ACTION -> cancelDownload(downloadInfo!!)
+            REQUEST_REMOVE_DOWNLOAD_ACTION -> removeDownload(downloadInfo!!)
+            REQUEST_PERMISSION_TO_DIE_ACTION -> permissionToDie = true
+        }
 
-                executor!!.execute { downloadWorker(info) }
-                reportQueue()
-            } else {
-                sendMessage(Intent(RESPONSE_ACTION).putExtra(ALREADY_IN_QUEUE,
-                        existingDownload))
-            }
-        }
-        if (REQUEST_QUERY_DOWNLOADS_ACTION == request) {
-            reportQueue()
-        }
-        if (REQUEST_CANCEL_DOWNLOAD_ACTION == request) {
-            val info = extras.get(DOWNLOAD_INFO) as DownloadInfo
-            val download = findScheduledDownload(info)
-            if (download != null) {
-                download.state = CANCELLED
-            }
-            reportQueue()
-        }
-        if (REQUEST_REMOVE_DOWNLOAD_ACTION == request) {
-            val info = extras.get(DOWNLOAD_INFO) as DownloadInfo
-            val download = findScheduledDownload(info)
-            if (download != null) {
-                download.state = CANCELLED
-                mScheduledDownloads.remove(info)
-            }
-            reportQueue()
-        }
-        if (REQUEST_PERMISSION_TO_DIE_ACTION == request) {
-            permissionToDie = true
-        }
         if (allComplete() && permissionToDie) {
             stopSelf(startId)
         }
         return Service.START_NOT_STICKY
+    }
+
+    private fun removeDownload(info: DownloadInfo) {
+        val download = findScheduledDownload(info)
+        if (download != null) {
+            download.state = CANCELLED
+            mScheduledDownloads.remove(info)
+        }
+        reportQueue()
+    }
+
+    private fun cancelDownload(info: DownloadInfo) {
+        val download = findScheduledDownload(info)
+        if (download != null) {
+            download.state = CANCELLED
+        }
+        reportQueue()
+    }
+
+    private fun addDownload(info: DownloadInfo) {
+        val existingDownload = findScheduledDownload(info)
+        if (existingDownload == null) {
+            permissionToDie = false
+            mScheduledDownloads.add(info)
+
+            executor!!.execute { downloadWorker(info) }
+            reportQueue()
+        } else {
+            sendMessage(Intent(RESPONSE_ACTION).putExtra(ALREADY_IN_QUEUE,
+                    existingDownload))
+        }
     }
 
     private fun downloadWorker(download: DownloadInfo) {
