@@ -5,18 +5,22 @@ import android.content.Context;
 import android.content.Intent;
 import android.media.MediaScannerConnection;
 import android.net.wifi.WifiManager;
-import android.os.*;
-import android.os.Process;
+import android.os.Bundle;
+import android.os.IBinder;
+import android.os.PowerManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import de.acepe.fritzstreams.util.Notifications;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import static android.net.wifi.WifiManager.WIFI_MODE_FULL_HIGH_PERF;
 import static de.acepe.fritzstreams.backend.Constants.*;
-import static de.acepe.fritzstreams.backend.DownloadState.*;
+import static de.acepe.fritzstreams.backend.DownloadState.CANCELLED;
+import static de.acepe.fritzstreams.backend.DownloadState.FINISHED;
 
 public class DownloadService extends Service {
     private static final String TAG = "DownloadService";
@@ -25,25 +29,18 @@ public class DownloadService extends Service {
 
     private final List<DownloadInfo> mScheduledDownloads = new ArrayList<>();
 
-    private ServiceHandler mServiceHandler;
     private WifiManager.WifiLock mWifiLock;
     private PowerManager.WakeLock mWakeLock;
     private boolean permissionToDie = false;
 
+    private ExecutorService executor;
+
 
     @Override
     public void onCreate() {
-        // Start up the thread running the service. Note that we create a
-        // separate thread because the service normally runs in the process's
-        // main thread, which we don't want to block. We also make it
-        // background priority so CPU-intensive work will not disrupt our UI.
-        HandlerThread thread = new HandlerThread("ServiceStartArguments", Process.THREAD_PRIORITY_BACKGROUND);
-        thread.start();
-
+        Log.i(TAG, "Service created");
+        executor = Executors.newSingleThreadExecutor();
         acquireLocks();
-
-        // Get the HandlerThread's Looper and use it for our Handler
-        mServiceHandler = new ServiceHandler(thread.getLooper());
     }
 
     @Override
@@ -57,16 +54,18 @@ public class DownloadService extends Service {
 
         String request = extras.getString(SERVICE_REQUEST);
         if (REQUEST_ADD_DOWNLOAD_ACTION.equals(request)) {
-            DownloadInfo info = (DownloadInfo) extras.get(DOWNLOAD_INFO);
+            final DownloadInfo info = (DownloadInfo) extras.get(DOWNLOAD_INFO);
             DownloadInfo existingDownload = findScheduledDownload(info);
             if (existingDownload == null) {
                 permissionToDie = false;
                 mScheduledDownloads.add(info);
-                // For each start request, send a message to start a job and deliver the
-                // start ID so we know which request we're stopping when we finish the job
-                Message msg = mServiceHandler.obtainMessage();
-                msg.arg1 = startId;
-                mServiceHandler.sendMessage(msg);
+
+                executor.execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        downloadWorker(info);
+                    }
+                });
                 reportQueue();
             } else {
                 sendMessage(new Intent(RESPONSE_ACTION).putExtra(ALREADY_IN_QUEUE,
@@ -132,6 +131,7 @@ public class DownloadService extends Service {
     @Override
     public void onDestroy() {
         Log.i(TAG, "Destroying Service");
+        executor.shutdownNow();
         releaseLocks();
     }
 
@@ -170,48 +170,20 @@ public class DownloadService extends Service {
     };
 
 
-    // Handler that receives messages from the thread
-    private final class ServiceHandler extends Handler {
+    private void downloadWorker(DownloadInfo download) {
+        startForeground(SERVICE_ID, Notifications.Companion.createNotification(DownloadService.this, 0));
 
-        ServiceHandler(Looper looper) {
-            super(looper);
+        Log.i(TAG + "-Handler", "Starting Download " + download);
+
+        new Downloader(download, downloadCallback).download();
+        downloadCallback.reportProgress(download);
+
+        if (download.getState() == FINISHED) {
+            MediaScannerConnection.scanFile(getBaseContext(), new String[]{download.getFilename()},
+                    null,
+                    null);
         }
-
-        @Override
-        public void handleMessage(Message msg) {
-            DownloadInfo download;
-            while ((download = findNext()) != null) {
-                startForeground(SERVICE_ID, Notifications.Companion.createNotification(DownloadService.this, 0));
-
-                Log.i(TAG + "-Handler", "Starting Download " + download);
-
-                new Downloader(download, downloadCallback).download();
-                downloadCallback.reportProgress(download);
-
-                if (download.getState() == FINISHED) {
-                    MediaScannerConnection.scanFile(getBaseContext(), new String[]{download.getFilename()},
-                            null,
-                            null);
-                }
-                reportQueue();
-            }
-
-            // Stop the service using the startId, so that we don't stop
-            // the service in the middle of handling another job. After all messages are processed, service will be
-            // destroyed
-            if (permissionToDie) {
-                stopSelf(msg.arg1);
-            }
-        }
-
-        private DownloadInfo findNext() {
-            for (DownloadInfo download : mScheduledDownloads) {
-                if (download.getState() == WAITING) {
-                    return download;
-                }
-            }
-            return null;
-        }
+        reportQueue();
     }
 
 }
