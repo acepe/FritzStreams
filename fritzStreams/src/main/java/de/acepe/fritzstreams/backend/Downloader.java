@@ -8,6 +8,8 @@ import java.net.URLConnection;
 
 class Downloader {
 
+    private static final long UPDATE_UI_INTERVAL = 1000;
+
     interface DownloadCallback {
         void reportProgress(DownloadInfo progressInfo);
     }
@@ -16,6 +18,7 @@ class Downloader {
 
     private final DownloadInfo mDownloadInfo;
     private final DownloadCallback callback;
+    private long lastupdate;
 
     Downloader(DownloadInfo downloadInfo, DownloadCallback callback) {
         this.mDownloadInfo = downloadInfo;
@@ -58,7 +61,11 @@ class Downloader {
                 int progressPercent = (int) (downloadedSum / (float) size * 100);
                 mDownloadInfo.setProgressPercent(progressPercent);
                 mDownloadInfo.setDownloadedSize(downloadedSum);
-                callback.reportProgress(mDownloadInfo);
+
+                if (System.currentTimeMillis() - lastupdate >= UPDATE_UI_INTERVAL) {
+                    callback.reportProgress(mDownloadInfo);
+                    lastupdate = System.currentTimeMillis();
+                }
                 Log.d(TAG, "Downloaded Bytes: " + downloadedSum + " / " + size);
             }
         } catch (IOException e) {
@@ -68,6 +75,7 @@ class Downloader {
             return;
         }
         mDownloadInfo.setState(DownloadState.FINISHED);
+        mDownloadInfo.setProgressPercent(100);
         Log.i(TAG, "Download successful: " + mDownloadInfo.getStreamURL());
     }
 

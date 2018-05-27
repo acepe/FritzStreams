@@ -9,16 +9,19 @@ import android.os.*;
 import android.os.Process;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
+import de.acepe.fritzstreams.util.Notifications;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static android.net.wifi.WifiManager.WIFI_MODE_FULL_HIGH_PERF;
 import static de.acepe.fritzstreams.backend.Constants.*;
+import static de.acepe.fritzstreams.backend.DownloadState.*;
 
 public class DownloadService extends Service {
     private static final String TAG = "DownloadService";
     private static final int MINUTE_IN_MILLIS = 60 * 1000;
+    public static final int SERVICE_ID = 2;
 
     private final List<DownloadInfo> mScheduledDownloads = new ArrayList<>();
 
@@ -77,7 +80,7 @@ public class DownloadService extends Service {
             DownloadInfo info = (DownloadInfo) extras.get(DOWNLOAD_INFO);
             DownloadInfo download = findScheduledDownload(info);
             if (download != null) {
-                download.setState(DownloadState.CANCELLED);
+                download.setState(CANCELLED);
             }
             reportQueue();
         }
@@ -85,7 +88,7 @@ public class DownloadService extends Service {
             DownloadInfo info = (DownloadInfo) extras.get(DOWNLOAD_INFO);
             DownloadInfo download = findScheduledDownload(info);
             if (download != null) {
-                download.setState(DownloadState.CANCELLED);
+                download.setState(CANCELLED);
                 mScheduledDownloads.remove(info);
             }
             reportQueue();
@@ -96,14 +99,13 @@ public class DownloadService extends Service {
         if (allComplete() && permissionToDie) {
             stopSelf(startId);
         }
-        // If we get killed, after returning from here, restart
-        return START_STICKY;
+        return START_NOT_STICKY;
     }
 
     private boolean allComplete() {
         for (DownloadInfo download : mScheduledDownloads) {
             DownloadState state = download.getState();
-            if (state == DownloadState.WAITING || state == DownloadState.DOWNLOADING) {
+            if (state.isPending()) {
                 return false;
             }
         }
@@ -129,6 +131,7 @@ public class DownloadService extends Service {
 
     @Override
     public void onDestroy() {
+        Log.i(TAG, "Destroying Service");
         releaseLocks();
     }
 
@@ -155,19 +158,20 @@ public class DownloadService extends Service {
     }
 
     private void sendMessage(Intent localIntent) {
-        // Broadcasts the Intent to receivers in this app.
         LocalBroadcastManager.getInstance(DownloadService.this).sendBroadcast(localIntent);
     }
 
+    private final Downloader.DownloadCallback downloadCallback = new Downloader.DownloadCallback() {
+        @Override
+        public void reportProgress(DownloadInfo downloadInfo) {
+            sendMessage(new Intent(RESPONSE_ACTION).putExtra(CURRENT_DOWNLOAD_PROGRESS_REPORT, downloadInfo));
+            startForeground(SERVICE_ID, Notifications.Companion.createNotification(DownloadService.this, downloadInfo.getProgressPercent()));
+        }
+    };
+
+
     // Handler that receives messages from the thread
     private final class ServiceHandler extends Handler {
-
-        private final Downloader.DownloadCallback downloadCallback = new Downloader.DownloadCallback() {
-            @Override
-            public void reportProgress(DownloadInfo downloadInfo) {
-                DownloadService.this.reportProgress(downloadInfo);
-            }
-        };
 
         ServiceHandler(Looper looper) {
             super(looper);
@@ -177,13 +181,15 @@ public class DownloadService extends Service {
         public void handleMessage(Message msg) {
             DownloadInfo download;
             while ((download = findNext()) != null) {
+                startForeground(SERVICE_ID, Notifications.Companion.createNotification(DownloadService.this, 0));
+
                 Log.i(TAG + "-Handler", "Starting Download " + download);
 
                 new Downloader(download, downloadCallback).download();
+                downloadCallback.reportProgress(download);
 
-                if (download.getState() == DownloadState.FINISHED) {
-                    MediaScannerConnection.scanFile(getBaseContext(),
-                            new String[]{download.getFilename()},
+                if (download.getState() == FINISHED) {
+                    MediaScannerConnection.scanFile(getBaseContext(), new String[]{download.getFilename()},
                             null,
                             null);
                 }
@@ -200,7 +206,7 @@ public class DownloadService extends Service {
 
         private DownloadInfo findNext() {
             for (DownloadInfo download : mScheduledDownloads) {
-                if (download.getState() == DownloadState.WAITING) {
+                if (download.getState() == WAITING) {
                     return download;
                 }
             }
@@ -208,8 +214,4 @@ public class DownloadService extends Service {
         }
     }
 
-    private void reportProgress(DownloadInfo downloadInfo) {
-        Intent localIntent = new Intent(RESPONSE_ACTION).putExtra(CURRENT_DOWNLOAD_PROGRESS_REPORT, downloadInfo);
-        sendMessage(localIntent);
-    }
 }
