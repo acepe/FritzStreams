@@ -1,6 +1,6 @@
 package de.acepe.fritzstreams.ui.fragments
 
-import android.content.Context
+import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.view.LayoutInflater
@@ -10,6 +10,7 @@ import de.acepe.fritzstreams.R
 import de.acepe.fritzstreams.backend.DownloadInfo
 import de.acepe.fritzstreams.backend.DownloadServiceAdapter
 import de.acepe.fritzstreams.backend.DownloadState.*
+import de.acepe.fritzstreams.backend.StreamsModel
 import de.acepe.fritzstreams.ui.components.DownloadEntryView
 import de.acepe.fritzstreams.util.Utilities.getFreeSpaceExternal
 import de.acepe.fritzstreams.util.Utilities.humanReadableBytes
@@ -20,33 +21,27 @@ private const val UPDATE_INTERVAL_IN_MS: Long = 3000
 
 class DownloadFragment : Fragment(), DownloadServiceAdapter.ResultReceiver {
 
+    private val model: StreamsModel by lazy {
+        ViewModelProviders.of(activity!!).get(StreamsModel::class.java)
+    }
+
     private val downloadViews = HashMap<DownloadInfo, DownloadEntryView>()
 
     private var lastUpdateFreeSpace: Long = 0
-    private lateinit var mDownloaderSupplier: DownloadServiceAdapterSupplier
-
-    interface DownloadServiceAdapterSupplier {
-        val downloader: DownloadServiceAdapter
-    }
-
-    override fun onAttach(context: Context?) {
-        super.onAttach(context)
-        mDownloaderSupplier = context as DownloadServiceAdapterSupplier
-    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.download_fragment, container, false)
     }
 
     override fun onPause() {
-        mDownloaderSupplier.downloader.removeResultReceiver(this)
+        model.downloadServiceAdapter.removeResultReceiver(this)
         super.onPause()
     }
 
     override fun onResume() {
         super.onResume()
-        mDownloaderSupplier.downloader.registerResultReceiver(this)
-        mDownloaderSupplier.downloader.queryDownloadInfos()
+        model.downloadServiceAdapter.registerResultReceiver(this)
+        model.downloadServiceAdapter.queryDownloadInfos()
         updateFreeSpace()
     }
 
@@ -89,7 +84,7 @@ class DownloadFragment : Fragment(), DownloadServiceAdapter.ResultReceiver {
     private fun execute(downloadInfo: DownloadInfo) {
         if (!isAdded) return
 
-        val downloader = mDownloaderSupplier.downloader
+        val downloader = model.downloadServiceAdapter
         with(downloader) {
             when (downloadInfo.state) {
                 DOWNLOADING -> cancelDownload(downloadInfo)

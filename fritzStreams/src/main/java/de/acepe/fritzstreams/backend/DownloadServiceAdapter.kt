@@ -1,5 +1,6 @@
 package de.acepe.fritzstreams.backend
 
+import android.app.Application
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -10,12 +11,15 @@ import de.acepe.fritzstreams.R
 import de.acepe.fritzstreams.backend.Constants.*
 import java.util.*
 
-class DownloadServiceAdapter : BroadcastReceiver() {
+class DownloadServiceAdapter(application: Application) : BroadcastReceiver() {
 
     private val statusIntentFilter: IntentFilter = IntentFilter(RESPONSE_ACTION)
     private val resultReceivers = ArrayList<ResultReceiver>()
+    private val mContext: Context = application.applicationContext
 
-    private var mContext: Context? = null
+    init {
+        LocalBroadcastManager.getInstance(mContext).registerReceiver(this, statusIntentFilter)
+    }
 
     interface ResultReceiver {
         fun downloadsInQueue(downloadInfoList: List<DownloadInfo>)
@@ -23,21 +27,10 @@ class DownloadServiceAdapter : BroadcastReceiver() {
         fun updateProgress(downloadInfo: DownloadInfo)
     }
 
-    fun attach(context: Context) {
-        mContext = context
-        LocalBroadcastManager.getInstance(mContext!!).registerReceiver(this, statusIntentFilter)
-    }
-
-    fun detach() {
-        LocalBroadcastManager.getInstance(mContext!!).unregisterReceiver(this)
-        resultReceivers.clear()
-        mContext = null
-    }
-
     fun detachFromService() {
         val intent = Intent(mContext, DownloadService::class.java)
         intent.putExtra(SERVICE_REQUEST, REQUEST_PERMISSION_TO_DIE_ACTION)
-        mContext!!.startService(intent)
+        mContext.startService(intent)
     }
 
     fun registerResultReceiver(resultReceiver: ResultReceiver) {
@@ -51,28 +44,28 @@ class DownloadServiceAdapter : BroadcastReceiver() {
     fun queryDownloadInfos() {
         val intent = Intent(mContext, DownloadService::class.java)
         intent.putExtra(SERVICE_REQUEST, REQUEST_QUERY_DOWNLOADS_ACTION)
-        mContext!!.startService(intent)
+        mContext.startService(intent)
     }
 
     fun addDownload(download: DownloadInfo) {
         val intent = Intent(mContext, DownloadService::class.java)
         intent.putExtra(SERVICE_REQUEST, REQUEST_ADD_DOWNLOAD_ACTION)
         intent.putExtra(DOWNLOAD_INFO, download)
-        mContext!!.startService(intent)
+        mContext.startService(intent)
     }
 
     fun removeDownload(download: DownloadInfo) {
         val intent = Intent(mContext, DownloadService::class.java)
         intent.putExtra(SERVICE_REQUEST, REQUEST_REMOVE_DOWNLOAD_ACTION)
         intent.putExtra(DOWNLOAD_INFO, download)
-        mContext!!.startService(intent)
+        mContext.startService(intent)
     }
 
     fun cancelDownload(download: DownloadInfo) {
         val intent = Intent(mContext, DownloadService::class.java)
         intent.putExtra(SERVICE_REQUEST, REQUEST_CANCEL_DOWNLOAD_ACTION)
         intent.putExtra(DOWNLOAD_INFO, download)
-        mContext!!.startService(intent)
+        mContext.startService(intent)
     }
 
     // Called when the BroadcastReceiver gets an Intent it's registered to receive

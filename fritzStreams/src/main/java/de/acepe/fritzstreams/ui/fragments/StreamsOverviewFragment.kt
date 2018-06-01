@@ -1,6 +1,6 @@
 package de.acepe.fritzstreams.ui.fragments
 
-import android.content.Context
+import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.view.LayoutInflater
@@ -19,15 +19,8 @@ import java.util.*
 
 class StreamsOverviewFragment : Fragment() {
 
-    private lateinit var streamCacheProvider: StreamCacheProvider
-
-    interface StreamCacheProvider {
-        fun get(): StreamCache
-    }
-
-    override fun onAttach(context: Context?) {
-        super.onAttach(context)
-        streamCacheProvider = context as StreamCacheProvider
+    private val model: StreamsModel by lazy {
+        ViewModelProviders.of(activity!!).get(StreamsModel::class.java)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -44,7 +37,7 @@ class StreamsOverviewFragment : Fragment() {
     }
 
     private fun onDownloadClicked(stream: Stream) {
-        val onDemandStream = streamCacheProvider.get().getStream(stream, streamCacheProvider.get().day!!)
+        val onDemandStream = model.getStream(stream, model.day!!)
 
         if (onDemandStream.isInitFailed) {
             init(stream, onDemandStream.day)
@@ -83,14 +76,14 @@ class StreamsOverviewFragment : Fragment() {
     }
 
     private fun onSelectedDayChange(day: Calendar) {
-        streamCacheProvider.get().day = day
+        model.day = day
         init(SOUNDGARDEN, day)
         init(NIGHTFLIGHT, day)
     }
 
     private fun init(stream: Stream, day: Calendar) {
         val view = if (stream === NIGHTFLIGHT) streamViewNightflight else streamViewSoundgarden
-        val onDemandStream = streamCacheProvider.get().getStream(stream, day)
+        val onDemandStream = model.getStream(stream, day)
 
         view.clearStream()
         onDemandStream.init({ setStreamView(view, onDemandStream) })
@@ -105,7 +98,7 @@ class StreamsOverviewFragment : Fragment() {
     }
 
     private fun restoreState() {
-        val dayFromCache = streamCacheProvider.get().day
+        val dayFromCache = model.day
         val day = dayFromCache ?: today()
         onSelectedDayChange(day)
 
@@ -131,7 +124,7 @@ class StreamsOverviewFragment : Fragment() {
         }
         Toast.makeText(context, R.string.download_started, Toast.LENGTH_SHORT).show()
 
-        streamCacheProvider.get().scheduleDownload(DownloadInfo(onDemandStream))
+        model.scheduleDownload(DownloadInfo(onDemandStream))
     }
 
 }
