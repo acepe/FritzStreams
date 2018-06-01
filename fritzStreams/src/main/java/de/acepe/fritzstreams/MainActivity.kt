@@ -31,7 +31,6 @@ class MainActivity : FragmentActivity(), ActionBar.TabListener {
         super.onCreate(savedInstanceState)
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
 
-
         setContentView(R.layout.main_activity)
 
         actionBar.setHomeButtonEnabled(false)

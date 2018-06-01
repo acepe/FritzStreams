@@ -21,12 +21,12 @@ class StreamManager(private val downloadPath: String) {
     }
 
     private fun computeDayOfStream(stream: Stream, day: Calendar): Calendar {
-        if (stream == Stream.SOUNDGARDEN && isTodayBeforeSoundgardenRelease(day)) {
+        return if (stream == Stream.SOUNDGARDEN && isTodayBeforeSoundgardenRelease(day)) {
             val dayInLastWeek = day.clone() as Calendar
             dayInLastWeek.add(Calendar.DAY_OF_YEAR, -7)
-            return dayInLastWeek
+            dayInLastWeek
         } else {
-            return day
+            day
         }
     }
 

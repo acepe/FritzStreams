@@ -1,5 +1,6 @@
 package de.acepe.fritzstreams.ui.fragments
 
+import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
 import android.support.v4.app.Fragment
@@ -23,6 +24,20 @@ class StreamsOverviewFragment : Fragment() {
         ViewModelProviders.of(activity!!).get(StreamsModel::class.java)
     }
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        model.day.observe(this, Observer<Calendar> { it ->
+            if (it != null) onDayUpdated(it)
+        }
+        )
+    }
+
+    private fun onDayUpdated(day: Calendar) {
+        findToggle(day)?.isChecked = true
+        init(SOUNDGARDEN, day)
+        init(NIGHTFLIGHT, day)
+    }
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_streams_overview, container, false)
     }
@@ -37,7 +52,7 @@ class StreamsOverviewFragment : Fragment() {
     }
 
     private fun onDownloadClicked(stream: Stream) {
-        val onDemandStream = model.getStream(stream, model.day!!)
+        val onDemandStream = model.getStream(stream, model.day.value!!)
 
         if (onDemandStream.isInitFailed) {
             init(stream, onDemandStream.day)
@@ -70,15 +85,9 @@ class StreamsOverviewFragment : Fragment() {
             toggle.isChecked = checked
 
             if (checked) {
-                onSelectedDayChange(day)
+                model.setDay(day)
             }
         }
-    }
-
-    private fun onSelectedDayChange(day: Calendar) {
-        model.day = day
-        init(SOUNDGARDEN, day)
-        init(NIGHTFLIGHT, day)
     }
 
     private fun init(stream: Stream, day: Calendar) {
@@ -98,14 +107,7 @@ class StreamsOverviewFragment : Fragment() {
     }
 
     private fun restoreState() {
-        val dayFromCache = model.day
-        val day = dayFromCache ?: today()
-        onSelectedDayChange(day)
-
-        val daysToggle = findToggle(day)
-        if (daysToggle != null) {
-            daysToggle.isChecked = true
-        }
+        model.setDay(model.day.value ?: today())
     }
 
     private fun findToggle(day: Calendar): ToggleButton? {
