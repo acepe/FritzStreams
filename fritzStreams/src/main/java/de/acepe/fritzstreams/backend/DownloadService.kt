@@ -6,6 +6,7 @@ import android.content.Intent
 import android.media.MediaScannerConnection
 import android.net.wifi.WifiManager
 import android.net.wifi.WifiManager.WIFI_MODE_FULL_HIGH_PERF
+import android.os.Environment
 import android.os.IBinder
 import android.os.PowerManager
 import android.support.v4.content.LocalBroadcastManager
@@ -21,18 +22,19 @@ import java.util.concurrent.Executors
 class DownloadService : Service() {
 
     private val mScheduledDownloads = ArrayList<DownloadInfo>()
-
-    private var mWifiLock: WifiManager.WifiLock? = null
-    private var mWakeLock: PowerManager.WakeLock? = null
-    private var permissionToDie = false
-    private var executor: ExecutorService? = null
-
     private val downloadCallback = Downloader.DownloadCallback { downloadInfo ->
         notifyProgress(downloadInfo)
     }
 
+    private lateinit var downloadPath: String
+    private var executor: ExecutorService? = null
+    private var mWifiLock: WifiManager.WifiLock? = null
+    private var mWakeLock: PowerManager.WakeLock? = null
+    private var permissionToDie = false
+
     override fun onCreate() {
         Log.i(TAG, "Service created")
+        downloadPath = applicationContext.getExternalFilesDir(Environment.DIRECTORY_MUSIC).absolutePath
         executor = Executors.newSingleThreadExecutor()
         acquireLocks()
     }
@@ -42,7 +44,7 @@ class DownloadService : Service() {
 
         val extras = intent.extras ?: return Service.START_STICKY
 
-        var downloadInfo = extras.get(DOWNLOAD_INFO) as DownloadInfo?
+        val downloadInfo = extras.get(DOWNLOAD_INFO) as DownloadInfo?
         when (extras.getString(SERVICE_REQUEST)) {
             REQUEST_ADD_DOWNLOAD_ACTION -> addDownload(downloadInfo!!)
             REQUEST_QUERY_DOWNLOADS_ACTION -> reportQueue()
@@ -93,7 +95,7 @@ class DownloadService : Service() {
 
         Log.i("$TAG-Handler", "Starting Download $download")
 
-        Downloader(download, downloadCallback).download()
+        Downloader(download, downloadCallback, downloadPath).download()
         downloadCallback.reportProgress(download)
 
         if (download.state === FINISHED) {

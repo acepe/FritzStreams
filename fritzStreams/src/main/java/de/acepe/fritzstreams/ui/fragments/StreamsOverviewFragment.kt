@@ -11,8 +11,8 @@ import android.widget.Toast
 import android.widget.ToggleButton
 import de.acepe.fritzstreams.R
 import de.acepe.fritzstreams.backend.*
-import de.acepe.fritzstreams.backend.Stream.NIGHTFLIGHT
-import de.acepe.fritzstreams.backend.Stream.SOUNDGARDEN
+import de.acepe.fritzstreams.backend.StreamType.NIGHTFLIGHT
+import de.acepe.fritzstreams.backend.StreamType.SOUNDGARDEN
 import de.acepe.fritzstreams.ui.components.StreamView
 import de.acepe.fritzstreams.util.Utilities.today
 import kotlinx.android.synthetic.main.fragment_streams_overview.*
@@ -51,11 +51,11 @@ class StreamsOverviewFragment : Fragment() {
         restoreState()
     }
 
-    private fun onDownloadClicked(stream: Stream) {
-        val onDemandStream = model.getStream(stream, model.day.value!!)
+    private fun onDownloadClicked(streamType: StreamType) {
+        val onDemandStream = model.getStream(streamType, model.day.value!!)
 
-        if (onDemandStream.isInitFailed) {
-            init(stream, onDemandStream.day)
+        if (onDemandStream.isFailed) {
+            init(streamType, onDemandStream.day)
         } else {
             download(onDemandStream)
         }
@@ -90,16 +90,20 @@ class StreamsOverviewFragment : Fragment() {
         }
     }
 
-    private fun init(stream: Stream, day: Calendar) {
-        val view = if (stream === NIGHTFLIGHT) streamViewNightflight else streamViewSoundgarden
-        val onDemandStream = model.getStream(stream, day)
+    private fun init(streamType: StreamType, day: Calendar) {
+        val view = if (streamType === NIGHTFLIGHT) streamViewNightflight else streamViewSoundgarden
+        val onDemandStream = model.getStream(streamType, day)
 
         view.clearStream()
-        onDemandStream.init({ setStreamView(view, onDemandStream) })
+        if (onDemandStream.isInited) {
+            setStreamView(view, onDemandStream)
+        } else {
+            model.crawlStream(onDemandStream, ({ setStreamView(view, onDemandStream) }))
+        }
     }
 
     private fun setStreamView(view: StreamView, onDemandStream: OnDemandStream) {
-        if (onDemandStream.isInitFailed) {
+        if (onDemandStream.isFailed) {
             view.failed()
             return
         }
@@ -118,7 +122,6 @@ class StreamsOverviewFragment : Fragment() {
         }
         return null
     }
-
 
     private fun download(onDemandStream: OnDemandStream) {
         if (!onDemandStream.isInited) {

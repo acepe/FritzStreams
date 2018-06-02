@@ -1,5 +1,5 @@
 package de.acepe.fritzstreams.backend
 
-enum class Stream {
+enum class StreamType {
     SOUNDGARDEN, NIGHTFLIGHT
 }

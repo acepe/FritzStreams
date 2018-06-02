@@ -18,17 +18,18 @@ class Downloader {
 
     private final DownloadInfo mDownloadInfo;
     private final DownloadCallback callback;
+    private final String downloadPath;
     private long lastupdate;
 
-    Downloader(DownloadInfo downloadInfo, DownloadCallback callback) {
+    Downloader(DownloadInfo downloadInfo, DownloadCallback callback, String downloadPath) {
         this.mDownloadInfo = downloadInfo;
         this.callback = callback;
+        this.downloadPath = downloadPath;
     }
 
     public void download() {
         mDownloadInfo.setState(DownloadState.DOWNLOADING);
-        String pathname = mDownloadInfo.getFilename();
-        File file = new File(pathname);
+        File file = new File(pathForMP3File());
 
         URLConnection connection;
         try {
@@ -87,4 +88,8 @@ class Downloader {
         file.renameTo(newFile);
     }
 
+
+    private String pathForMP3File() {
+        return downloadPath + File.separator + mDownloadInfo.getFilename();
+    }
 }

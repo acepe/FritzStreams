@@ -35,6 +35,10 @@ class Notifications {
                     .setSmallIcon(SMALL_ICON)
                     .setContentIntent(piLaunchMainActivity)
                     .setStyle(NotificationCompat.BigTextStyle())
+                    .setGroupAlertBehavior(NotificationCompat.GROUP_ALERT_SUMMARY)
+                    .setGroupSummary(false)
+                    .setGroup("blargh")
+                    .setDefaults(NotificationCompat.DEFAULT_ALL)
             if (progressPercent < 100) {
                 builder.setProgress(100, progressPercent, false)
             }
@@ -54,7 +58,7 @@ class Notifications {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 val name = "channel name"
                 val description = "channel descr"
-                val importance = NotificationManager.IMPORTANCE_DEFAULT
+                val importance = NotificationManager.IMPORTANCE_NONE
                 val channel = NotificationChannel(CHANNEL_ID.toString(), name, importance)
                 channel.description = description
                 // Register the channel with the system; you can't change the importance
