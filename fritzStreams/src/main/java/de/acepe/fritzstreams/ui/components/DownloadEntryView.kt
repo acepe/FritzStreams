@@ -12,6 +12,7 @@ import de.acepe.fritzstreams.BuildConfig
 import de.acepe.fritzstreams.R
 import de.acepe.fritzstreams.backend.DownloadInfo
 import de.acepe.fritzstreams.backend.DownloadState.*
+import de.acepe.fritzstreams.util.Utilities
 import kotlinx.android.synthetic.main.download_entry_view.view.*
 import java.io.File
 
@@ -58,7 +59,8 @@ class DownloadEntryView(context: Context) : LinearLayout(context) {
     }
 
     private fun openWithMusicApp() {
-        val outFile = FileProvider.getUriForFile(context, BuildConfig.APPLICATION_ID + ".provider", File(mDownload.filename))
+        val downloadedFile = File(Utilities.getPathToDownloadDir(mDownload.filename))
+        val outFile = FileProvider.getUriForFile(context, BuildConfig.APPLICATION_ID + ".provider", downloadedFile)
 
         val mediaIntent = Intent()
         with(mediaIntent) {

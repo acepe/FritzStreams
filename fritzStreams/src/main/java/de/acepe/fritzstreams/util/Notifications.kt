@@ -11,6 +11,8 @@ import android.support.v4.app.NotificationCompat
 import android.support.v4.app.NotificationManagerCompat
 import de.acepe.fritzstreams.MainActivity
 import de.acepe.fritzstreams.R
+import de.acepe.fritzstreams.backend.DownloadInfo
+import de.acepe.fritzstreams.backend.DownloadState
 import java.util.*
 
 class Notifications {
@@ -24,14 +26,15 @@ class Notifications {
             return Random().nextInt(100000)
         }
 
-        fun createNotification(context: Context, progressPercent: Int): Notification {
+        fun createNotification(context: Context, downloadInfo: DownloadInfo): Notification {
             createNotificationChannel(context)
             // Create Pending Intents.
             val piLaunchMainActivity = getLaunchActivityPI(context)
 
+            val progressPercent = downloadInfo.progressPercent
             val builder = NotificationCompat.Builder(context, CHANNEL_ID.toString())
                     .setContentTitle(context.getString(R.string.notification_text_title))
-                    .setContentText(getContentText(progressPercent, context))
+                    .setContentText(contentText(downloadInfo, context))
                     .setSmallIcon(SMALL_ICON)
                     .setContentIntent(piLaunchMainActivity)
                     .setStyle(NotificationCompat.BigTextStyle())
@@ -39,14 +42,20 @@ class Notifications {
                     .setGroupSummary(false)
                     .setGroup("blargh")
                     .setDefaults(NotificationCompat.DEFAULT_ALL)
-            if (progressPercent < 100) {
+            if (progressPercent < 100 && downloadInfo.state==DownloadState.DOWNLOADING) {
                 builder.setProgress(100, progressPercent, false)
             }
             return builder.build()
         }
 
-        private fun getContentText(progressPercent: Int, context: Context) =
-                if (progressPercent == 100) context.getString(R.string.notification_text_done) else context.getString(R.string.notification_text_downloading)
+        private fun contentText(downloadInfo: DownloadInfo, context: Context): String? {
+            return when {
+                downloadInfo.state == DownloadState.CANCELLED -> context.getString(R.string.notification_text_cancelled)
+                downloadInfo.state == DownloadState.FAILED -> context.getString(R.string.notification_text_failed)
+                downloadInfo.progressPercent == 100 -> context.getString(R.string.notification_text_done)
+                else -> context.getString(R.string.notification_text_downloading)
+            }
+        }
 
         fun cancelNotification(context: Context) {
             NotificationManagerCompat.from(context).cancel(ONGOING_NOTIFICATION_ID)

@@ -6,6 +6,8 @@ import java.io.*;
 import java.net.URL;
 import java.net.URLConnection;
 
+import static de.acepe.fritzstreams.util.Utilities.getPathToDownloadDir;
+
 class Downloader {
 
     private static final long UPDATE_UI_INTERVAL = 1000;
@@ -18,18 +20,16 @@ class Downloader {
 
     private final DownloadInfo mDownloadInfo;
     private final DownloadCallback callback;
-    private final String downloadPath;
     private long lastupdate;
 
-    Downloader(DownloadInfo downloadInfo, DownloadCallback callback, String downloadPath) {
+    Downloader(DownloadInfo downloadInfo, DownloadCallback callback) {
         this.mDownloadInfo = downloadInfo;
         this.callback = callback;
-        this.downloadPath = downloadPath;
     }
 
     public void download() {
         mDownloadInfo.setState(DownloadState.DOWNLOADING);
-        File file = new File(pathForMP3File());
+        File file = new File(getPathToDownloadDir(mDownloadInfo.getFilename()));
 
         URLConnection connection;
         try {
@@ -72,6 +72,7 @@ class Downloader {
         } catch (IOException e) {
             Log.e(TAG, "Download failed: " + mDownloadInfo.getStreamURL(), e);
             mDownloadInfo.setState(DownloadState.FAILED);
+            callback.reportProgress(mDownloadInfo);
             renameToFailed(file);
             return;
         }
@@ -89,7 +90,4 @@ class Downloader {
     }
 
 
-    private String pathForMP3File() {
-        return downloadPath + File.separator + mDownloadInfo.getFilename();
-    }
 }

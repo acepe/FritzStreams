@@ -14,6 +14,7 @@ import android.view.WindowManager
 import de.acepe.fritzstreams.backend.StreamsModel
 import de.acepe.fritzstreams.ui.fragments.DownloadFragment
 import de.acepe.fritzstreams.ui.fragments.StreamsOverviewFragment
+import de.acepe.fritzstreams.util.Utilities
 import java.util.*
 
 class MainActivity : FragmentActivity(), ActionBar.TabListener {
@@ -29,6 +30,8 @@ class MainActivity : FragmentActivity(), ActionBar.TabListener {
 
     public override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        Utilities.verifyStoragePermissions(this)
+
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
 
         setContentView(R.layout.main_activity)

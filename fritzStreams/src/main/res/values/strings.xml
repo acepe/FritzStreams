@@ -43,4 +43,6 @@
     <string name="notification_text_title">Fritz Streams</string>
     <string name="notification_text_downloading">Downloading Streams</string>
     <string name="notification_text_done">Downloads finished</string>
+    <string name="notification_text_cancelled">Download cancelled</string>
+    <string name="notification_text_failed">Download failed</string>
 </resources>

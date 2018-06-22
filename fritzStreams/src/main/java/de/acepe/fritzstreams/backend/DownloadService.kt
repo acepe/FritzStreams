@@ -6,7 +6,6 @@ import android.content.Intent
 import android.media.MediaScannerConnection
 import android.net.wifi.WifiManager
 import android.net.wifi.WifiManager.WIFI_MODE_FULL_HIGH_PERF
-import android.os.Environment
 import android.os.IBinder
 import android.os.PowerManager
 import android.support.v4.content.LocalBroadcastManager
@@ -26,7 +25,6 @@ class DownloadService : Service() {
         notifyProgress(downloadInfo)
     }
 
-    private lateinit var downloadPath: String
     private var executor: ExecutorService? = null
     private var mWifiLock: WifiManager.WifiLock? = null
     private var mWakeLock: PowerManager.WakeLock? = null
@@ -34,7 +32,6 @@ class DownloadService : Service() {
 
     override fun onCreate() {
         Log.i(TAG, "Service created")
-        downloadPath = applicationContext.getExternalFilesDir(Environment.DIRECTORY_MUSIC).absolutePath
         executor = Executors.newSingleThreadExecutor()
         acquireLocks()
     }
@@ -91,11 +88,11 @@ class DownloadService : Service() {
     }
 
     private fun downloadWorker(download: DownloadInfo) {
-        startForeground(SERVICE_ID, Notifications.createNotification(this, 0))
+        startForeground(SERVICE_ID, Notifications.createNotification(this, download))
 
         Log.i("$TAG-Handler", "Starting Download $download")
 
-        Downloader(download, downloadCallback, downloadPath).download()
+        Downloader(download, downloadCallback).download()
         downloadCallback.reportProgress(download)
 
         if (download.state === FINISHED) {
@@ -106,7 +103,7 @@ class DownloadService : Service() {
 
     private fun notifyProgress(downloadInfo: DownloadInfo) {
         sendMessage(Intent(RESPONSE_ACTION).putExtra(CURRENT_DOWNLOAD_PROGRESS_REPORT, downloadInfo))
-        startForeground(SERVICE_ID, Notifications.createNotification(this@DownloadService, downloadInfo.progressPercent))
+        startForeground(SERVICE_ID, Notifications.createNotification(this@DownloadService, downloadInfo))
     }
 
     private fun sendMessage(localIntent: Intent) {
