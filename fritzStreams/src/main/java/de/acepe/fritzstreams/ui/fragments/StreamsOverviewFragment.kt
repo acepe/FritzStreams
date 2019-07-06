@@ -26,10 +26,7 @@ class StreamsOverviewFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        model.day.observe(this, Observer<Calendar> { it ->
-            if (it != null) onDayUpdated(it)
-        }
-        )
+        model.day.observe(this, Observer<Calendar> { if (it != null) onDayUpdated(it) })
     }
 
     private fun onDayUpdated(day: Calendar) {
@@ -44,8 +41,8 @@ class StreamsOverviewFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        streamViewNightflight.setOnClickListener({ onDownloadClicked(NIGHTFLIGHT) })
-        streamViewSoundgarden.setOnClickListener({ onDownloadClicked(SOUNDGARDEN) })
+        streamViewNightflight.setOnClickListener { onDownloadClicked(NIGHTFLIGHT) }
+        streamViewSoundgarden.setOnClickListener { onDownloadClicked(SOUNDGARDEN) }
 
         configureToggleButtons()
         restoreState()
@@ -72,7 +69,7 @@ class StreamsOverviewFragment : Fragment() {
             view.textOff = text
             view.textOn = text
             view.text = text
-            view.setOnClickListener({ onToggleChecked(it, day) })
+            view.setOnClickListener { onToggleChecked(it, day) }
             view.tag = day
         }
     }
