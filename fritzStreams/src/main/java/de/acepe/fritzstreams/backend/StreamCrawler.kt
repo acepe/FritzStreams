@@ -146,7 +146,7 @@ class StreamCrawler(private val stream: OnDemandStream, private val onInitDone: 
         private const val SOUNDGARDEN_URL = "/livestream/liveplayer_bestemusik.htm/day=%s2000.html"
         private const val TITLE_SELECTOR = "#main > article > div.count2.even.last.layouthalf_2_4.layoutstandard.teaserboxgroup > section > article.manualteaser.first.count1.odd.layoutlaufende_sendung.doctypesendeplatz > h3 > a > span"
         private const val SUBTITLE_SELECTOR = "#main > article > div.count2.even.last.layouthalf_2_4.layoutstandard.teaserboxgroup > section > article.manualteaser.first.count1.odd.layoutlaufende_sendung.doctypesendeplatz > div > p"
-        private const val DOWNLOAD_SELECTOR = "#main > article > div.count1.first.layouthalf_2_4.layoutstandard.odd.teaserboxgroup > section > article.count2.doctypeteaser.even.last.layoutbeitrag_av_nur_av.layoutmusikstream.manualteaser > div"
+        private const val DOWNLOAD_SELECTOR = "#main > article > div.count1.first.layouthalf_2_4.layoutstandard.odd.teaserboxgroup > section > article > div"
         private const val DOWNLOAD_DESCRIPTOR_ATTRIBUTE = "data-jsb"
         private const val IMAGE_SELECTOR = "#main .layoutlivestream .layouthalf_2_4.count2 .layoutlivestream_info .manualteaser .manualteaserpicture img"
         private const val FILE_DATE_FORMAT = "yyyy-MM-dd"
