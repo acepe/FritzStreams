@@ -59,7 +59,10 @@ class StreamCrawler(private val stream: OnDemandStream, private val onInitDone: 
             val `in` = java.net.URL(imageUrl).openStream()
             stream.image = BitmapFactory.decodeStream(`in`)
         } catch (e: Exception) {
-            Log.e("Error", e.message)
+            val message = e.message
+            if (message != null) {
+                Log.e("Error", message)
+            }
             e.printStackTrace()
         }
     }

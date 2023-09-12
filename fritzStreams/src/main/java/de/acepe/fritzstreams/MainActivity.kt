@@ -36,8 +36,8 @@ class MainActivity : FragmentActivity(), ActionBar.TabListener {
 
         setContentView(R.layout.main_activity)
 
-        actionBar.setHomeButtonEnabled(false)
-        actionBar.navigationMode = ActionBar.NAVIGATION_MODE_TABS
+        actionBar?.setHomeButtonEnabled(false)
+        actionBar?.navigationMode = ActionBar.NAVIGATION_MODE_TABS
 
         val fm = supportFragmentManager
         if (isTablet) {

@@ -18,6 +18,7 @@
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name"
+            android:exported="true"
             android:theme="@style/FritzTheme">
 
             <intent-filter>

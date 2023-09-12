@@ -71,17 +71,17 @@ class DownloadServiceAdapter(application: Application) : BroadcastReceiver() {
     // Called when the BroadcastReceiver gets an Intent it's registered to receive
     override fun onReceive(context: Context, intent: Intent) {
         val extras = intent.extras
-        val progress: DownloadInfo? = extras.get(CURRENT_DOWNLOAD_PROGRESS_REPORT) as DownloadInfo?
+        val progress: DownloadInfo? = extras?.get(CURRENT_DOWNLOAD_PROGRESS_REPORT) as DownloadInfo?
         if (progress != null) {
             for (resultReceiver in resultReceivers) {
                 resultReceiver.updateProgress(progress)
             }
         }
-        val alreadyInQueue: DownloadInfo? = extras.get(ALREADY_IN_QUEUE) as DownloadInfo?
+        val alreadyInQueue: DownloadInfo? = extras?.get(ALREADY_IN_QUEUE) as DownloadInfo?
         if (alreadyInQueue != null) {
             Toast.makeText(mContext, R.string.already_in_queue, Toast.LENGTH_SHORT).show()
         }
-        val downloadQueue: ArrayList<DownloadInfo>? = extras.get(QUERY_DOWNLOADS) as ArrayList<DownloadInfo>?
+        val downloadQueue: ArrayList<DownloadInfo>? = extras?.get(QUERY_DOWNLOADS) as ArrayList<DownloadInfo>?
         if (downloadQueue != null) {
             for (resultReceiver in resultReceivers) {
                 resultReceiver.downloadsInQueue(downloadQueue)
