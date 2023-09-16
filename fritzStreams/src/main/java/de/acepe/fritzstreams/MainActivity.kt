@@ -1,10 +1,13 @@
 package de.acepe.fritzstreams
 
+import android.Manifest
 import android.app.ActionBar
 import android.app.FragmentTransaction
 import android.arch.lifecycle.ViewModelProviders
 import android.content.res.Configuration
+import android.os.Build
 import android.os.Bundle
+import android.support.v4.app.ActivityCompat
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentActivity
 import android.support.v4.app.FragmentManager
@@ -15,7 +18,6 @@ import de.acepe.fritzstreams.backend.StreamsModel
 import de.acepe.fritzstreams.ui.fragments.DownloadFragment
 import de.acepe.fritzstreams.ui.fragments.StreamsOverviewFragment
 import de.acepe.fritzstreams.util.Utilities
-import java.util.*
 
 class MainActivity : FragmentActivity(), ActionBar.TabListener {
 
@@ -30,6 +32,14 @@ class MainActivity : FragmentActivity(), ActionBar.TabListener {
 
     public override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(
+                    Manifest.permission.POST_NOTIFICATIONS,
+                ), 0
+            )
+        }
         Utilities.verifyStoragePermissions(this)
 
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
@@ -64,8 +74,8 @@ class MainActivity : FragmentActivity(), ActionBar.TabListener {
             })
             for (i in 0 until mAppSectionsPagerAdapter.count) {
                 val tab = actionBar!!.newTab()
-                        .setText(mAppSectionsPagerAdapter.getPageTitle(i))
-                        .setTabListener(this)
+                    .setText(mAppSectionsPagerAdapter.getPageTitle(i))
+                    .setTabListener(this)
                 actionBar!!.addTab(tab)
             }
         }
@@ -84,7 +94,10 @@ class MainActivity : FragmentActivity(), ActionBar.TabListener {
 
     override fun onTabReselected(tab: ActionBar.Tab, fragmentTransaction: FragmentTransaction) {}
 
-    private inner class AppSectionsPagerAdapter internal constructor(fm: FragmentManager, private val mFragments: List<Fragment>) : FragmentPagerAdapter(fm) {
+    private inner class AppSectionsPagerAdapter internal constructor(
+        fm: FragmentManager,
+        private val mFragments: List<Fragment>
+    ) : FragmentPagerAdapter(fm) {
 
         override fun getItem(position: Int): Fragment {
             return mFragments[position]

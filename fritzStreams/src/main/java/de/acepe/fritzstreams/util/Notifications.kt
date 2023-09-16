@@ -51,7 +51,6 @@ class Notifications {
                 .setStyle(NotificationCompat.BigTextStyle())
                 .setAutoCancel(false)
 
-
             if (progressPercent < 100 && downloadInfo.state == DownloadState.DOWNLOADING) {
                 builder.setProgress(100, progressPercent, false)
             }
