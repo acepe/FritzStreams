@@ -138,7 +138,9 @@ class DownloadService : Service() {
 
     private fun acquireLocks() {
         val powerManager = applicationContext.getSystemService(Context.POWER_SERVICE) as PowerManager
-        mWakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, TAG)
+        mWakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,
+            "de.acepe.fritzstreams:$TAG"
+        )
         mWakeLock!!.acquire((30 * MINUTE_IN_MILLIS).toLong())
 
         val wifiManager = applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager

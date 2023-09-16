@@ -40,6 +40,7 @@
     <string name="already_in_queue">Download is already in Queue</string>
     <string name="download_started">Download started</string>
 
+    <string name="NotificationChannelDescription">Displays Notifications from the server</string>
     <string name="notification_text_title">Fritz Streams</string>
     <string name="notification_text_downloading">Downloading Streams</string>
     <string name="notification_text_done">Downloads finished</string>

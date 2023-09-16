@@ -3,15 +3,15 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 
 android {
-    compileSdkVersion 33
+    compileSdk 34
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
     defaultConfig {
         applicationId "de.acepe.fritzstreams"
-        minSdkVersion 23
-        targetSdkVersion 27
+        minSdkVersion 28
+        targetSdkVersion 33
     }
     buildTypes {
         release {
